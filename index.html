@@ -5839,6 +5839,10 @@
         let lastSyncedAppState = null;
         let realtimeConnected = false;
         let appStateChannel = null;
+        let appStateReconnectTimer = null;
+        let appStateReconnectAttempts = 0;
+        let appStateReconnectInProgress = false;
+        let appStateLifecycleListenersRegistered = false;
         let app_state = null;
 
         function obtenerEstadoAplicacion() {
@@ -6095,10 +6099,24 @@
                 console.error('No se pudo iniciar Realtime: el SDK de Supabase no está disponible.');
                 return;
             }
+            if (!appStateLifecycleListenersRegistered) {
+                const reconectarAlVolver = () => {
+                    if (document.visibilityState !== 'hidden' && !realtimeConnected) {
+                        if (appStateReconnectTimer) {
+                            clearTimeout(appStateReconnectTimer);
+                            appStateReconnectTimer = null;
+                        }
+                        reconectarSuscripcionEstadoAplicacion();
+                    }
+                };
+                document.addEventListener('visibilitychange', reconectarAlVolver);
+                window.addEventListener('pageshow', reconectarAlVolver);
+                appStateLifecycleListenersRegistered = true;
+            }
             if (appStateChannel) return;
 
-            appStateChannel = supabaseClient
-                .channel('eureka-app-state')
+            const channel = supabaseClient
+                .channel('app_state_changes')
                 .on('postgres_changes', {
                     event: 'INSERT',
                     schema: 'public',
@@ -6112,14 +6130,53 @@
                     filter: `key=eq.${APP_STATE_KEY}`
                 }, recibirCambioEstadoAplicacion)
                 .subscribe(status => {
+                    if (appStateChannel !== channel) return;
+                    console.log('Suscripción Realtime activa:', status);
                     realtimeConnected = status === 'SUBSCRIBED';
                     if (realtimeConnected) {
+                        appStateReconnectAttempts = 0;
+                        if (appStateReconnectTimer) {
+                            clearTimeout(appStateReconnectTimer);
+                            appStateReconnectTimer = null;
+                        }
                         actualizarEstadoSincronizacion('🟢 Conectado en tiempo real', '#86efac');
                     } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
                         actualizarEstadoSincronizacion('🔴 Sin conexión en tiempo real', '#fca5a5');
                         console.error(`Estado de la suscripción Realtime: ${status}`);
+                        programarReconexionEstadoAplicacion();
                     }
                 });
+            appStateChannel = channel;
+        }
+
+        function programarReconexionEstadoAplicacion() {
+            if (appStateReconnectTimer || document.visibilityState === 'hidden') return;
+            const delay = Math.min(1000 * (2 ** appStateReconnectAttempts), 30000);
+            appStateReconnectAttempts += 1;
+            appStateReconnectTimer = setTimeout(() => {
+                appStateReconnectTimer = null;
+                reconectarSuscripcionEstadoAplicacion();
+            }, delay);
+        }
+
+        async function reconectarSuscripcionEstadoAplicacion() {
+            if (!supabaseClient || realtimeConnected || appStateReconnectInProgress) return;
+            appStateReconnectInProgress = true;
+            const channelAnterior = appStateChannel;
+            appStateChannel = null;
+            try {
+                if (channelAnterior) {
+                    const resultado = await supabaseClient.removeChannel(channelAnterior);
+                    if (resultado !== 'ok') {
+                        console.error(`No se pudo cerrar el canal Realtime anterior: ${resultado}`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cerrar el canal Realtime anterior:', error);
+            } finally {
+                appStateReconnectInProgress = false;
+            }
+            iniciarSuscripcionEstadoAplicacion();
         }
 
         function recibirCambioEstadoAplicacion(payload) {

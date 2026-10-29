@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Eureka Turnos">
-    <link rel="manifest" href="./manifest.json">
     <title>EUREKA - Gestión de Turnos Operativos</title>
     <style>
         :root {
@@ -6124,9 +6123,22 @@
         }
 
         function recibirCambioEstadoAplicacion(payload) {
-            const datos = payload?.new?.data;
+            let datos = payload?.new?.data ?? payload?.data;
+            if (!datos && payload?.new && typeof payload.new === 'object'
+                && Object.prototype.hasOwnProperty.call(payload.new, 'baseDatosTurnos')) {
+                datos = payload.new;
+            }
+            if (typeof datos === 'string') {
+                try {
+                    datos = JSON.parse(datos);
+                } catch (error) {
+                    console.error('El estado recibido por Realtime no contiene JSON válido:', error);
+                    actualizarEstadoSincronizacion('🔴 Datos de nube no válidos', '#fca5a5');
+                    return;
+                }
+            }
             if (!datos || typeof datos !== 'object') {
-                console.error('Se recibió un cambio Realtime sin datos válidos.');
+                console.error('El payload Realtime no contiene datos de estado válidos.', payload?.eventType);
                 return;
             }
             if (serializarEstadoAplicacion(datos) === lastSyncedAppState) return;
@@ -8810,6 +8822,7 @@
         let lastRightClickInfo = { time: 0, id: null };
         let memoriaBloqueDias = null;
         let isRightDragging = false;
+        let isSwapDragging = false;
 
         let swapState = 0;
         let swapRange1 = null;
@@ -14400,20 +14413,6 @@
         }
     </script>
 
-    <!-- PWA Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
-        }
-    </script>
     <!-- ===== MODAL AJUSTES DE FUNCIONES ===== -->
     <div id="modal-ajustes-funciones" style="
         display:none; position:fixed; inset:0; z-index:9999;

@@ -5840,6 +5840,7 @@
         let lastSyncedAppState = null;
         let realtimeConnected = false;
         let appStateChannel = null;
+        let app_state = null;
 
         function obtenerEstadoAplicacion() {
             return {
@@ -5924,6 +5925,7 @@
                 return false;
             }
 
+            app_state = datos;
             ultimoNumeroEmpleado = datos.ultimoNumeroEmpleado || 0;
             baseDatosTurnos = datos.baseDatosTurnos || {};
             listaTrabajadores = datos.listaTrabajadores || [];

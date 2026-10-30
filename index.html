@@ -7655,7 +7655,8 @@
 
                 let contextAccion = `oncontextmenu="handleRightClickGlobal(event, this, '${empId}', '${dateKey}', ${rowTipo})"`;
                 let autoTextColor = (rowTipo === 0) ? getAutoTextColor(valorPrevio) : null;
-                let inputStyle = `${!dateActive ? 'cursor:not-allowed;' : ''}${autoTextColor ? `color:${autoTextColor};font-weight:900;` : ''}`;
+                let textoNegro = rowTipo > 0 && !sinColorRotacion;
+                let inputStyle = `${!dateActive ? 'cursor:not-allowed;' : ''}${textoNegro ? 'color:#000000 !important;' : ''}${autoTextColor ? `color:${autoTextColor};font-weight:900;` : ''}`;
 
                 celdas += `
                     <td class="${claseAplicada}${claseExtraSeparador}${tieneNotaClase}${tieneExtraClase}" style="${colorFondoTd}" ${textoTooltip}>

@@ -10772,7 +10772,6 @@
 
                     let bgKey = emp.id + "_bg_" + key + "_0";
                     let customBg = baseDatosTurnos[bgKey];
-                    let esCustomHex = colorClase.startsWith('#');
                     let colorFondoTd = '';
                     let colorTextoFinal = '';
 
@@ -10780,11 +10779,11 @@
                         colorFondoTd = `background-color: ${customBg} !important;`;
                         colorTextoFinal = getAutoTextColor(customBg);
                     } else {
-                        colorFondoTd = 'background-color: #123b5d !important;';
+                        colorFondoTd = 'background-color: #12283a !important;';
                         colorTextoFinal = autoText;
                     }
 
-                    let claseAplicada = esCustomHex || autoBg || customBg ? '' : colorClase;
+                    let claseAplicada = '';
                     claseAplicada += getEstadoVisualClass(val);
                     let textoInputStyle = colorTextoFinal ? `color:${colorTextoFinal};font-weight:700;` : '';
 

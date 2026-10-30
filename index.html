@@ -5809,6 +5809,13 @@
         const APP_STATE_KEY = 'eureka_auto_save_data';
         const APP_STATE_KEY_COLUMN = 'key';
         const APP_STATE_DATA_COLUMN = 'data';
+        const COLORES_FONDO_ROTACION = {
+            'cell-azul': 'var(--rot-azul)',
+            'cell-rojo': 'var(--rot-rojo)',
+            'cell-verde': 'var(--rot-verde)',
+            'cell-amarillo': 'var(--rot-amarillo)',
+            'cell-rosa': 'var(--rot-rosa)'
+        };
         let appStateSyncReady = false;
         let isSavingAppState = false;
         let appStateSaveQueued = false;
@@ -7611,7 +7618,7 @@
                 let sinColorRotacion = colorClase === 'cell-blanco';
                 let colorFondoDefecto = (rowTipo === 0)
                     ? '#12283a'
-                    : (esCustomHex ? colorClase : (sinColorRotacion ? '#12283a' : ''));
+                    : (esCustomHex ? colorClase : (COLORES_FONDO_ROTACION[colorClase] || '#12283a'));
 
                 let currentEmp = listaTrabajadores.find(e => e.id === empId);
                 let dateActive = isDateActive(currentEmp, fecha);

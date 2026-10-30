@@ -4253,44 +4253,44 @@
         </div>
 
         <div id="modal-ajustes-opciones-rrhh"
-            style="display:none; position:fixed; inset:0; z-index:1000001; background:rgba(15,23,42,.75); overflow-y:auto; padding:24px; box-sizing:border-box; align-items:center; justify-content:center;">
-            <div style="width:100%; max-width:900px; max-height:calc(100vh - 48px); overflow-y:auto; margin:0 auto; padding:22px; box-sizing:border-box; background:#fff; border-radius:12px; box-shadow:0 20px 50px rgba(0,0,0,.3);">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
-                    <h2 style="margin:0; color:#153D64;">Ajustes de opciones RRHH</h2>
-                    <button type="button" class="nav-btn" onclick="cerrarAjustesOpcionesRRHH()">Cerrar</button>
+            style="display:none; position:fixed; inset:0; z-index:1000001; background:rgba(2,6,23,.82); overflow-y:auto; padding:24px; box-sizing:border-box; align-items:center; justify-content:center;">
+            <div class="rrhh-settings-dialog" style="width:100%; max-width:900px; max-height:calc(100vh - 48px); overflow-y:auto; margin:0 auto; padding:24px; box-sizing:border-box; border-radius:12px;">
+                <div class="rrhh-settings-header">
+                    <h2>Ajustes de opciones RRHH</h2>
+                    <button type="button" class="nav-btn rrhh-settings-button" onclick="cerrarAjustesOpcionesRRHH()">Cerrar</button>
                 </div>
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;">
-                    <section>
+                    <section class="rrhh-settings-section">
                         <h3>Funciones</h3>
                         <div id="opciones-rrhh-funciones" style="display:grid; gap:6px; margin-bottom:10px;"></div>
                         <div style="display:flex; gap:6px;">
-                            <input id="nueva-opcion-funcion" class="form-control" placeholder="Nueva función">
-                            <button type="button" class="nav-btn" onclick="añadirOpcionRRHH('funciones')">Añadir</button>
+                            <input id="nueva-opcion-funcion" class="form-control rrhh-settings-input" placeholder="Nueva función">
+                            <button type="button" class="nav-btn rrhh-settings-button" onclick="añadirOpcionRRHH('funciones')">Añadir</button>
                         </div>
                     </section>
-                    <section>
+                    <section class="rrhh-settings-section">
                         <h3>Rotación (color)</h3>
                         <div id="opciones-rrhh-colores" style="display:grid; gap:6px; margin-bottom:10px;"></div>
                         <div style="display:flex; gap:6px;">
-                            <input id="nuevo-nombre-color-rotacion" class="form-control" placeholder="Nombre del color">
-                            <input id="nuevo-color-rotacion" type="color" value="#ff8800" aria-label="Color de rotación">
-                            <button type="button" class="nav-btn" onclick="añadirOpcionRRHH('colores')">Añadir</button>
+                            <input id="nuevo-nombre-color-rotacion" class="form-control rrhh-settings-input" placeholder="Nombre del color">
+                            <input id="nuevo-color-rotacion" class="rrhh-settings-color" type="color" value="#ff8800" aria-label="Color de rotación">
+                            <button type="button" class="nav-btn rrhh-settings-button" onclick="añadirOpcionRRHH('colores')">Añadir</button>
                         </div>
                     </section>
-                    <section>
+                    <section class="rrhh-settings-section">
                         <h3>Rotación (número)</h3>
                         <div id="opciones-rrhh-numeros" style="display:grid; gap:6px; margin-bottom:10px;"></div>
                         <div style="display:flex; gap:6px;">
-                            <input id="nuevo-numero-rotacion" class="form-control" placeholder="Número de rotación">
-                            <button type="button" class="nav-btn" onclick="añadirOpcionRRHH('numeros')">Añadir</button>
+                            <input id="nuevo-numero-rotacion" class="form-control rrhh-settings-input" placeholder="Número de rotación">
+                            <button type="button" class="nav-btn rrhh-settings-button" onclick="añadirOpcionRRHH('numeros')">Añadir</button>
                         </div>
                     </section>
-                    <section>
+                    <section class="rrhh-settings-section">
                         <h3>Tipos de contrato</h3>
                         <div id="opciones-rrhh-contratos" style="display:grid; gap:6px; margin-bottom:10px;"></div>
                         <div style="display:flex; gap:6px;">
-                            <input id="nuevo-tipo-contrato" class="form-control" placeholder="Nuevo tipo de contrato">
-                            <button type="button" class="nav-btn" onclick="añadirOpcionRRHH('contratos')">Añadir</button>
+                            <input id="nuevo-tipo-contrato" class="form-control rrhh-settings-input" placeholder="Nuevo tipo de contrato">
+                            <button type="button" class="nav-btn rrhh-settings-button" onclick="añadirOpcionRRHH('contratos')">Añadir</button>
                         </div>
                     </section>
                 </div>
@@ -8310,14 +8310,13 @@
             contenedor.replaceChildren();
             opciones.forEach(opcion => {
                 const fila = document.createElement('div');
-                fila.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 8px; border:1px solid #e5e7eb; border-radius:6px;';
+                fila.className = 'rrhh-settings-option-row';
                 const etiqueta = document.createElement('span');
                 etiqueta.textContent = obtenerTexto(opcion);
                 fila.appendChild(etiqueta);
                 const boton = document.createElement('button');
                 boton.type = 'button';
-                boton.className = 'nav-btn';
-                boton.style.cssText = 'background:#dc2626; padding:4px 8px;';
+                boton.className = 'nav-btn rrhh-settings-delete';
                 boton.textContent = 'Eliminar';
                 boton.addEventListener('click', () => eliminar(opcion));
                 fila.appendChild(boton);
@@ -14176,6 +14175,110 @@
                 #modal-rrhh #contenedor-actividad {
                     background: rgba(15, 30, 53, 0.6) !important;
                     border-color: rgba(148, 163, 184, 0.2) !important;
+                }
+
+                #modal-ajustes-opciones-rrhh {
+                    font-family: inherit;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-dialog {
+                    background: linear-gradient(160deg, #0f1e35 0%, #1a2d4a 100%);
+                    border: 1px solid rgba(34, 211, 238, 0.25);
+                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 12px;
+                    border-bottom: 2px solid rgba(34, 211, 238, 0.4);
+                    padding-bottom: 12px;
+                    margin-bottom: 18px;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-header h2 {
+                    margin: 0;
+                    color: #22d3ee;
+                    font-size: 16px;
+                    letter-spacing: 0.05em;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-section {
+                    min-width: 0;
+                    padding: 14px;
+                    background: rgba(15, 30, 53, 0.6);
+                    border: 1px solid rgba(148, 163, 184, 0.2);
+                    border-radius: 8px;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-section h3 {
+                    margin: 0 0 10px;
+                    color: #94a3b8;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-input {
+                    min-width: 0;
+                    background: rgba(15, 30, 53, 0.8) !important;
+                    color: #f1f5f9 !important;
+                    border: 1px solid rgba(148, 163, 184, 0.25) !important;
+                    border-radius: 5px;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-input:focus {
+                    border-color: rgba(34, 211, 238, 0.6) !important;
+                    outline: none;
+                    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.15);
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-color {
+                    width: 38px;
+                    min-width: 38px;
+                    height: 34px;
+                    padding: 2px;
+                    background: rgba(15, 30, 53, 0.8);
+                    border: 1px solid rgba(148, 163, 184, 0.25);
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-option-row {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 8px;
+                    padding: 6px 8px;
+                    color: #f1f5f9;
+                    background: rgba(15, 30, 53, 0.8);
+                    border: 1px solid rgba(148, 163, 184, 0.2);
+                    border-radius: 6px;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-button {
+                    flex-shrink: 0;
+                    background: #0e7490;
+                    border-color: #22d3ee;
+                    color: #fff;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-button:hover {
+                    background: #155e75;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-delete {
+                    flex-shrink: 0;
+                    padding: 4px 8px;
+                    background: #b91c1c;
+                    border-color: #f87171;
+                    color: #fff;
+                }
+
+                #modal-ajustes-opciones-rrhh .rrhh-settings-delete:hover {
+                    background: #991b1b;
                 }
             </style>
             <form id="form-empleado" onsubmit="agregarEmpleado(event)">

@@ -2756,6 +2756,11 @@
             font-family: Inter, Roboto, "Segoe UI", system-ui, sans-serif !important;
         }
 
+        #vac-hours-view .compact-table th:first-child,
+        #vac-hours-view .compact-table td:first-child {
+            width: 180px;
+        }
+
         #pane-vacaciones .compact-table tr.row-vac-horas td.col-worker {
             background: #040f1c !important;
             color: #67e8f9 !important;
@@ -4676,8 +4681,14 @@
 
     <!-- PESTAÑA VACACIONES -->
     <div id="pane-vacaciones" class="tab-panel">
+        <div id="vac-subtabs" class="panel-row" style="gap: 6px; margin-bottom: 8px;">
+            <button type="button" class="segment-btn active" id="btn-vac-subtab-vacaciones"
+                onclick="cambiarSubpestanaVacaciones('VACACIONES')">Vacaciones</button>
+            <button type="button" class="segment-btn" id="btn-vac-subtab-horas"
+                onclick="cambiarSubpestanaVacaciones('HORAS')">Horas</button>
+        </div>
         <div class="controls-panel">
-            <div class="panel-row" style="justify-content: space-between;">
+            <div id="vac-controls-calendar" class="panel-row" style="justify-content: space-between;">
                 <div style="display: flex; gap: 4px; align-items: center;">
                     <button class="nav-btn" onclick="desplazarMesVacaciones(-1)">◀ Mes Anterior</button>
                     <button class="nav-btn" onclick="desplazarMesVacaciones(1)">Mes Siguiente ▶</button>
@@ -4686,20 +4697,23 @@
                         Cargando mes...
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <button class="nav-btn" style="background:#64748b; padding: 6px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: background 0.2s;"
-                        onclick="abrirGestionPuntos()"
-                        onmouseover="this.style.background='#475569'"
-                        onmouseout="this.style.background='#64748b'">
-                        📊 Gestión de Puntos
-                    </button>
-                    <button class="nav-btn" style="background:#64748b; padding: 6px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: background 0.2s;"
-                        onclick="abrirModalCiclos()"
-                        onmouseover="this.style.background='#475569'"
-                        onmouseout="this.style.background='#64748b'">
-                        ⚙️ Diseñador de Ciclos
-                    </button>
+                <button class="nav-btn" style="background:#64748b; padding: 6px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: background 0.2s;"
+                    onclick="abrirModalCiclos()"
+                    onmouseover="this.style.background='#475569'"
+                    onmouseout="this.style.background='#64748b'">
+                    ⚙️ Diseñador de Ciclos
+                </button>
+            </div>
+            <div id="vac-controls-hours" class="panel-row" style="display:none; justify-content: space-between;">
+                <div style="font-weight: bold; font-size: 15px; color: #22d3ee; text-transform: uppercase;">
+                    RESUMEN DE HORAS · <span id="titulo-anio-metricas-vacaciones">AÑO</span>
                 </div>
+                <button class="nav-btn" style="background:#64748b; padding: 6px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: background 0.2s;"
+                    onclick="abrirGestionPuntos()"
+                    onmouseover="this.style.background='#475569'"
+                    onmouseout="this.style.background='#64748b'">
+                    📊 Gestión de Puntos
+                </button>
             </div>
             <div id="vac-controles-segmentacion" class="panel-row" style="margin-top:8px;">
                 <div class="segmentation-nav" id="vacaciones-function-filters">
@@ -4719,12 +4733,20 @@
                 </div>
             </div>
         </div>
-        <div class="table-wrapper">
+        <div id="vac-calendar-view" class="table-wrapper">
             <table class="compact-table">
                 <thead id="header-vacaciones-container">
                     <tr id="header-vac-days"></tr>
                 </thead>
                 <tbody id="vacaciones-matrix"></tbody>
+            </table>
+        </div>
+        <div id="vac-hours-view" class="table-wrapper" style="display:none;">
+            <table class="compact-table">
+                <thead>
+                    <tr id="header-vac-metrics"></tr>
+                </thead>
+                <tbody id="vacaciones-metrics-matrix"></tbody>
             </table>
         </div>
         <!-- VISTA ANUAL TRABAJADOR: todos los meses en vertical -->
@@ -10541,6 +10563,18 @@
         // ==========================================
         let filtroFuncionVacActivo = "TODOS";
         let ordenVacActivo = "ALFABETICO";
+        let vistaVacacionesActiva = "VACACIONES";
+
+        function cambiarSubpestanaVacaciones(vista) {
+            vistaVacacionesActiva = vista === "HORAS" ? "HORAS" : "VACACIONES";
+            let mostrarHoras = vistaVacacionesActiva === "HORAS";
+            document.getElementById('btn-vac-subtab-vacaciones').classList.toggle('active', !mostrarHoras);
+            document.getElementById('btn-vac-subtab-horas').classList.toggle('active', mostrarHoras);
+            document.getElementById('vac-controls-calendar').style.display = mostrarHoras ? 'none' : '';
+            document.getElementById('vac-controls-hours').style.display = mostrarHoras ? 'flex' : 'none';
+            document.getElementById('vac-calendar-view').style.display = mostrarHoras ? 'none' : '';
+            document.getElementById('vac-hours-view').style.display = mostrarHoras ? '' : 'none';
+        }
 
         function inicializarVacaciones() {
             if (!window.fechaBaseVacaciones) {
@@ -10555,8 +10589,13 @@
                 return;
             }
 
+            document.getElementById('vac-subtabs').style.display = '';
+            document.getElementById('vac-worker-anual').style.display = 'none';
+            document.querySelector('#pane-vacaciones .controls-panel').style.display = '';
+            renderizarCabeceraMetricasVacaciones();
             renderizarCabeceraVacaciones();
             renderizarMatrizVacaciones();
+            cambiarSubpestanaVacaciones(vistaVacacionesActiva);
             if (typeof memoriaBloqueDias !== 'undefined' && memoriaBloqueDias !== null) {
                 dibujarSeleccionArrastre();
             }
@@ -10569,10 +10608,14 @@
             if (!emp) return;
 
             // Ocultar vista tabla estándar, mostrar vista anual
-            let tablaWrapper = document.querySelector('#pane-vacaciones .table-wrapper');
+            let tablaWrapper = document.getElementById('vac-calendar-view');
+            let tablaMetricas = document.getElementById('vac-hours-view');
+            let subpestanas = document.getElementById('vac-subtabs');
             let vistaAnual = document.getElementById('vac-worker-anual');
             let controles = document.querySelector('#pane-vacaciones .controls-panel');
             if (tablaWrapper) tablaWrapper.style.display = 'none';
+            if (tablaMetricas) tablaMetricas.style.display = 'none';
+            if (subpestanas) subpestanas.style.display = 'none';
             if (controles) controles.style.display = 'none';
             if (!vistaAnual) return;
             vistaAnual.style.display = 'block';
@@ -10696,6 +10739,8 @@
 
             let titulo = document.getElementById('titulo-mes-vacaciones');
             if (titulo) titulo.innerText = `${nombresMeses[mes]} ${anio}`;
+            let tituloAnioMetricas = document.getElementById('titulo-anio-metricas-vacaciones');
+            if (tituloAnioMetricas) tituloAnioMetricas.innerText = anio;
 
             let thTrab = document.createElement('th');
             thTrab.className = 'col-worker';
@@ -10712,32 +10757,45 @@
                 headerDays.appendChild(th);
                 d.setDate(d.getDate() + 1);
             }
+        }
 
-            // Columnas de métricas: solo para admin/gestor
-            if (!sesionActual || sesionActual.role !== 'trabajador') {
-                let metricas = [
-                    "H. Jornada Anual", "Horas Día", "Días Año", "Días Vac.", "L", "LF", "LE", "LA", "B", "SAN", "X",
-                    "Días Trab. Efe.", "H. Trab. Día", "H. Exc. Día", "Total H. Prog.", "Exc. H. Prog.", "Puntos"
-                ];
-                metricas.forEach(tit => {
-                    let th = document.createElement('th');
-                    th.className = 'header-metric';
-                    th.innerText = tit;
-                    headerDays.appendChild(th);
-                });
-            }
+        function renderizarCabeceraMetricasVacaciones() {
+            const headerMetrics = document.getElementById('header-vac-metrics');
+            if (!headerMetrics) return;
+            headerMetrics.innerHTML = '';
+            if (sesionActual && sesionActual.role === 'trabajador') return;
+
+            const titulos = [
+                'Trabajador', 'H. Jornada Anual', 'Horas Día', 'Días Año', 'Días Vac.',
+                'L', 'LF', 'LE', 'LA', 'B', 'SAN', 'X', 'Días Trab. Efe.',
+                'H. Trab. Día', 'H. Exc. Día', 'Total H. Prog.', 'Exc. H. Prog.', 'Puntos'
+            ];
+            titulos.forEach((titulo, index) => {
+                let th = document.createElement('th');
+                th.className = index === 0 ? 'col-worker' : 'header-metric';
+                th.innerText = titulo;
+                headerMetrics.appendChild(th);
+            });
         }
 
         function renderizarMatrizVacaciones() {
             const tbody = document.getElementById('vacaciones-matrix');
-            if (!tbody) return;
+            const tbodyMetricas = document.getElementById('vacaciones-metrics-matrix');
+            if (!tbody || !tbodyMetricas) return;
             tbody.innerHTML = '';
+            tbodyMetricas.innerHTML = '';
 
             let mes = window.fechaBaseVacaciones.getMonth();
             let anio = window.fechaBaseVacaciones.getFullYear();
             let listaOrdenada = [...listaTrabajadores];
+            const pesoColor = Object.fromEntries(opcionesRRHH.colores.map((color, index) => [color.valor, index + 1]));
+            const pesoContrato = { "FTC": 1, "FIJO": 2, "FIJI": 3, "FTP 90": 4, "FTP 50": 5, "FD 20": 6, "FD 15": 7, "ETT": 8 };
             if (ordenVacActivo === "ALFABETICO") {
                 listaOrdenada.sort(compararTrabajadoresPorApellido);
+            } else if (ordenVacActivo === "ROTACION") {
+                listaOrdenada.sort((a, b) => (pesoColor[a.claseColor] || 1) - (pesoColor[b.claseColor] || 1));
+            } else if (ordenVacActivo === "CONTRATO") {
+                listaOrdenada.sort((a, b) => (pesoContrato[a.contrato] || 1) - (pesoContrato[b.contrato] || 1));
             }
 
             listaOrdenada.forEach((emp) => {
@@ -10812,13 +10870,7 @@
                 }
 
                 let calc = calcularVariablesAnualesVac(emp.id, anio);
-                let esWorkerView = sesionActual && sesionActual.role === 'trabajador';
-
-                // Calcular puntos del trabajador
                 let puntosTrabajador = calcularPuntosTrabajador(emp.id, anio);
-
-                // Número de columnas de métricas para que la fila de horas abarque el mismo ancho
-                let numColMetricas = esWorkerView ? 0 : 13;
 
                 // ── TR 1: fila de estados ────────────────────────────────────────
                 let tr = document.createElement('tr');
@@ -10826,25 +10878,6 @@
                 tr.innerHTML = `
                     <td class="col-worker" style="${estiloColorCustomWorker}">${emp.apellidos}, ${emp.nombre}<br><small>${funcionVisual}</small></td>
                     ${htmlCeldasDias}
-                    ${esWorkerView ? '' : `
-                    <td class="col-metric-input"><input type="number" step="0.01" value="${calc.hAnual || ''}" onchange="guardarMetricaVac('${emp.id}', 'hanual', ${anio}, this.value)"></td>
-                    <td class="col-metric-input"><input type="number" step="0.01" value="${calc.hDia || ''}" onchange="guardarMetricaVac('${emp.id}', 'hdia', ${anio}, this.value)"></td>
-                    <td class="col-metric">${calc.diasAno}</td>
-                    <td class="col-metric-input"><input type="number" step="0.01" value="${calc.vManual || ''}" onchange="guardarMetricaVac('${emp.id}', 'dvac', ${anio}, this.value)"></td>
-                    <td class="col-metric">${calc.l}</td>
-                    <td class="col-metric">${calc.lf}</td>
-                    <td class="col-metric">${calc.le}</td>
-                    <td class="col-metric">${calc.la}</td>
-                    <td class="col-metric">${calc.b}</td>
-                    <td class="col-metric">${calc.san}</td>
-                    <td class="col-metric">${calc.x}</td>
-                    <td class="col-metric" style="color:#0369a1; background:#e0f9ff;">${calc.dEfec}</td>
-                    <td class="col-metric">${calc.hTrabDia.toFixed(2)}</td>
-                    <td class="col-metric" style="color: ${calc.hExcDia > 0 ? '#dc2626' : 'black'};">${calc.hExcDia.toFixed(2)}</td>
-                    <td class="col-metric" style="color:#0369a1; background:#e0f9ff;">${calc.totHProg.toFixed(2)}</td>
-                    <td class="col-metric" style="color: ${calc.excHProg > 0 ? '#dc2626' : '#16a34a'};">${calc.excHProg.toFixed(2)}</td>
-                    <td class="col-metric" style="font-weight: 700; background:#fef3c7; color:#92400e;">${puntosTrabajador}</td>
-                    `}
                 `;
                 tbody.appendChild(tr);
 
@@ -10854,9 +10887,33 @@
                 trHoras.innerHTML = `
                     <td class="col-worker"><div style="height:24px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;">⏱ horas</div></td>
                     ${htmlCeldasHoras}
-                    ${esWorkerView ? '' : `<td class="col-metric" colspan="${numColMetricas}"></td>`}
                 `;
                 tbody.appendChild(trHoras);
+
+                if (!sesionActual || sesionActual.role !== 'trabajador') {
+                    let trMetricas = document.createElement('tr');
+                    trMetricas.innerHTML = `
+                        <td class="col-worker">${emp.apellidos}, ${emp.nombre}<br><small>${funcionVisual}</small></td>
+                        <td class="col-metric-input"><input type="number" step="0.01" value="${calc.hAnual || ''}" onchange="guardarMetricaVac('${emp.id}', 'hanual', ${anio}, this.value)"></td>
+                        <td class="col-metric-input"><input type="number" step="0.01" value="${calc.hDia || ''}" onchange="guardarMetricaVac('${emp.id}', 'hdia', ${anio}, this.value)"></td>
+                        <td class="col-metric">${calc.diasAno}</td>
+                        <td class="col-metric-input"><input type="number" step="0.01" value="${calc.vManual || ''}" onchange="guardarMetricaVac('${emp.id}', 'dvac', ${anio}, this.value)"></td>
+                        <td class="col-metric">${calc.l}</td>
+                        <td class="col-metric">${calc.lf}</td>
+                        <td class="col-metric">${calc.le}</td>
+                        <td class="col-metric">${calc.la}</td>
+                        <td class="col-metric">${calc.b}</td>
+                        <td class="col-metric">${calc.san}</td>
+                        <td class="col-metric">${calc.x}</td>
+                        <td class="col-metric" style="color:#0369a1; background:#e0f9ff;">${calc.dEfec}</td>
+                        <td class="col-metric">${calc.hTrabDia.toFixed(2)}</td>
+                        <td class="col-metric" style="color: ${calc.hExcDia > 0 ? '#dc2626' : 'black'};">${calc.hExcDia.toFixed(2)}</td>
+                        <td class="col-metric" style="color:#0369a1; background:#e0f9ff;">${calc.totHProg.toFixed(2)}</td>
+                        <td class="col-metric" style="color: ${calc.excHProg > 0 ? '#dc2626' : '#16a34a'};">${calc.excHProg.toFixed(2)}</td>
+                        <td class="col-metric" style="font-weight: 700; background:#fef3c7; color:#92400e;">${puntosTrabajador}</td>
+                    `;
+                    tbodyMetricas.appendChild(trMetricas);
+                }
             });
         }
 

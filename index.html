@@ -3948,15 +3948,6 @@
             <div class="panel-row">
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%;">
                     <div class="segmentation-nav" id="function-filters">
-                        <button class="segment-btn active" onclick="filtrarPorFuncion('TODOS', this)">Todos</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Centro Gestión', this)">Centro
-                            Gestión</button>
-                        <button class="segment-btn"
-                            onclick="filtrarPorFuncion('Supervisión', this)">Supervisión</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Ambulift', this)">Ambulift</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Furgoneta', this)">Furgoneta</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Agente', this)">Agente</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Agente ETT', this)">Agente ETT</button>
                     </div>
 
                     <div id="turnos-ord-search"
@@ -4152,15 +4143,6 @@
             <div class="panel-row">
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%;">
                     <div class="segmentation-nav" style="gap: 4px;" id="planificar-function-filters">
-                        <button class="segment-btn active" onclick="filtrarPorFuncion('TODOS', this)">Todos</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Centro Gestión', this)">Centro
-                            Gestión</button>
-                        <button class="segment-btn"
-                            onclick="filtrarPorFuncion('Supervisión', this)">Supervisión</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Ambulift', this)">Ambulift</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Furgoneta', this)">Furgoneta</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Agente', this)">Agente</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncion('Agente ETT', this)">Agente ETT</button>
                     </div>
                     <div style="display: flex; gap: 4px; align-items: center; margin-left: 10px;">
                         <strong style="font-size: 11px;">Ordenar:</strong>
@@ -4263,11 +4245,57 @@
                 onclick="mostrarFormularioRRHH()">➕ Alta Nuevo Empleado</button>
             <button class="nav-btn" style="background:#2563eb; font-size:13px; padding:10px 14px; white-space: nowrap;"
                 onclick="mostrarAyudaRRHH()">📘 Manual Eureka</button>
+            <button class="nav-btn" style="background:#7c3aed; font-size:13px; padding:10px 14px; white-space: nowrap;"
+                onclick="abrirAjustesOpcionesRRHH()">⚙️ Ajustes</button>
             <button class="nav-btn"
                 style="background:#4b5563; font-size:13px; padding:10px 14px; white-space: nowrap; margin-left:auto;"
                 onclick="exportarRRHHExcel()">📊 Exportar Excel</button>
         </div>
 
+        <div id="modal-ajustes-opciones-rrhh"
+            style="display:none; position:fixed; inset:0; z-index:1000000; background:rgba(15,23,42,.75); overflow:auto; padding:24px;">
+            <div style="max-width:900px; margin:30px auto; padding:22px; background:#fff; border-radius:12px; box-shadow:0 20px 50px rgba(0,0,0,.3);">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+                    <h2 style="margin:0; color:#153D64;">Ajustes de opciones RRHH</h2>
+                    <button type="button" class="nav-btn" onclick="cerrarAjustesOpcionesRRHH()">Cerrar</button>
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;">
+                    <section>
+                        <h3>Funciones</h3>
+                        <div id="opciones-rrhh-funciones" style="display:grid; gap:6px; margin-bottom:10px;"></div>
+                        <div style="display:flex; gap:6px;">
+                            <input id="nueva-opcion-funcion" class="form-control" placeholder="Nueva función">
+                            <button type="button" class="nav-btn" onclick="añadirOpcionRRHH('funciones')">Añadir</button>
+                        </div>
+                    </section>
+                    <section>
+                        <h3>Rotación (color)</h3>
+                        <div id="opciones-rrhh-colores" style="display:grid; gap:6px; margin-bottom:10px;"></div>
+                        <div style="display:flex; gap:6px;">
+                            <input id="nuevo-nombre-color-rotacion" class="form-control" placeholder="Nombre del color">
+                            <input id="nuevo-color-rotacion" type="color" value="#ff8800" aria-label="Color de rotación">
+                            <button type="button" class="nav-btn" onclick="añadirOpcionRRHH('colores')">Añadir</button>
+                        </div>
+                    </section>
+                    <section>
+                        <h3>Rotación (número)</h3>
+                        <div id="opciones-rrhh-numeros" style="display:grid; gap:6px; margin-bottom:10px;"></div>
+                        <div style="display:flex; gap:6px;">
+                            <input id="nuevo-numero-rotacion" class="form-control" placeholder="Número de rotación">
+                            <button type="button" class="nav-btn" onclick="añadirOpcionRRHH('numeros')">Añadir</button>
+                        </div>
+                    </section>
+                    <section>
+                        <h3>Tipos de contrato</h3>
+                        <div id="opciones-rrhh-contratos" style="display:grid; gap:6px; margin-bottom:10px;"></div>
+                        <div style="display:flex; gap:6px;">
+                            <input id="nuevo-tipo-contrato" class="form-control" placeholder="Nuevo tipo de contrato">
+                            <button type="button" class="nav-btn" onclick="añadirOpcionRRHH('contratos')">Añadir</button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
 
         <div class="list-container" style="width: 100%;">
             <div class="search-box" style="margin-bottom: 10px;">
@@ -4303,16 +4331,16 @@
                                     style="font-size:10px; padding:0; cursor:pointer; color:black;"
                                     onchange="buscarTrabajador()">
                                     <option value="ALL">▽</option>
-                                    <option value="Supervisión">SUP</option>
-                                    <option value="Centro Gestión">CG</option>
-                                    <option value="Ambulift">AMB</option>
-                                    <option value="Furgoneta">FUR</option>
-                                    <option value="Agente">AG</option>
-                                    <option value="Agente ETT">ETT</option>
                                 </select></th>
-                            <th style="width: 70px; text-align:center;">Rotación</th>
-                            <th style="width: 50px; text-align:center;">Rot. Nº</th>
-                            <th style="width: 70px; text-align:center;">Contrato</th>
+                            <th style="width: 90px; text-align:center;">Rotación <select id="filter-rotacion"
+                                    style="font-size:10px; padding:0; cursor:pointer; color:black;"
+                                    onchange="buscarTrabajador()"><option value="ALL">▽</option></select></th>
+                            <th style="width: 65px; text-align:center;">Rot. Nº <select id="filter-rotacion-numero"
+                                    style="font-size:10px; padding:0; cursor:pointer; color:black;"
+                                    onchange="buscarTrabajador()"><option value="ALL">▽</option></select></th>
+                            <th style="width: 90px; text-align:center;">Contrato <select id="filter-contrato"
+                                    style="font-size:10px; padding:0; cursor:pointer; color:black;"
+                                    onchange="buscarTrabajador()"><option value="ALL">▽</option></select></th>
                             <th style="width: 70px; text-align:center;">Horas</th>
                             <th style="width: 210px; text-align:center;">Consultar/Modificar y Eliminar</th>
                             <th style="width: 100%;"></th>
@@ -4331,20 +4359,6 @@
             <div class="panel-row">
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%;">
                     <div class="segmentation-nav" id="horas-function-filters">
-                        <button class="segment-btn active"
-                            onclick="filtrarPorFuncionHoras(&#39;TODOS&#39;, this)">Todos</button>
-                        <button class="segment-btn"
-                            onclick="filtrarPorFuncionHoras(&#39;Centro Gestión&#39;, this)">Centro Gestión</button>
-                        <button class="segment-btn"
-                            onclick="filtrarPorFuncionHoras(&#39;Supervisión&#39;, this)">Supervisión</button>
-                        <button class="segment-btn"
-                            onclick="filtrarPorFuncionHoras(&#39;Ambulift&#39;, this)">Ambulift</button>
-                        <button class="segment-btn"
-                            onclick="filtrarPorFuncionHoras(&#39;Furgoneta&#39;, this)">Furgoneta</button>
-                        <button class="segment-btn"
-                            onclick="filtrarPorFuncionHoras(&#39;Agente&#39;, this)">Agente</button>
-                        <button class="segment-btn" onclick="filtrarPorFuncionHoras(&#39;Agente ETT&#39;, this)">Agente
-                            ETT</button>
                     </div>
                     <div style="display: flex; gap: 4px; align-items: center; margin-left: 10px;">
                         <strong style="font-size: 11px;">Ordenar:</strong>
@@ -4650,20 +4664,7 @@
                 </div>
             </div>
             <div id="vac-controles-segmentacion" class="panel-row" style="margin-top:8px;">
-                <div class="segmentation-nav">
-                    <button class="segment-btn active"
-                        onclick="filtrarPorFuncionVac(&#39;TODOS&#39;, this)">Todos</button>
-                    <button class="segment-btn" onclick="filtrarPorFuncionVac(&#39;Centro Gestión&#39;, this)">Centro
-                        Gestión</button>
-                    <button class="segment-btn"
-                        onclick="filtrarPorFuncionVac(&#39;Supervisión&#39;, this)">Supervisión</button>
-                    <button class="segment-btn"
-                        onclick="filtrarPorFuncionVac(&#39;Ambulift&#39;, this)">Ambulift</button>
-                    <button class="segment-btn"
-                        onclick="filtrarPorFuncionVac(&#39;Furgoneta&#39;, this)">Furgoneta</button>
-                    <button class="segment-btn" onclick="filtrarPorFuncionVac(&#39;Agente&#39;, this)">Agente</button>
-                    <button class="segment-btn" onclick="filtrarPorFuncionVac(&#39;Agente ETT&#39;, this)">Agente
-                        ETT</button>
+                <div class="segmentation-nav" id="vacaciones-function-filters">
                 </div>
                 <div style="display: flex; gap: 6px; align-items: center;">
                     <strong>Ordenar filas por:</strong>
@@ -4723,21 +4724,7 @@
             </div>
 
             <div class="panel-row" style="margin-top:8px;">
-                <div class="segmentation-nav">
-                    <button class="segment-btn filter-btn-var active"
-                        onclick="filtrarPorFuncionVar(&#39;TODOS&#39;, this)">Todos</button>
-                    <button class="segment-btn filter-btn-var"
-                        onclick="filtrarPorFuncionVar(&#39;Centro Gestión&#39;, this)">Centro Gestión</button>
-                    <button class="segment-btn filter-btn-var"
-                        onclick="filtrarPorFuncionVar(&#39;Supervisión&#39;, this)">Supervisión</button>
-                    <button class="segment-btn filter-btn-var"
-                        onclick="filtrarPorFuncionVar(&#39;Ambulift&#39;, this)">Ambulift</button>
-                    <button class="segment-btn filter-btn-var"
-                        onclick="filtrarPorFuncionVar(&#39;Furgoneta&#39;, this)">Furgoneta</button>
-                    <button class="segment-btn filter-btn-var"
-                        onclick="filtrarPorFuncionVar(&#39;Agente&#39;, this)">Agente</button>
-                    <button class="segment-btn filter-btn-var"
-                        onclick="filtrarPorFuncionVar(&#39;Agente ETT&#39;, this)">Agente ETT</button>
+                <div class="segmentation-nav" id="variables-function-filters">
                 </div>
                 <div style="display: flex; gap: 6px; align-items: center;">
                     <strong>Ordenar filas por:</strong>
@@ -4931,21 +4918,7 @@
             </div>
             <!-- Fila 2: filtros de función + ordenación + buscador -->
             <div id="reg-controles-segmentacion" class="panel-row" style="margin-top: 8px;">
-                <div class="segmentation-nav">
-                    <button class="segment-btn filter-btn-reg active"
-                        onclick="filtrarRegistroJornada('TODOS', this)">Todos</button>
-                    <button class="segment-btn filter-btn-reg"
-                        onclick="filtrarRegistroJornada('Centro Gestión', this)">Centro Gestión</button>
-                    <button class="segment-btn filter-btn-reg"
-                        onclick="filtrarRegistroJornada('Supervisión', this)">Supervisión</button>
-                    <button class="segment-btn filter-btn-reg"
-                        onclick="filtrarRegistroJornada('Ambulift', this)">Ambulift</button>
-                    <button class="segment-btn filter-btn-reg"
-                        onclick="filtrarRegistroJornada('Furgoneta', this)">Furgoneta</button>
-                    <button class="segment-btn filter-btn-reg"
-                        onclick="filtrarRegistroJornada('Agente', this)">Agente</button>
-                    <button class="segment-btn filter-btn-reg"
-                        onclick="filtrarRegistroJornada('Agente ETT', this)">Agente ETT</button>
+                <div class="segmentation-nav" id="registro-function-filters">
                 </div>
                 <div style="display: flex; gap: 6px; align-items: center;">
                     <strong style="font-size: 11px;">Ordenar filas por:</strong>
@@ -5847,6 +5820,19 @@
         let appStateLifecycleListenersRegistered = false;
         let isRefreshingAppState = false;
         let app_state = null;
+        let opcionesRRHH = {
+            funciones: ['Centro Gestión', 'Supervisión', 'Ambulift', 'Furgoneta', 'Agente', 'Agente ETT'],
+            colores: [
+                { valor: 'cell-blanco', nombre: 'No aplica' },
+                { valor: 'cell-azul', nombre: 'Azul' },
+                { valor: 'cell-rojo', nombre: 'Rojo' },
+                { valor: 'cell-amarillo', nombre: 'Amarillo' },
+                { valor: 'cell-verde', nombre: 'Verde' },
+                { valor: 'cell-rosa', nombre: 'Rosa' }
+            ],
+            numeros: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
+            contratos: ['FTC', 'FIJI', 'FTP 90', 'FTP 50', 'FD 20', 'FD 15', 'ETT']
+        };
 
         function obtenerEstadoAplicacion() {
             return {
@@ -5862,7 +5848,8 @@
                 vacYLibranzasPublicadas: vacYLibranzasPublicadas,
                 estadosConfig: estadosConfig,
                 puntosVacacionesConfig: puntosVacacionesConfig,
-                datosRegistrosMensuales: datosRegistrosMensuales
+                datosRegistrosMensuales: datosRegistrosMensuales,
+                opcionesRRHH: opcionesRRHH
             };
         }
 
@@ -5957,6 +5944,8 @@
             if (Array.isArray(datos.estadosConfig)) estadosConfig = datos.estadosConfig;
             if (Array.isArray(datos.puntosVacacionesConfig)) puntosVacacionesConfig = datos.puntosVacacionesConfig;
             datosRegistrosMensuales = datos.datosRegistrosMensuales || {};
+            opcionesRRHH = normalizarOpcionesRRHH(datos.opcionesRRHH);
+            if (typeof actualizarControlesOpcionesRRHH === 'function') actualizarControlesOpcionesRRHH();
             if (typeof actualizarEstilosEstados === 'function') actualizarEstilosEstados();
 
             if (volverAPintar) {
@@ -6307,7 +6296,7 @@
             let contenedor = document.getElementById('doc-funciones-list');
             if (!contenedor) return;
             contenedor.innerHTML = '';
-            let funciones = new Set(['Centro Gestión', 'Supervisión', 'Ambulift', 'Furgoneta', 'Agente', 'Agente ETT']);
+            let funciones = new Set(opcionesRRHH.funciones);
             listaTrabajadores.forEach(emp => {
                 let func = (emp.funcion || '').trim();
                 if (func) funciones.add(func);
@@ -7043,6 +7032,7 @@
             } catch (error) {
                 console.error('Se continuará con los datos iniciales porque no se pudo cargar Supabase:', error);
             }
+            actualizarControlesOpcionesRRHH();
             iniciarSuscripcionEstadoAplicacion();
             inicializarCuadrante();
             renderizarListaRRHH();
@@ -7232,7 +7222,7 @@
             const fechas = getFechasPlanificarVisibles();
 
             let listaOrdenada = [...listaTrabajadores];
-            const pesoColor = { "cell-blanco": 1, "cell-azul": 2, "cell-rojo": 3, "cell-amarillo": 4, "cell-verde": 5, "cell-rosa": 6 };
+            const pesoColor = Object.fromEntries(opcionesRRHH.colores.map((color, index) => [color.valor, index + 1]));
             const pesoContrato = { "FTC": 1, "FIJO": 2, "FIJI": 3, "FTP 90": 4, "FTP 50": 5, "FD 20": 6, "FD 15": 7, "ETT": 8 };
 
             if (criterioOrdenMatriz === "ALFABETICO") {
@@ -7491,7 +7481,7 @@
             const fechas = getFechasVisibles();
 
             let listaOrdenada = [...listaTrabajadores];
-            const pesoColor = { "cell-blanco": 1, "cell-azul": 2, "cell-rojo": 3, "cell-amarillo": 4, "cell-verde": 5, "cell-rosa": 6 };
+            const pesoColor = Object.fromEntries(opcionesRRHH.colores.map((color, index) => [color.valor, index + 1]));
             const pesoContrato = { "FTC": 1, "FIJO": 2, "FIJI": 3, "FTP 90": 4, "FTP 50": 5, "FD 20": 6, "FD 15": 7, "ETT": 8 };
 
             if (criterioOrdenMatriz === "ALFABETICO") {
@@ -7980,10 +7970,10 @@
 
         function filtrarPorFuncion(codigoFuncion, btnElement) {
             filtroFuncionActivo = codigoFuncion;
-            document.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
+            const activePanel = document.querySelector('.tab-panel.active');
+            const filtroId = activePanel?.id === 'pane-planificar' ? 'planificar-function-filters' : 'function-filters';
+            document.querySelectorAll(`#${filtroId} .segment-btn`).forEach(btn => btn.classList.remove('active'));
             if (btnElement) btnElement.classList.add('active');
-
-            let activePanel = document.querySelector('.tab-panel.active');
             if (!activePanel) return;
             if (activePanel.id === 'pane-planificar') {
                 renderizarMatrizTrabajadoresPlanificar();
@@ -8229,8 +8219,311 @@
             desplazarRango(dias);
         }
 
+        function normalizarOpcionesRRHH(opcionesGuardadas) {
+            const base = opcionesGuardadas && typeof opcionesGuardadas === 'object'
+                ? opcionesGuardadas
+                : {};
+            const unicos = valores => [...new Set(valores.map(valor => String(valor || '').trim()).filter(Boolean))];
+            const funciones = unicos(Array.isArray(base.funciones) ? base.funciones : opcionesRRHH.funciones);
+            const coloresGuardados = Array.isArray(base.colores) ? base.colores : opcionesRRHH.colores;
+            const colores = coloresGuardados
+                .filter(color => color && typeof color === 'object' && color.valor && color.nombre)
+                .map(color => ({ valor: String(color.valor), nombre: String(color.nombre).trim() }))
+                .filter(color => color.nombre);
+            listaTrabajadores.forEach(emp => {
+                if (emp.funcion && !funciones.includes(emp.funcion)) funciones.push(emp.funcion);
+                const color = emp.claseColor;
+                if (color && !colores.some(opcion => opcion.valor === color)) {
+                    colores.push({ valor: color, nombre: color.startsWith('#') ? color : color });
+                }
+            });
+            const numerosGuardados = Array.isArray(base.numeros) ? base.numeros : opcionesRRHH.numeros;
+            const numeros = unicos(numerosGuardados);
+            const contratosGuardados = Array.isArray(base.contratos) ? base.contratos : opcionesRRHH.contratos;
+            const contratos = unicos(contratosGuardados).filter(contrato => contrato.toLocaleUpperCase() !== 'NUEVO');
+            listaTrabajadores.forEach(emp => {
+                (emp.actividad || []).forEach(periodo => {
+                    if (periodo.contrato?.toLocaleUpperCase() === 'NUEVO') periodo.contrato = '';
+                    if (periodo.contrato && !contratos.includes(periodo.contrato)) contratos.push(periodo.contrato);
+                });
+                if (emp.contrato?.toLocaleUpperCase() === 'NUEVO') emp.contrato = '';
+                if (emp.contrato && !contratos.includes(emp.contrato)) contratos.push(emp.contrato);
+                if (emp.rotacionNumero && !numeros.includes(String(emp.rotacionNumero))) {
+                    numeros.push(String(emp.rotacionNumero));
+                }
+            });
+            return { funciones, colores, numeros, contratos };
+        }
+
+        function popularSelectOpciones(select, opciones, valor, texto) {
+            if (!select) return;
+            const valorActual = select.value;
+            select.replaceChildren();
+            opciones.forEach(opcion => {
+                const elemento = document.createElement('option');
+                elemento.value = valor(opcion);
+                elemento.textContent = texto(opcion);
+                select.appendChild(elemento);
+            });
+            if ([...select.options].some(opcion => opcion.value === valorActual)) {
+                select.value = valorActual;
+            }
+        }
+
+        function escaparHTML(valor) {
+            return String(valor).replace(/[&<>"']/g, caracter => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[caracter]);
+        }
+
+        function renderizarFiltrosFuncion() {
+            const filtros = [
+                { id: 'function-filters', clase: '', activo: filtroFuncionActivo, alFiltrar: filtrarPorFuncion },
+                { id: 'planificar-function-filters', clase: '', activo: filtroFuncionActivo, alFiltrar: filtrarPorFuncion },
+                { id: 'horas-function-filters', clase: '', activo: horasFiltroFuncion, alFiltrar: filtrarPorFuncionHoras },
+                { id: 'vacaciones-function-filters', clase: '', activo: filtroFuncionVacActivo, alFiltrar: filtrarPorFuncionVac },
+                { id: 'variables-function-filters', clase: 'filter-btn-var', activo: filtroFuncionVarActivo, alFiltrar: filtrarPorFuncionVar },
+                { id: 'registro-function-filters', clase: 'filter-btn-reg', activo: filtroActualRegistro, alFiltrar: filtrarRegistroJornada }
+            ];
+            filtros.forEach(config => {
+                const contenedor = document.getElementById(config.id);
+                if (!contenedor) return;
+                contenedor.replaceChildren();
+                [['TODOS', 'Todos'], ...opcionesRRHH.funciones.map(funcion => [funcion, funcion])].forEach(([valor, etiqueta]) => {
+                    const boton = document.createElement('button');
+                    boton.type = 'button';
+                    boton.className = `segment-btn${config.clase ? ` ${config.clase}` : ''}${config.activo === valor ? ' active' : ''}`;
+                    boton.textContent = etiqueta;
+                    boton.addEventListener('click', () => config.alFiltrar(valor, boton));
+                    contenedor.appendChild(boton);
+                });
+            });
+        }
+
+        function renderizarListaOpcionesRRHH(contenedorId, opciones, obtenerTexto, eliminar) {
+            const contenedor = document.getElementById(contenedorId);
+            if (!contenedor) return;
+            contenedor.replaceChildren();
+            opciones.forEach(opcion => {
+                const fila = document.createElement('div');
+                fila.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 8px; border:1px solid #e5e7eb; border-radius:6px;';
+                const etiqueta = document.createElement('span');
+                etiqueta.textContent = obtenerTexto(opcion);
+                fila.appendChild(etiqueta);
+                const boton = document.createElement('button');
+                boton.type = 'button';
+                boton.className = 'nav-btn';
+                boton.style.cssText = 'background:#dc2626; padding:4px 8px;';
+                boton.textContent = 'Eliminar';
+                boton.addEventListener('click', () => eliminar(opcion));
+                fila.appendChild(boton);
+                contenedor.appendChild(fila);
+            });
+        }
+
+        function renderizarAjustesOpcionesRRHH() {
+            renderizarListaOpcionesRRHH(
+                'opciones-rrhh-funciones',
+                opcionesRRHH.funciones,
+                funcion => funcion,
+                funcion => eliminarOpcionRRHH('funciones', funcion)
+            );
+            renderizarListaOpcionesRRHH(
+                'opciones-rrhh-colores',
+                opcionesRRHH.colores,
+                color => `${color.nombre} (${color.valor})`,
+                color => eliminarOpcionRRHH('colores', color.valor)
+            );
+            renderizarListaOpcionesRRHH(
+                'opciones-rrhh-numeros',
+                opcionesRRHH.numeros,
+                numero => numero,
+                numero => eliminarOpcionRRHH('numeros', numero)
+            );
+            renderizarListaOpcionesRRHH(
+                'opciones-rrhh-contratos',
+                opcionesRRHH.contratos,
+                contrato => contrato,
+                contrato => eliminarOpcionRRHH('contratos', contrato)
+            );
+        }
+
+        function actualizarControlesOpcionesRRHH() {
+            popularSelectOpciones(
+                document.getElementById('emp-funcion'),
+                opcionesRRHH.funciones,
+                funcion => funcion,
+                funcion => funcion
+            );
+            popularSelectOpciones(
+                document.getElementById('emp-rotacion'),
+                opcionesRRHH.colores,
+                color => color.valor,
+                color => color.nombre
+            );
+            popularSelectOpciones(
+                document.getElementById('emp-rotacion-numero'),
+                ['', ...opcionesRRHH.numeros],
+                numero => numero,
+                numero => numero || 'Sin asignar'
+            );
+            popularSelectOpciones(
+                document.getElementById('filter-func'),
+                ['ALL', ...opcionesRRHH.funciones],
+                funcion => funcion,
+                funcion => funcion === 'ALL' ? '▽' : funcion
+            );
+            popularSelectOpciones(
+                document.getElementById('filter-rotacion'),
+                ['ALL', ...opcionesRRHH.colores.map(color => color.valor)],
+                color => color,
+                color => color === 'ALL' ? '▽' : opcionesRRHH.colores.find(item => item.valor === color)?.nombre || color
+            );
+            popularSelectOpciones(
+                document.getElementById('filter-rotacion-numero'),
+                ['ALL', ...opcionesRRHH.numeros],
+                numero => numero,
+                numero => numero === 'ALL' ? '▽' : numero
+            );
+            popularSelectOpciones(
+                document.getElementById('filter-contrato'),
+                ['ALL', ...opcionesRRHH.contratos],
+                contrato => contrato,
+                contrato => contrato === 'ALL' ? '▽' : contrato
+            );
+            document.querySelectorAll('.act-contrato').forEach(select => {
+                const valorActual = select.value;
+                popularSelectOpciones(select, opcionesRRHH.contratos, contrato => contrato, contrato => contrato);
+                select.value = valorActual;
+            });
+            renderizarFiltrosFuncion();
+            renderizarAjustesOpcionesRRHH();
+        }
+
+        function abrirAjustesOpcionesRRHH() {
+            actualizarControlesOpcionesRRHH();
+            document.getElementById('modal-ajustes-opciones-rrhh').style.display = 'block';
+        }
+
+        function cerrarAjustesOpcionesRRHH() {
+            document.getElementById('modal-ajustes-opciones-rrhh').style.display = 'none';
+        }
+
+        function añadirOpcionRRHH(tipo) {
+            const campos = {
+                funciones: document.getElementById('nueva-opcion-funcion'),
+                numeros: document.getElementById('nuevo-numero-rotacion'),
+                contratos: document.getElementById('nuevo-tipo-contrato'),
+                colores: document.getElementById('nuevo-nombre-color-rotacion')
+            };
+            const campo = campos[tipo];
+            const nombre = campo?.value.trim();
+            if (!nombre) {
+                alert('Escribe un nombre para la nueva opción.');
+                campo?.focus();
+                return;
+            }
+            if (tipo === 'funciones' && nombre.toLocaleUpperCase() === 'TODOS') {
+                alert('"TODOS" está reservado para el filtro general.');
+                return;
+            }
+            if (tipo === 'contratos' && nombre.toLocaleUpperCase() === 'ALL') {
+                alert('"ALL" está reservado para el filtro general.');
+                return;
+            }
+            if (tipo === 'colores') {
+                const colorValor = document.getElementById('nuevo-color-rotacion').value;
+                if (opcionesRRHH.colores.some(color => color.valor === colorValor
+                    || color.nombre.toLocaleLowerCase() === nombre.toLocaleLowerCase())) {
+                    alert('Ya existe una opción de color con ese nombre o valor.');
+                    return;
+                }
+                opcionesRRHH.colores.push({ valor: colorValor, nombre });
+            } else {
+                const lista = opcionesRRHH[tipo];
+                const valorNuevo = tipo === 'contratos' ? nombre.toLocaleUpperCase() : nombre;
+                if (tipo === 'numeros' && (!/^\d+$/.test(valorNuevo) || Number(valorNuevo) < 1)) {
+                    alert('La rotación debe ser un número entero positivo.');
+                    campo.focus();
+                    return;
+                }
+                if (lista.some(valor => valor.toLocaleLowerCase() === valorNuevo.toLocaleLowerCase())) {
+                    alert('Esa opción ya existe.');
+                    return;
+                }
+                lista.push(valorNuevo);
+            }
+            campo.value = '';
+            guardarCambiosOpcionesRRHH();
+        }
+
+        function eliminarOpcionRRHH(tipo, valor) {
+            if (tipo === 'funciones' && opcionesRRHH.funciones.length <= 1) {
+                alert('Debe quedar al menos una función disponible.');
+                return;
+            }
+            if (tipo === 'colores' && valor === 'cell-blanco') {
+                alert('La opción "No aplica" es necesaria y no se puede eliminar.');
+                return;
+            }
+            const etiqueta = tipo === 'colores'
+                ? opcionesRRHH.colores.find(color => color.valor === valor)?.nombre || valor
+                : valor;
+            if (!confirm(`¿Eliminar la opción "${etiqueta}"? Las asignaciones actuales también se borrarán.`)) return;
+            if (tipo === 'funciones') {
+                opcionesRRHH.funciones = opcionesRRHH.funciones.filter(funcion => funcion !== valor);
+                listaTrabajadores.forEach(emp => {
+                    if (emp.funcion === valor) emp.funcion = '';
+                });
+                if (filtroFuncionActivo === valor) filtroFuncionActivo = 'TODOS';
+                if (filtroFuncionActivoPlanificar === valor) filtroFuncionActivoPlanificar = 'TODOS';
+                if (horasFiltroFuncion === valor) horasFiltroFuncion = 'TODOS';
+                if (filtroFuncionVacActivo === valor) filtroFuncionVacActivo = 'TODOS';
+                if (filtroFuncionVarActivo === valor) filtroFuncionVarActivo = 'TODOS';
+                if (filtroActualRegistro === valor) filtroActualRegistro = 'TODOS';
+            } else if (tipo === 'colores') {
+                opcionesRRHH.colores = opcionesRRHH.colores.filter(color => color.valor !== valor);
+                listaTrabajadores.forEach(emp => {
+                    if (emp.claseColor === valor) emp.claseColor = 'cell-blanco';
+                });
+            } else if (tipo === 'numeros') {
+                opcionesRRHH.numeros = opcionesRRHH.numeros.filter(numero => numero !== valor);
+                listaTrabajadores.forEach(emp => {
+                    if (String(emp.rotacionNumero) === valor) emp.rotacionNumero = '';
+                });
+            } else if (tipo === 'contratos') {
+                opcionesRRHH.contratos = opcionesRRHH.contratos.filter(contrato => contrato !== valor);
+                listaTrabajadores.forEach(emp => {
+                    if (emp.contrato === valor) emp.contrato = '';
+                    (emp.actividad || []).forEach(periodo => {
+                        if (periodo.contrato === valor) periodo.contrato = '';
+                    });
+                });
+            }
+            guardarCambiosOpcionesRRHH();
+        }
+
+        function guardarCambiosOpcionesRRHH() {
+            opcionesRRHH = normalizarOpcionesRRHH(opcionesRRHH);
+            actualizarControlesOpcionesRRHH();
+            if (typeof buscarTrabajador === 'function') buscarTrabajador();
+            if (typeof inicializarCuadrante === 'function') inicializarCuadrante();
+            if (document.getElementById('pane-funciones')?.classList.contains('active')) renderizarMatrizFunciones();
+            if (document.getElementById('pane-planificar')?.classList.contains('active')) inicializarPlanificar();
+            if (document.getElementById('pane-horas')?.classList.contains('active')) inicializarHoras();
+            if (document.getElementById('pane-vacaciones')?.classList.contains('active')) inicializarVacaciones();
+            if (document.getElementById('pane-variables')?.classList.contains('active')) inicializarVariables();
+            if (document.getElementById('pane-registro-jornada')?.classList.contains('active')) renderizarFichasJornada();
+            autoSaveToSupabase();
+        }
+
         // --- MOTOR RRHH ---
         function mostrarFormularioRRHH() {
+            actualizarControlesOpcionesRRHH();
             document.getElementById('modal-rrhh').style.display = 'flex';
             document.getElementById('form-empleado').reset();
             document.getElementById('emp-id').readOnly = false;
@@ -8246,9 +8539,7 @@
             document.getElementById('emp-nombre').focus();
         }
 
-        // Funciones obsoletas eliminadas (los campos de contrato/jornada
-        // ahora están dentro de cada fila de actividad: actualizarHorasRow,
-        // calcularHorasAnualesRow, sincronizarPctRow, actualizarContratoNuevoRow)
+        // Los campos de contrato y jornada se gestionan por periodo de actividad.
 
         function ocultarFormularioRRHH() {
             document.getElementById('modal-rrhh').style.display = 'none';
@@ -8263,10 +8554,10 @@
             // Determinar tipo y generar ID único para esta fila
             let uid = Date.now() + Math.random().toString(36).slice(2);
             let horasTipo = per.horasTipo || 'ANUALES';
-            let contrato = per.contrato || 'FTC';
-            let opcionesFijas = ['FTC', 'FIJI', 'FTP 90', 'FTP 50', 'FD 20', 'FD 15', 'ETT'];
-            let contratoVal = opcionesFijas.includes(contrato) ? contrato : 'NUEVO';
-            let contratoNuevoVal = opcionesFijas.includes(contrato) ? '' : contrato;
+            if (per.contrato && !opcionesRRHH.contratos.includes(per.contrato)) {
+                opcionesRRHH.contratos.push(per.contrato);
+            }
+            let contrato = per.contrato || opcionesRRHH.contratos[0] || '';
 
             div.innerHTML = `
                 <!-- Periodo -->
@@ -8283,17 +8574,7 @@
 
                 <!-- Tipo Contrato -->
                 <span style="font-size:10px; color:#6b7280; white-space:nowrap;">Contrato</span>
-                <select class="form-control act-contrato" style="width:auto;" onchange="actualizarContratoNuevoRow(this)">
-                    <option value="FTC" ${contratoVal === 'FTC' ? 'selected' : ''}>FTC</option>
-                    <option value="FIJI" ${contratoVal === 'FIJI' ? 'selected' : ''}>FIJI</option>
-                    <option value="FTP 90" ${contratoVal === 'FTP 90' ? 'selected' : ''}>FTP 90</option>
-                    <option value="FTP 50" ${contratoVal === 'FTP 50' ? 'selected' : ''}>FTP 50</option>
-                    <option value="FD 20" ${contratoVal === 'FD 20' ? 'selected' : ''}>FD 20</option>
-                    <option value="FD 15" ${contratoVal === 'FD 15' ? 'selected' : ''}>FD 15</option>
-                    <option value="ETT" ${contratoVal === 'ETT' ? 'selected' : ''}>ETT</option>
-                    <option value="NUEVO" ${contratoVal === 'NUEVO' ? 'selected' : ''}>✏️ Nuevo</option>
-                </select>
-                <input type="text" class="form-control act-contrato-nuevo" placeholder="Nombre" value="${contratoNuevoVal}" style="width:80px; display:${contratoVal === 'NUEVO' ? 'inline-block' : 'none'};">
+                <select class="form-control act-contrato" style="width:auto;"></select>
 
                 <!-- Tipo Horas -->
                 <span style="font-size:10px; color:#6b7280; white-space:nowrap;">Horas</span>
@@ -8386,6 +8667,9 @@
                 <button type="button" onclick="this.closest('.actividad-row').remove()" style="background:#ef4444; color:white; border:none; padding:3px 7px; border-radius:3px; cursor:pointer; font-weight:bold; flex-shrink:0;">&#x2716;</button>
             `;
             cont.appendChild(div);
+            const contratoSelect = div.querySelector('.act-contrato');
+            popularSelectOpciones(contratoSelect, opcionesRRHH.contratos, opcion => opcion, opcion => opcion);
+            contratoSelect.value = contrato;
         }
 
         function formatActFmt(h) {
@@ -8403,13 +8687,6 @@
             let semGrp = row.querySelector('.act-semanales-group');
             semGrp.style.display = tipo === 'SEMANALES' ? 'flex' : 'none';
             if (tipo === 'SEMANALES') semGrp.style.flexDirection = 'column';
-        }
-
-        function actualizarContratoNuevoRow(sel) {
-            let row = sel.closest('.actividad-row');
-            let inp = row.querySelector('.act-contrato-nuevo');
-            inp.style.display = sel.value === 'NUEVO' ? 'inline-block' : 'none';
-            if (sel.value !== 'NUEVO') inp.value = '';
         }
 
         function calcularHorasAnualesRow(el) {
@@ -8538,17 +8815,23 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             let lista = filtrada || listaTrabajadores;
-            const nombresColores = { "cell-blanco": "No aplica", "cell-azul": "Azul", "cell-rojo": "Rojo", "cell-amarillo": "Amarillo", "cell-verde": "Verde", "cell-rosa": "Rosa" };
+            const nombresColores = Object.fromEntries(opcionesRRHH.colores.map(color => [color.valor, color.nombre]));
             lista.forEach((emp, index) => {
                 let esCustom = emp.claseColor && emp.claseColor.startsWith('#');
-                let nameColor = esCustom ? "Color HEX" : (nombresColores[emp.claseColor] || "No aplica");
+                let nameColor = nombresColores[emp.claseColor] || (esCustom ? "Color HEX" : "No aplica");
                 let stColor = esCustom ? `background-color: ${emp.claseColor}; color: white; text-shadow: 1px 1px 2px black;` : '';
                 let clColor = esCustom ? '' : emp.claseColor;
 
                 let funcionVisual = (emp.funcion || "").toUpperCase().trim();
-                if (funcionVisual === "CON" || funcionVisual === "CONDUCTOR" || funcionVisual === "AMBULIFT") funcionVisual = "AMB";
-                if (funcionVisual === "SUPERVISIÓN" || funcionVisual === "SUPERVISION") funcionVisual = "SUP";
-                if (funcionVisual === "CENTRO DE GESTIÓN" || funcionVisual === "CENTRO GESTION") funcionVisual = "CG";
+                const abreviaturasFuncion = {
+                    "CON": "AMB", "CONDUCTOR": "AMB", "AMBULIFT": "AMB",
+                    "SUPERVISIÓN": "SUP", "SUPERVISION": "SUP",
+                    "CENTRO DE GESTIÓN": "CG", "CENTRO GESTION": "CG",
+                    "FURGONETA": "FUR", "AGENTE": "AG", "AGENTE ETT": "AG ETT"
+                };
+                funcionVisual = abreviaturasFuncion[funcionVisual] || funcionVisual;
+                funcionVisual = escaparHTML(funcionVisual);
+                nameColor = escaparHTML(nameColor);
 
                 let hasAdap = (emp.adaptacion && emp.adaptacion.trim() !== "") ? "<span style='color:#059669; background:#d1fae5; padding:2px 6px; border-radius:3px; font-weight:bold;'>SÍ</span>" : "<span style='color:#ef4444; font-weight:bold;'>NO</span>";
                 let hasRest = (emp.restricciones && emp.restricciones.trim() !== "") ? "<span style='color:#059669; background:#d1fae5; padding:2px 6px; border-radius:3px; font-weight:bold;'>SÍ</span>" : "<span style='color:#ef4444; font-weight:bold;'>NO</span>";
@@ -8606,10 +8889,6 @@
             let indexExistente = listaTrabajadores.findIndex(emp => emp.id === idActual);
 
             let colorSeleccionado = document.getElementById('emp-rotacion').value;
-            if (colorSeleccionado === 'CUSTOM') {
-                let elCustom = document.getElementById('emp-color-custom');
-                if (elCustom) colorSeleccionado = elCustom.value;
-            }
 
             let rowsAct = document.querySelectorAll('.actividad-row');
             let actividadArr = [];
@@ -8618,9 +8897,7 @@
                 let fechaF = row.querySelector('.act-fecha-f').value;
                 if (!fechaI) return;
                 let contratoSel = row.querySelector('.act-contrato').value;
-                let contratoFila = contratoSel === 'NUEVO'
-                    ? (row.querySelector('.act-contrato-nuevo').value.trim().toUpperCase() || 'NUEVO')
-                    : contratoSel;
+                let contratoFila = contratoSel;
                 let horasTipoFila = row.querySelector('.act-horas-tipo').value;
                 let hConvenio = parseFloat(row.querySelector('.act-h-convenio').value);
                 let pctJornada = parseFloat(row.querySelector('.act-pct-jornada').value);
@@ -8740,14 +9017,7 @@
             if (tlfEmEl) tlfEmEl.value = emp.tlfEmergencia || "";
             document.getElementById('emp-funcion').value = emp.funcion;
 
-            let elCustom = document.getElementById('emp-color-custom');
-            if (emp.claseColor && emp.claseColor.startsWith('#')) {
-                document.getElementById('emp-rotacion').value = 'CUSTOM';
-                if (elCustom) { elCustom.style.display = 'block'; elCustom.value = emp.claseColor; }
-            } else {
-                document.getElementById('emp-rotacion').value = emp.claseColor || "cell-blanco";
-                if (elCustom) elCustom.style.display = 'none';
-            }
+            document.getElementById('emp-rotacion').value = emp.claseColor || "cell-blanco";
 
             // Cargar Rotación (Número)
             document.getElementById('emp-rotacion-numero').value = emp.rotacionNumero || "";
@@ -8799,6 +9069,10 @@
             let txt = document.getElementById('search-rrhh-input').value.toLowerCase();
             let fAdap = document.getElementById('filter-adap') ? document.getElementById('filter-adap').value : 'ALL';
             let fRest = document.getElementById('filter-rest') ? document.getElementById('filter-rest').value : 'ALL';
+            let fFuncion = document.getElementById('filter-func')?.value || 'ALL';
+            let fRotacion = document.getElementById('filter-rotacion')?.value || 'ALL';
+            let fRotacionNumero = document.getElementById('filter-rotacion-numero')?.value || 'ALL';
+            let fContrato = document.getElementById('filter-contrato')?.value || 'ALL';
 
             let res = listaTrabajadores.filter(e => {
                 let matchTxt = (e.nombre || "").toLowerCase().includes(txt) ||
@@ -8813,8 +9087,16 @@
 
                 let matchAdap = (fAdap === 'ALL') || (fAdap === hasAdap);
                 let matchRest = (fRest === 'ALL') || (fRest === hasRest);
+                let matchFuncion = fFuncion === 'ALL' || e.funcion === fFuncion;
+                let matchRotacion = fRotacion === 'ALL' || e.claseColor === fRotacion;
+                let matchRotacionNumero = fRotacionNumero === 'ALL' || String(e.rotacionNumero || '') === fRotacionNumero;
+                let contratoActual = e.actividad?.length
+                    ? e.actividad[e.actividad.length - 1].contrato || ''
+                    : e.contrato || '';
+                let matchContrato = fContrato === 'ALL' || contratoActual === fContrato;
 
-                return matchTxt && matchAdap && matchRest;
+                return matchTxt && matchAdap && matchRest && matchFuncion
+                    && matchRotacion && matchRotacionNumero && matchContrato;
             });
             renderizarListaRRHH(res);
         }
@@ -10348,7 +10630,7 @@
 
         function filtrarPorFuncionVac(codigoFuncion, btnElement) {
             filtroFuncionVacActivo = codigoFuncion;
-            document.querySelectorAll('#pane-vacaciones .segment-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#vacaciones-function-filters .segment-btn').forEach(btn => btn.classList.remove('active'));
             if (btnElement) btnElement.classList.add('active');
             renderizarMatrizVacaciones();
         }
@@ -10622,7 +10904,7 @@
 
             let listaOrdenada = [...listaTrabajadores];
 
-            const pesoColor = { "cell-blanco": 1, "cell-azul": 2, "cell-rojo": 3, "cell-amarillo": 4, "cell-verde": 5, "cell-rosa": 6 };
+            const pesoColor = Object.fromEntries(opcionesRRHH.colores.map((color, index) => [color.valor, index + 1]));
             const pesoContrato = { "FTC": 1, "FIJO": 2, "FIJI": 3, "FTP 90": 4, "FTP 50": 5, "FD 20": 6, "FD 15": 7, "ETT": 8 };
 
             if (ordenVarActivo === "ALFABETICO") {
@@ -11644,7 +11926,7 @@
             });
 
             let listaOrdenada = [...listaTrabajadores];
-            const pesoColor = { "cell-blanco": 1, "cell-azul": 2, "cell-rojo": 3, "cell-amarillo": 4, "cell-verde": 5, "cell-rosa": 6 };
+            const pesoColor = Object.fromEntries(opcionesRRHH.colores.map((color, index) => [color.valor, index + 1]));
             const pesoContrato = { "FTC": 1, "FIJO": 2, "FIJI": 3, "FTP 90": 4, "FTP 50": 5, "FD 20": 6, "FD 15": 7, "ETT": 8 };
 
             if (horasCriterioOrden === "ALFABETICO") {
@@ -13959,44 +14241,17 @@
                     <div class="form-group">
                         <label>Función *</label>
                         <select id="emp-funcion" class="form-control" required="">
-                            <option value="Centro Gestión">Centro de Gestión</option>
-                            <option value="Supervisión">Supervisión</option>
-                            <option value="Ambulift">Ambulift</option>
-                            <option value="Furgoneta">Furgoneta</option>
-                            <option value="Agente">Agente</option>
-                            <option value="Agente ETT">Agente ETT</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Rotación (Color) *</label>
                         <div style="display: flex; gap: 4px;">
-                            <select id="emp-rotacion" class="form-control" required="" style="flex-grow: 1;"
-                                onchange="if(this.value==='CUSTOM') document.getElementById('emp-color-custom').style.display='block'; else document.getElementById('emp-color-custom').style.display='none';">
-                                <option value="cell-blanco">No aplica</option>
-                                <option value="cell-azul">Azul</option>
-                                <option value="cell-rojo">Rojo</option>
-                                <option value="cell-amarillo">Amarillo</option>
-                                <option value="cell-verde">Verde</option>
-                                <option value="cell-rosa">Rosa</option>
-                                <option value="CUSTOM">🎨 Personalizado HEX...</option>
-                            </select>
-                            <input type="color" id="emp-color-custom" value="#ff8800"
-                                style="display: none; width: 35px; height: 26px; padding: 0; border: 1px solid #d1d5db; cursor: pointer;">
+                            <select id="emp-rotacion" class="form-control" required="" style="flex-grow: 1;"></select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Rotación (Número)</label>
                         <select id="emp-rotacion-numero" class="form-control" style="flex-grow: 1;">
-                            <option value="">Sin asignar</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
                         </select>
                     </div>
                     <div></div>

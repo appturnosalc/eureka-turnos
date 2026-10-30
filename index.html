@@ -5571,6 +5571,11 @@
         let baseDatosCiclos = [];
         let memoriaPortapapelesTurnoRapido = null;
 
+        function compararTrabajadoresPorApellido(a, b) {
+            return (a.apellidos || "").localeCompare(b.apellidos || "", "es", { sensitivity: "base" })
+                || (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" });
+        }
+
         let documentTypes = ['NOTA'];
         let documentosPDF = [];
         let lecturasDocumentos = {};
@@ -7295,7 +7300,7 @@
             const pesoContrato = { "FTC": 1, "FIJO": 2, "FIJI": 3, "FTP 90": 4, "FTP 50": 5, "FD 20": 6, "FD 15": 7, "ETT": 8 };
 
             if (criterioOrdenMatriz === "ALFABETICO") {
-                listaOrdenada.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
+                listaOrdenada.sort(compararTrabajadoresPorApellido);
             } else if (criterioOrdenMatriz === "ROTACION") {
                 listaOrdenada.sort((a, b) => (pesoColor[a.claseColor] || 1) - (pesoColor[b.claseColor] || 1));
             } else if (criterioOrdenMatriz === "CONTRATO") {
@@ -7554,7 +7559,7 @@
             const pesoContrato = { "FTC": 1, "FIJO": 2, "FIJI": 3, "FTP 90": 4, "FTP 50": 5, "FD 20": 6, "FD 15": 7, "ETT": 8 };
 
             if (criterioOrdenMatriz === "ALFABETICO") {
-                listaOrdenada.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
+                listaOrdenada.sort(compararTrabajadoresPorApellido);
             } else if (criterioOrdenMatriz === "ROTACION") {
                 listaOrdenada.sort((a, b) => (pesoColor[a.claseColor] || 1) - (pesoColor[b.claseColor] || 1));
             } else if (criterioOrdenMatriz === "CONTRATO") {
@@ -10731,6 +10736,9 @@
             let mes = window.fechaBaseVacaciones.getMonth();
             let anio = window.fechaBaseVacaciones.getFullYear();
             let listaOrdenada = [...listaTrabajadores];
+            if (ordenVacActivo === "ALFABETICO") {
+                listaOrdenada.sort(compararTrabajadoresPorApellido);
+            }
 
             listaOrdenada.forEach((emp) => {
                 // ROL TRABAJADOR: solo mostrar la fila del empleado logueado
@@ -10944,7 +10952,7 @@
             const pesoContrato = { "FTC": 1, "FIJO": 2, "FIJI": 3, "FTP 90": 4, "FTP 50": 5, "FD 20": 6, "FD 15": 7, "ETT": 8 };
 
             if (ordenVarActivo === "ALFABETICO") {
-                listaOrdenada.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                listaOrdenada.sort(compararTrabajadoresPorApellido);
             } else if (ordenVarActivo === "ROTACION") {
                 listaOrdenada.sort((a, b) => (pesoColor[a.claseColor] || 1) - (pesoColor[b.claseColor] || 1));
             } else if (ordenVarActivo === "CONTRATO") {
@@ -11966,7 +11974,7 @@
             const pesoContrato = { "FTC": 1, "FIJO": 2, "FIJI": 3, "FTP 90": 4, "FTP 50": 5, "FD 20": 6, "FD 15": 7, "ETT": 8 };
 
             if (horasCriterioOrden === "ALFABETICO") {
-                listaOrdenada.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                listaOrdenada.sort(compararTrabajadoresPorApellido);
             } else if (horasCriterioOrden === "ROTACION") {
                 listaOrdenada.sort((a, b) => (pesoColor[a.claseColor] || 1) - (pesoColor[b.claseColor] || 1));
             } else if (horasCriterioOrden === "CONTRATO") {
@@ -13287,7 +13295,7 @@
             });
 
             if (ordenActualRegistro === 'AZ') {
-                traba.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                traba.sort(compararTrabajadoresPorApellido);
             } else {
                 traba.sort((a, b) => (a.rotacion || "").localeCompare(b.rotacion || "") || a.nombre.localeCompare(b.nombre));
             }
@@ -13620,7 +13628,7 @@
             });
 
             if (ordenActualRegistro === 'AZ') {
-                traba.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                traba.sort(compararTrabajadoresPorApellido);
             } else {
                 traba.sort((a, b) => (a.rotacion || "").localeCompare(b.rotacion || "") || a.nombre.localeCompare(b.nombre));
             }

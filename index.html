@@ -2524,6 +2524,12 @@
             letter-spacing: 0.1px;
         }
 
+        .compact-table input.input-tramo-color-rotacion,
+        .compact-table input.input-tramo-color-rotacion:focus {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+        }
+
         .compact-table tr:not(.row-estado) input[data-campo="tramo1"]:focus,
         .compact-table tr:not(.row-estado) input[data-campo="tramo2"]:focus {
             background: rgba(8, 47, 73, 0.92) !important;
@@ -7656,14 +7662,15 @@
                 let contextAccion = `oncontextmenu="handleRightClickGlobal(event, this, '${empId}', '${dateKey}', ${rowTipo})"`;
                 let autoTextColor = (rowTipo === 0) ? getAutoTextColor(valorPrevio) : null;
                 let textoNegro = rowTipo > 0 && !sinColorRotacion;
-                let inputStyle = `${!dateActive ? 'cursor:not-allowed;' : ''}${textoNegro ? 'color:#000000 !important;' : ''}${autoTextColor ? `color:${autoTextColor};font-weight:900;` : ''}`;
+                let claseTextoRotacion = textoNegro ? ' input-tramo-color-rotacion' : '';
+                let inputStyle = `${!dateActive ? 'cursor:not-allowed;' : ''}${autoTextColor ? `color:${autoTextColor};font-weight:900;` : ''}`;
 
                 celdas += `
                     <td class="${claseAplicada}${claseExtraSeparador}${tieneNotaClase}${tieneExtraClase}" style="${colorFondoTd}" ${textoTooltip}>
                         <input type="text" id="${empId}_${prefijoTipo}_idx${diaIdx}" 
                                data-emp="${empIdx}" data-row="${rowTipo}" data-col="${diaIdx}"
                                data-empid="${empId}" data-campo="${prefijoTipo}" data-fecha="${dateKey}"
-                               class="input-text navigation-input" value="${valorPrevio}" 
+                               class="input-text navigation-input${claseTextoRotacion}" value="${valorPrevio}"
                                ${readOnlyAttr} style="${inputStyle}">
                     </td>`;
             });

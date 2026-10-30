@@ -5843,6 +5843,7 @@
         let appStateReconnectAttempts = 0;
         let appStateReconnectInProgress = false;
         let appStateLifecycleListenersRegistered = false;
+        let isRefreshingAppState = false;
         let app_state = null;
 
         function obtenerEstadoAplicacion() {
@@ -6057,6 +6058,32 @@
             return true;
         }
 
+        async function refrescarEstadoAplicacionDesdeSupabase() {
+            if (!supabaseClient || isRefreshingAppState) return;
+            isRefreshingAppState = true;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('app_state')
+                    .select('data')
+                    .eq('key', APP_STATE_KEY)
+                    .maybeSingle();
+
+                if (error) throw error;
+                const datos = data?.data;
+                if (!datos || typeof datos !== 'object' || Array.isArray(datos)) return;
+                if (serializarEstadoAplicacion(datos) === lastSyncedAppState) return;
+
+                if (aplicarEstadoAplicacion(datos)) {
+                    lastSyncedAppState = serializarEstadoAplicacion(obtenerEstadoAplicacion());
+                    actualizarEstadoSincronizacion('🟢 Actualizado desde Supabase', '#86efac');
+                }
+            } catch (error) {
+                console.error('Error al comprobar cambios del estado en Supabase:', error);
+            } finally {
+                isRefreshingAppState = false;
+            }
+        }
+
         function migrarDatosAuxiliaresLocales(estadoRemoto) {
             const clavesMigradas = [];
             const migrarArray = (claveLocal, propiedadEstado, asignar) => {
@@ -6101,6 +6128,9 @@
             }
             if (!appStateLifecycleListenersRegistered) {
                 const reconectarAlVolver = () => {
+                    if (document.visibilityState !== 'hidden') {
+                        refrescarEstadoAplicacionDesdeSupabase();
+                    }
                     if (document.visibilityState !== 'hidden' && !realtimeConnected) {
                         if (appStateReconnectTimer) {
                             clearTimeout(appStateReconnectTimer);
@@ -6140,6 +6170,7 @@
                             appStateReconnectTimer = null;
                         }
                         actualizarEstadoSincronizacion('🟢 Conectado en tiempo real', '#86efac');
+                        refrescarEstadoAplicacionDesdeSupabase();
                     } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
                         actualizarEstadoSincronizacion('🔴 Sin conexión en tiempo real', '#fca5a5');
                         console.error(`Estado de la suscripción Realtime: ${status}`);
@@ -7007,7 +7038,12 @@
             iniciarSuscripcionEstadoAplicacion();
             inicializarCuadrante();
             renderizarListaRRHH();
-            setInterval(autoSaveToSupabase, 5000);
+            setInterval(() => {
+                autoSaveToSupabase();
+                if (document.visibilityState !== 'hidden') {
+                    refrescarEstadoAplicacionDesdeSupabase();
+                }
+            }, 5000);
             checkSesionEureka();
         }
 

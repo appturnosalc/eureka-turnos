@@ -5834,6 +5834,8 @@
         let trabajadorGuiasLeidas = {};
         let datosRegistrosMensuales = {};
         const APP_STATE_KEY = 'eureka_auto_save_data';
+        const APP_STATE_KEY_COLUMN = 'Clave';
+        const APP_STATE_DATA_COLUMN = 'Datos';
         let isSavingAppState = false;
         let appStateSaveQueued = false;
         let lastSyncedAppState = null;
@@ -5902,7 +5904,10 @@
                     actualizarEstadoSincronizacion('🔴 Guardando...', '#fca5a5');
                     const { error } = await supabaseClient
                         .from('app_state')
-                        .upsert({ key: APP_STATE_KEY, data: datos }, { onConflict: 'key' });
+                        .upsert({
+                            [APP_STATE_KEY_COLUMN]: APP_STATE_KEY,
+                            [APP_STATE_DATA_COLUMN]: datos
+                        }, { onConflict: APP_STATE_KEY_COLUMN });
 
                     if (error) throw error;
                     lastSyncedAppState = serializarEstadoAplicacion(datos);
@@ -6019,8 +6024,8 @@
 
             const { data, error } = await supabaseClient
                 .from('app_state')
-                .select('data')
-                .eq('key', APP_STATE_KEY)
+                .select(`${APP_STATE_KEY_COLUMN},${APP_STATE_DATA_COLUMN}`)
+                .eq(APP_STATE_KEY_COLUMN, APP_STATE_KEY)
                 .maybeSingle();
 
             if (error) {
@@ -6029,7 +6034,7 @@
                 throw error;
             }
 
-            let estadoRemoto = data?.data || null;
+            let estadoRemoto = extraerEstadoRegistroAppState(data);
             const clavesLocalesMigradas = [];
             if (!estadoRemoto) {
                 const estadoAnterior = localStorage.getItem(APP_STATE_KEY);
@@ -6064,13 +6069,13 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('app_state')
-                    .select('data')
-                    .eq('key', APP_STATE_KEY)
+                    .select(`${APP_STATE_KEY_COLUMN},${APP_STATE_DATA_COLUMN}`)
+                    .eq(APP_STATE_KEY_COLUMN, APP_STATE_KEY)
                     .maybeSingle();
 
                 if (error) throw error;
-                const datos = data?.data;
-                if (!datos || typeof datos !== 'object' || Array.isArray(datos)) return;
+                const datos = extraerEstadoRegistroAppState(data);
+                if (!datos) return;
                 if (serializarEstadoAplicacion(datos) === lastSyncedAppState) return;
 
                 if (aplicarEstadoAplicacion(datos)) {
@@ -6082,6 +6087,20 @@
             } finally {
                 isRefreshingAppState = false;
             }
+        }
+
+        function extraerEstadoRegistroAppState(registro) {
+            if (!registro || (registro[APP_STATE_KEY_COLUMN] ?? registro.key) !== APP_STATE_KEY) return null;
+            let datos = registro[APP_STATE_DATA_COLUMN] ?? registro.data;
+            if (typeof datos === 'string') {
+                try {
+                    datos = JSON.parse(datos);
+                } catch (error) {
+                    console.error('La columna Datos de app_state no contiene JSON válido:', error);
+                    return null;
+                }
+            }
+            return datos && typeof datos === 'object' && !Array.isArray(datos) ? datos : null;
         }
 
         function migrarDatosAuxiliaresLocales(estadoRemoto) {
@@ -6151,13 +6170,13 @@
                     event: 'INSERT',
                     schema: 'public',
                     table: 'app_state',
-                    filter: `key=eq.${APP_STATE_KEY}`
+                    filter: `${APP_STATE_KEY_COLUMN}=eq.${APP_STATE_KEY}`
                 }, recibirCambioEstadoAplicacion)
                 .on('postgres_changes', {
                     event: 'UPDATE',
                     schema: 'public',
                     table: 'app_state',
-                    filter: `key=eq.${APP_STATE_KEY}`
+                    filter: `${APP_STATE_KEY_COLUMN}=eq.${APP_STATE_KEY}`
                 }, recibirCambioEstadoAplicacion)
                 .subscribe(status => {
                     if (appStateChannel !== channel) return;
@@ -6211,22 +6230,11 @@
         }
 
         function recibirCambioEstadoAplicacion(payload) {
-            let datos = payload?.new?.data ?? payload?.data;
-            if (!datos && payload?.new && typeof payload.new === 'object'
-                && Object.prototype.hasOwnProperty.call(payload.new, 'baseDatosTurnos')) {
-                datos = payload.new;
-            }
-            if (typeof datos === 'string') {
-                try {
-                    datos = JSON.parse(datos);
-                } catch (error) {
-                    console.error('El estado recibido por Realtime no contiene JSON válido:', error);
-                    actualizarEstadoSincronizacion('🔴 Datos de nube no válidos', '#fca5a5');
-                    return;
+            const datos = extraerEstadoRegistroAppState(payload?.new);
+            if (!datos) {
+                if (payload?.new) {
+                    console.error('El payload Realtime no contiene un registro app_state válido para esta aplicación.');
                 }
-            }
-            if (!datos || typeof datos !== 'object') {
-                console.error('El payload Realtime no contiene datos de estado válidos.', payload?.eventType);
                 return;
             }
             if (serializarEstadoAplicacion(datos) === lastSyncedAppState) return;

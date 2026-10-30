@@ -2524,10 +2524,13 @@
             letter-spacing: 0.1px;
         }
 
-        .compact-table input.input-tramo-color-rotacion,
-        .compact-table input.input-tramo-color-rotacion:focus {
+        #pane-turnos .compact-table input.input-tramo-color-rotacion,
+        #pane-turnos .compact-table input.input-tramo-color-rotacion:focus,
+        #pane-planificar .compact-table input.input-tramo-color-rotacion,
+        #pane-planificar .compact-table input.input-tramo-color-rotacion:focus {
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
+            background: rgba(255, 255, 255, 0.28) !important;
         }
 
         .compact-table tr:not(.row-estado) input[data-campo="tramo1"]:focus,
@@ -5815,6 +5818,7 @@
         const APP_STATE_KEY = 'eureka_auto_save_data';
         const APP_STATE_KEY_COLUMN = 'key';
         const APP_STATE_DATA_COLUMN = 'data';
+        const COLOR_FONDO_ROTACION_SIN_ASIGNAR = '#DCE6F1';
         const COLORES_FONDO_ROTACION = {
             'cell-azul': 'var(--rot-azul)',
             'cell-rojo': 'var(--rot-rojo)',
@@ -5822,6 +5826,10 @@
             'cell-amarillo': 'var(--rot-amarillo)',
             'cell-rosa': 'var(--rot-rosa)'
         };
+        function obtenerFondoRotacion(colorClase) {
+            if (typeof colorClase === 'string' && colorClase.startsWith('#')) return colorClase;
+            return COLORES_FONDO_ROTACION[colorClase] || COLOR_FONDO_ROTACION_SIN_ASIGNAR;
+        }
         let appStateSyncReady = false;
         let isSavingAppState = false;
         let appStateSaveQueued = false;
@@ -7624,7 +7632,7 @@
                 let sinColorRotacion = colorClase === 'cell-blanco';
                 let colorFondoDefecto = (rowTipo === 0)
                     ? '#12283a'
-                    : (esCustomHex ? colorClase : (COLORES_FONDO_ROTACION[colorClase] || '#12283a'));
+                    : obtenerFondoRotacion(colorClase);
 
                 let currentEmp = listaTrabajadores.find(e => e.id === empId);
                 let dateActive = isDateActive(currentEmp, fecha);
@@ -7661,7 +7669,7 @@
 
                 let contextAccion = `oncontextmenu="handleRightClickGlobal(event, this, '${empId}', '${dateKey}', ${rowTipo})"`;
                 let autoTextColor = (rowTipo === 0) ? getAutoTextColor(valorPrevio) : null;
-                let textoNegro = rowTipo > 0 && !sinColorRotacion;
+                let textoNegro = rowTipo > 0 && dateActive;
                 let claseTextoRotacion = textoNegro ? ' input-tramo-color-rotacion' : '';
                 let inputStyle = `${!dateActive ? 'cursor:not-allowed;' : ''}${autoTextColor ? `color:${autoTextColor};font-weight:900;` : ''}`;
 
@@ -10741,6 +10749,7 @@
                 if (visibleClass === "hidden-worker") return;
 
                 let colorClase = emp.claseColor || "cell-blanco";
+                let colorFondoHoras = obtenerFondoRotacion(colorClase);
                 let estiloColorCustomWorker = (colorClase.startsWith('#')) ? `background-color: ${colorClase} !important; border-right: 3px solid #1f2937 !important;` : '';
 
                 let funcionVisual = emp.funcion.toUpperCase().trim();
@@ -10793,7 +10802,7 @@
                     let horasDia = calcularHorasTrabajadasDia(emp, new Date(anio, mes, d.getDate()));
                     let horasTexto = (horasDia > 0) ? formatHoursToHHMM(horasDia) : '';
                     // Div con altura fija = misma que los inputs de la fila de estado
-                    htmlCeldasHoras += `<td><div style="height:24px;display:flex;align-items:center;justify-content:center;">${horasTexto}</div></td>`;
+                    htmlCeldasHoras += `<td style="background-color:${colorFondoHoras} !important;color:#000000 !important;"><div style="height:24px;display:flex;align-items:center;justify-content:center;">${horasTexto}</div></td>`;
 
                     d.setDate(d.getDate() + 1);
                     diaColIdx++;

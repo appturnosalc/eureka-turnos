@@ -4062,19 +4062,6 @@
                         </div>
                     </div>
 
-                    <div id="turnos-backup-controles"
-                        style="display: flex; gap: 4px; align-items: center; margin-left: auto; border-left: 2px solid var(--border); padding-left: 10px;">
-                        <button type="button" class="nav-btn" onclick="exportarDatosSistema()"
-                            style="background: #64748b; padding: 6px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: background 0.2s;"
-                            onmouseover="this.style.background='#475569'"
-                            onmouseout="this.style.background='#64748b'">Exportar Copia</button>
-                        <button type="button" class="nav-btn" onclick="document.getElementById('importarFile').click()"
-                            style="background: #64748b; padding: 6px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: background 0.2s;"
-                            onmouseover="this.style.background='#475569'"
-                            onmouseout="this.style.background='#64748b'">Importar Copia</button>
-                        <input type="file" id="importarFile" accept=".json" style="display: none;"
-                            onchange="importarDatosSistema(this)">
-                    </div>
                 </div>
             </div>
 
@@ -9139,68 +9126,6 @@
                     && matchRotacion && matchRotacionNumero && matchContrato;
             });
             renderizarListaRRHH(res);
-        }
-
-        function exportarDatosSistema() {
-            let datosAExportar = {
-                ultimoNumeroEmpleado: ultimoNumeroEmpleado,
-                baseDatosTurnos: baseDatosTurnos,
-                listaTrabajadores: listaTrabajadores,
-                baseDatosCiclos: baseDatosCiclos,
-                limitesConfig: {
-                    maxHoras: (document.getElementById('limit-max-horas') || {}).value || 9,
-                    minHoras: (document.getElementById('limit-min-horas') || {}).value || 2,
-                    maxPartido: (document.getElementById('limit-max-partido') || {}).value || 5,
-                    minPartido: (document.getElementById('limit-min-partido') || {}).value || 1,
-                    minInterdiario: (document.getElementById('limit-min-interdiario') || {}).value || 10
-                }
-            };
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datosAExportar));
-            let downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "copia_seguridad_cuadrante.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importarDatosSistema(input) {
-            let file = input.files;
-            if (!file || file.length === 0) return;
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                try {
-                    let datosImportados = JSON.parse(e.target.result);
-                    if (datosImportados) {
-                        ultimoNumeroEmpleado = datosImportados.ultimoNumeroEmpleado || 0;
-                        baseDatosTurnos = datosImportados.baseDatosTurnos || {};
-                        listaTrabajadores = datosImportados.listaTrabajadores || [];
-                        baseDatosCiclos = datosImportados.baseDatosCiclos || [];
-
-                        if (ultimoNumeroEmpleado === 0 && listaTrabajadores.length > 0) {
-                            listaTrabajadores.forEach(e => { if (e.num && e.num > ultimoNumeroEmpleado) ultimoNumeroEmpleado = e.num; });
-                        }
-
-                        if (datosImportados.limitesConfig) {
-                            let l_max = document.getElementById('limit-max-horas'); if (l_max) l_max.value = datosImportados.limitesConfig.maxHoras || 9;
-                            let l_min = document.getElementById('limit-min-horas'); if (l_min) l_min.value = datosImportados.limitesConfig.minHoras || 2;
-                            let p_max = document.getElementById('limit-max-partido'); if (p_max) p_max.value = datosImportados.limitesConfig.maxPartido || 5;
-                            let p_min = document.getElementById('limit-min-partido'); if (p_min) p_min.value = datosImportados.limitesConfig.minPartido || 1;
-                            let i_min = document.getElementById('limit-min-interdiario'); if (i_min) i_min.value = datosImportados.limitesConfig.minInterdiario || 10;
-                        }
-
-                        inicializarCuadrante();
-                        renderizarListaRRHH();
-                        input.value = "";
-                        alert("¡Datos cargados con éxito! Ya puedes seguir trabajando.");
-                    } else {
-                        alert("El archivo no contiene datos válidos.");
-                    }
-                } catch (err) {
-                    alert("Error crítico al procesar el archivo de copia de seguridad.");
-                }
-            };
-            reader.readAsText(file[0]);
         }
 
         // --- MODO PINTURA MANUAL ---

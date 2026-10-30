@@ -5809,6 +5809,7 @@
         const APP_STATE_KEY = 'eureka_auto_save_data';
         const APP_STATE_KEY_COLUMN = 'key';
         const APP_STATE_DATA_COLUMN = 'data';
+        let appStateSyncReady = false;
         let isSavingAppState = false;
         let appStateSaveQueued = false;
         let lastSyncedAppState = null;
@@ -5871,6 +5872,8 @@
         }
 
         async function autoSaveToSupabase() {
+            if (!appStateSyncReady) return false;
+
             if (!supabaseClient) {
                 actualizarEstadoSincronizacion('🔴 Supabase no disponible', '#fca5a5');
                 console.error('No se pudo guardar: el cliente de Supabase no está inicializado.');
@@ -6024,6 +6027,11 @@
             }
 
             let estadoRemoto = extraerEstadoRegistroAppState(data);
+            if (data && !estadoRemoto) {
+                actualizarEstadoSincronizacion('🔴 Datos de nube no válidos', '#fca5a5');
+                console.error('El registro app_state existe, pero no contiene un estado válido; se detiene la sincronización para proteger los datos.');
+                return false;
+            }
             const clavesLocalesMigradas = [];
             if (!estadoRemoto) {
                 const estadoAnterior = localStorage.getItem(APP_STATE_KEY);
@@ -6039,6 +6047,7 @@
             }
 
             if (estadoRemoto && !aplicarEstadoAplicacion(estadoRemoto, false)) return false;
+            appStateSyncReady = true;
             const clavesAuxiliaresMigradas = migrarDatosAuxiliaresLocales(estadoRemoto || {});
             clavesLocalesMigradas.push(...clavesAuxiliaresMigradas);
 
@@ -6053,7 +6062,7 @@
         }
 
         async function refrescarEstadoAplicacionDesdeSupabase() {
-            if (!supabaseClient || isRefreshingAppState) return;
+            if (!supabaseClient || !appStateSyncReady || isRefreshingAppState) return;
             isRefreshingAppState = true;
             try {
                 const { data, error } = await supabaseClient
@@ -7033,15 +7042,17 @@
                 console.error('Se continuará con los datos iniciales porque no se pudo cargar Supabase:', error);
             }
             actualizarControlesOpcionesRRHH();
-            iniciarSuscripcionEstadoAplicacion();
             inicializarCuadrante();
             renderizarListaRRHH();
-            setInterval(() => {
-                autoSaveToSupabase();
-                if (document.visibilityState !== 'hidden') {
-                    refrescarEstadoAplicacionDesdeSupabase();
-                }
-            }, 5000);
+            if (appStateSyncReady) {
+                iniciarSuscripcionEstadoAplicacion();
+                setInterval(() => {
+                    autoSaveToSupabase();
+                    if (document.visibilityState !== 'hidden') {
+                        refrescarEstadoAplicacionDesdeSupabase();
+                    }
+                }, 5000);
+            }
             checkSesionEureka();
         }
 
@@ -7597,7 +7608,10 @@
                 let autoBg = (rowTipo === 0) ? getAutoColor(valorPrevio) : null;
 
                 let esCustomHex = colorClase.startsWith('#');
-                let colorFondoDefecto = (rowTipo === 0) ? '#12283a' : (esCustomHex ? colorClase : '');
+                let sinColorRotacion = colorClase === 'cell-blanco';
+                let colorFondoDefecto = (rowTipo === 0)
+                    ? '#12283a'
+                    : (esCustomHex ? colorClase : (sinColorRotacion ? '#12283a' : ''));
 
                 let currentEmp = listaTrabajadores.find(e => e.id === empId);
                 let dateActive = isDateActive(currentEmp, fecha);
@@ -7617,7 +7631,9 @@
                 if (esPublicado && rowTipo === 0 && !customBg && !valorPrevio) {
                     colorFondoTd = `background-color: #6b7280 !important;`;
                 }
-                let claseAplicada = (!dateActive) ? '' : ((rowTipo === 0) ? 'cell-blanco' : (esCustomHex ? '' : colorClase));
+                let claseAplicada = (!dateActive)
+                    ? ''
+                    : ((rowTipo === 0) ? 'cell-blanco' : (esCustomHex || sinColorRotacion ? '' : colorClase));
                 if (rowTipo === 0) claseAplicada += getEstadoVisualClass(valorPrevio);
                 if (esPublicado && rowTipo === 0) claseAplicada += ' published-turno';
 

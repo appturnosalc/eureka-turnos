@@ -2094,6 +2094,38 @@
             border-right-color: rgba(34, 211, 238, 0.55) !important;
         }
 
+        #pane-turnos .table-wrapper,
+        #pane-planificar .table-wrapper {
+            border-color: #22d3ee !important;
+        }
+
+        #pane-turnos .compact-table th,
+        #pane-turnos .compact-table td,
+        #pane-planificar .compact-table th,
+        #pane-planificar .compact-table td {
+            border-color: #22d3ee !important;
+        }
+
+        #pane-turnos .compact-table tbody tr[data-row-tipo] .turno-grid-cell,
+        #pane-planificar .compact-table tbody tr[data-row-tipo] .turno-grid-cell {
+            border-color: #111827 !important;
+        }
+
+        #pane-turnos .compact-table tbody tr[data-row-tipo="0"] .turno-grid-cell,
+        #pane-planificar .compact-table tbody tr[data-row-tipo="0"] .turno-grid-cell {
+            border-top-color: #22d3ee !important;
+        }
+
+        #pane-turnos .compact-table tbody tr[data-row-tipo] .turno-grid-cell.separador-semana,
+        #pane-planificar .compact-table tbody tr[data-row-tipo] .turno-grid-cell.separador-semana {
+            border-right: 3px solid #22d3ee !important;
+        }
+
+        #pane-turnos .compact-table tbody tr.row-fin-block .turno-grid-cell,
+        #pane-planificar .compact-table tbody tr.row-fin-block .turno-grid-cell {
+            border-bottom: 2px solid #22d3ee !important;
+        }
+
         #pane-turnos .compact-table .separador-semana,
         #pane-planificar .compact-table .separador-semana {
             border-right: 3px solid #22d3ee !important;
@@ -7285,7 +7317,7 @@
                 let visibleClass = (!isEmpActiveInView || !esFuncionEquivalente(emp.funcion, filtroFuncionActivo)) ? "hidden-worker" : "";
                 let numFilaActual = visibleClass === "hidden-worker" ? "" : contadorVisible++;
                 let colorClase = emp.claseColor || "cell-blanco";
-                let estiloColorCustomWorker = (colorClase.startsWith('#')) ? `background-color: ${colorClase} !important; border-right: 3px solid #1f2937 !important;` : '';
+                let estiloColorCustomWorker = (colorClase.startsWith('#')) ? `background-color: ${colorClase} !important; border-right: 3px solid #22d3ee !important;` : '';
                 let funcionVisual = (emp.funcion || "").toUpperCase().trim();
                 if (funcionVisual === "CENTRO DE GESTIÓN" || funcionVisual === "CENTRO GESTION") funcionVisual = "CG";
                 else if (funcionVisual === "SUPERVISIÓN" || funcionVisual === "SUPERVISION") funcionVisual = "SUP";
@@ -7549,7 +7581,7 @@
                 let numFilaActual = visibleClass === "hidden-worker" ? "" : contadorVisible++;
 
                 let colorClase = emp.claseColor || "cell-blanco";
-                let estiloColorCustomWorker = (colorClase.startsWith('#')) ? `background-color: ${colorClase} !important; border-right: 3px solid #1f2937 !important;` : '';
+                let estiloColorCustomWorker = (colorClase.startsWith('#')) ? `background-color: ${colorClase} !important; border-right: 3px solid #22d3ee !important;` : '';
 
                 let funcionVisual = (emp.funcion || "").toUpperCase().trim();
                 if (funcionVisual === "CENTRO DE GESTIÓN" || funcionVisual === "CENTRO GESTION") funcionVisual = "CG";
@@ -7645,7 +7677,7 @@
                 let readOnlyAttr = '';
 
                 if (!dateActive) {
-                    colorFondoTd = 'background-color: #494529 !important; border-color: #333 !important;';
+                    colorFondoTd = 'background-color: #494529 !important;';
                     readOnlyAttr = 'readonly';
                 } else {
                     if (customBg) colorFondoTd = `background-color: ${customBg} !important;`;
@@ -7679,7 +7711,7 @@
                 let inputStyle = `${!dateActive ? 'cursor:not-allowed;' : ''}${autoTextColor ? `color:${autoTextColor};font-weight:900;` : ''}`;
 
                 celdas += `
-                    <td class="${claseAplicada}${claseExtraSeparador}${tieneNotaClase}${tieneExtraClase}" style="${colorFondoTd}" ${textoTooltip}>
+                    <td class="turno-grid-cell ${claseAplicada}${claseExtraSeparador}${tieneNotaClase}${tieneExtraClase}" style="${colorFondoTd}" ${textoTooltip}>
                         <input type="text" id="${empId}_${prefijoTipo}_idx${diaIdx}" 
                                data-emp="${empIdx}" data-row="${rowTipo}" data-col="${diaIdx}"
                                data-empid="${empId}" data-campo="${prefijoTipo}" data-fecha="${dateKey}"

@@ -5807,8 +5807,8 @@
         let trabajadorGuiasLeidas = {};
         let datosRegistrosMensuales = {};
         const APP_STATE_KEY = 'eureka_auto_save_data';
-        const APP_STATE_KEY_COLUMN = 'Clave';
-        const APP_STATE_DATA_COLUMN = 'Datos';
+        const APP_STATE_KEY_COLUMN = 'clave';
+        const APP_STATE_DATA_COLUMN = 'datos';
         let isSavingAppState = false;
         let appStateSaveQueued = false;
         let lastSyncedAppState = null;
@@ -6085,7 +6085,7 @@
                 try {
                     datos = JSON.parse(datos);
                 } catch (error) {
-                    console.error('La columna Datos de app_state no contiene JSON válido:', error);
+                    console.error('La columna datos de app_state no contiene JSON válido:', error);
                     return null;
                 }
             }

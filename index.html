@@ -9448,6 +9448,23 @@
         }
 
         function ejecutarIntercambio() {
+            const obtenerCamposIntercambio = campo => {
+                if (campo === 'tramo1') return ['t1i', 't1f'];
+                if (campo === 'tramo2') return ['t2i', 't2f'];
+                return [campo];
+            };
+            const esCampoHorario = campo => campo === 'tramo1' || campo === 'tramo2';
+
+            const hayTiposIncompatibles = swapRange1.celdas.some((celda1, index) => {
+                const celda2 = swapRange2.celdas[index];
+                return esCampoHorario(celda1.campo) !== esCampoHorario(celda2.campo);
+            });
+            if (hayTiposIncompatibles) {
+                alert('Selecciona el mismo tipo de celdas en ambos rangos: estados con estados u horarios con horarios.');
+                cancelarSwap();
+                return;
+            }
+
             saveHistoryState();
             const notasIntercambio = new Map();
             
@@ -9461,11 +9478,8 @@
                 let campo1 = celda1.campo;
                 let campo2 = celda2.campo;
                 
-                // Determinar subcampos a intercambiar
-                let campos1 = campo1 === 't1i' || campo1 === 't1f' ? ['t1i', 't1f'] : 
-                             (campo1 === 't2i' || campo1 === 't2f' ? ['t2i', 't2f'] : [campo1]);
-                let campos2 = campo2 === 't1i' || campo2 === 't1f' ? ['t1i', 't1f'] : 
-                             (campo2 === 't2i' || campo2 === 't2f' ? ['t2i', 't2f'] : [campo2]);
+                const campos1 = obtenerCamposIntercambio(campo1);
+                const campos2 = obtenerCamposIntercambio(campo2);
                 
                 // Intercambiar valores
                 campos1.forEach((subcampo, idx) => {

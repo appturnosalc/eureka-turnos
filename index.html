@@ -9449,6 +9449,7 @@
 
         function ejecutarIntercambio() {
             saveHistoryState();
+            const notasIntercambio = new Map();
             
             // Intercambiar celda por celda basándose en el orden
             for (let i = 0; i < swapRange1.celdas.length; i++) {
@@ -9503,23 +9504,29 @@
                 baseDatosTurnos[bgKey1] = oscurecerColor(colorActual2, 15);
                 baseDatosTurnos[bgKey2] = oscurecerColor(colorActual1, 15);
                 
-                // Intercambiar notas si son celdas de estado
-                if (campo1 === 'est' && campo2 === 'est') {
-                    let notaKey1 = `${celda1.empId}_est_${date1}_nota`;
-                    let notaKey2 = `${celda2.empId}_est_${date2}_nota`;
-                    let prevNota1 = baseDatosTurnos[notaKey1] ? baseDatosTurnos[notaKey1] + " | " : "";
-                    let prevNota2 = baseDatosTurnos[notaKey2] ? baseDatosTurnos[notaKey2] + " | " : "";
-                    
-                    let emp1 = listaTrabajadores.find(e => e.id === celda1.empId);
-                    let emp2 = listaTrabajadores.find(e => e.id === celda2.empId);
-                    
-                    baseDatosTurnos[notaKey1] = prevNota1 + "CT CON " + (emp2 ? emp2.nombre : celda2.empId);
-                    baseDatosTurnos[notaKey2] = prevNota2 + "CT CON " + (emp1 ? emp1.nombre : celda1.empId);
-                }
+                const emp1 = listaTrabajadores.find(e => e.id === celda1.empId);
+                const emp2 = listaTrabajadores.find(e => e.id === celda2.empId);
+                const notaKey1 = `${celda1.empId}_est_${date1}_nota`;
+                const notaKey2 = `${celda2.empId}_est_${date2}_nota`;
+                const nota1 = `CAMBIA CON ${emp2 ? emp2.nombre : celda2.empId}`.toLocaleUpperCase();
+                const nota2 = `CAMBIA CON ${emp1 ? emp1.nombre : celda1.empId}`.toLocaleUpperCase();
+                if (!notasIntercambio.has(notaKey1)) notasIntercambio.set(notaKey1, new Set());
+                if (!notasIntercambio.has(notaKey2)) notasIntercambio.set(notaKey2, new Set());
+                notasIntercambio.get(notaKey1).add(nota1);
+                notasIntercambio.get(notaKey2).add(nota2);
             }
+
+            notasIntercambio.forEach((notas, notaKey) => {
+                const existentes = baseDatosTurnos[notaKey] || '';
+                const nuevas = [...notas].filter(nota => !existentes.includes(nota));
+                if (nuevas.length > 0) {
+                    baseDatosTurnos[notaKey] = [existentes, ...nuevas].filter(Boolean).join(' | ');
+                }
+            });
             
             cancelarSwap();
             inicializarCuadrante();
+            autoSaveToSupabase();
             alert(`✅ Intercambio realizado con éxito.\n${swapRange1.count} celdas intercambiadas.`);
         }
 

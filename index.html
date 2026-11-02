@@ -6474,7 +6474,7 @@
                 checkbox.type = 'checkbox';
                 checkbox.id = `doc-func-${index}`;
                 checkbox.value = valor;
-                checkbox.checked = valor === 'Todos';
+                checkbox.checked = false;
                 label.append(checkbox, document.createTextNode(` ${etiqueta}`));
                 contenedor.appendChild(label);
             });

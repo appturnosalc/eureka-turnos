@@ -2707,17 +2707,20 @@
             border-color: #cbd5e1 !important;
         }
 
-        #pane-documentacion #doc-seguimiento-list table {
+        #pane-documentacion #doc-seguimiento-list table,
+        #pane-documentacion #postit-seguimiento-list table {
             background: #f1f5f9 !important;
         }
 
-        #pane-documentacion #doc-seguimiento-list th {
+        #pane-documentacion #doc-seguimiento-list th,
+        #pane-documentacion #postit-seguimiento-list th {
             color: #0f172a !important;
             background: #e2e8f0 !important;
             border-color: #94a3b8 !important;
         }
 
-        #pane-documentacion #doc-seguimiento-estado {
+        #pane-documentacion #doc-seguimiento-estado,
+        #pane-documentacion #postit-seguimiento-estado {
             width: 100%;
             min-width: 85px;
             padding: 3px;
@@ -2728,7 +2731,8 @@
             -webkit-text-fill-color: #0f172a !important;
         }
 
-        #pane-documentacion #doc-seguimiento-list td {
+        #pane-documentacion #doc-seguimiento-list td,
+        #pane-documentacion #postit-seguimiento-list td {
             color: #0f172a !important;
             background: #f1f5f9 !important;
             border-color: #cbd5e1 !important;
@@ -3975,6 +3979,11 @@
                     <div id="postit-historial-list" style="display:grid; gap:12px;"></div>
                 </div>
                 <div id="postit-seguimiento-panel" class="doc-subpanel" style="display:none;">
+                    <div style="margin-bottom:10px;">
+                        <input type="search" id="postit-seguimiento-trabajador" class="form-control"
+                            placeholder="Buscar trabajador..." aria-label="Buscar trabajador en seguimiento de post-it"
+                            oninput="renderizarSeguimientoPostIts()">
+                    </div>
                     <div id="postit-seguimiento-list" style="overflow:auto; max-height:420px; border:1px solid #d1d5db; border-radius:8px;"></div>
                 </div>
             </div>
@@ -4082,6 +4091,11 @@
                             <button class="nav-btn" style="background:#10b981;"
                                 onclick="exportarSeguimiento('XLSX')">Exportar Excel</button>
                         </div>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <input type="search" id="doc-seguimiento-trabajador" class="form-control"
+                            placeholder="Buscar trabajador..." aria-label="Buscar trabajador en seguimiento de documentos"
+                            oninput="renderizarSeguimientoDocumentos()">
                     </div>
                     <div id="doc-seguimiento-list"
                         style="overflow:auto; max-height:420px; border:1px solid #d1d5db; border-radius:8px;"></div>
@@ -6874,6 +6888,8 @@
         function renderizarSeguimientoPostIts() {
             const contenedor = document.getElementById('postit-seguimiento-list');
             if (!contenedor) return;
+            const estadoFiltro = document.getElementById('postit-seguimiento-estado')?.value || 'TODOS';
+            const trabajadorFiltro = (document.getElementById('postit-seguimiento-trabajador')?.value || '').trim().toLocaleLowerCase();
             contenedor.replaceChildren();
             if (postIts.length === 0) {
                 contenedor.innerHTML = '<p style="color:#6b7280; padding:10px;">No hay post-it para seguimiento.</p>';
@@ -6882,11 +6898,13 @@
             const tabla = document.createElement('table');
             tabla.className = 'doc-followup-table';
             tabla.style.cssText = 'width:100%; border-collapse:collapse; background:#f1f5f9;';
-            tabla.innerHTML = '<thead><tr style="background:#eff6ff;"><th style="padding:6px; border:1px solid #d1d5db;">Trabajador</th><th style="padding:6px; border:1px solid #d1d5db;">Post-it</th><th style="padding:6px; border:1px solid #d1d5db;">Leído</th></tr></thead><tbody></tbody>';
+            tabla.innerHTML = `<thead><tr style="background:#eff6ff;"><th style="padding:6px; border:1px solid #d1d5db;">Trabajador</th><th style="padding:6px; border:1px solid #d1d5db;">Post-it</th><th style="padding:3px; border:1px solid #d1d5db;"><select id="postit-seguimiento-estado" aria-label="Filtrar post-it por lectura" onchange="renderizarSeguimientoPostIts()"><option value="TODOS" ${estadoFiltro === 'TODOS' ? 'selected' : ''}>Leído: Todos</option><option value="SI" ${estadoFiltro === 'SI' ? 'selected' : ''}>Sí</option><option value="NO" ${estadoFiltro === 'NO' ? 'selected' : ''}>No</option></select></th></tr></thead><tbody></tbody>`;
             const tbody = tabla.querySelector('tbody');
             postIts.forEach(postIt => {
                 obtenerDestinatariosPostItParaSeguimiento(postIt).forEach(destinatario => {
                     const lectura = lecturasPostIts[`${postIt.id}_${destinatario.id}`] || null;
+                    if (trabajadorFiltro && !destinatario.nombre.toLocaleLowerCase().includes(trabajadorFiltro)) return;
+                    if (estadoFiltro !== 'TODOS' && ((estadoFiltro === 'SI') !== !!lectura)) return;
                     const fila = document.createElement('tr');
                     [destinatario.nombre, postIt.contenido, lectura ? `SÍ - ${formatDateTime(lectura)}` : 'NO'].forEach(texto => {
                         const celda = document.createElement('td');
@@ -6897,6 +6915,13 @@
                     tbody.appendChild(fila);
                 });
             });
+            if (!tbody.rows.length) {
+                const fila = tbody.insertRow();
+                const celda = fila.insertCell();
+                celda.colSpan = 3;
+                celda.style.cssText = 'padding:10px; color:#475569; text-align:center;';
+                celda.textContent = 'No hay resultados para los filtros seleccionados.';
+            }
             contenedor.appendChild(tabla);
         }
 
@@ -7016,6 +7041,7 @@
             let contenedor = document.getElementById('doc-seguimiento-list');
             let tipoFiltro = document.getElementById('doc-seguimiento-tipo').value;
             let estadoFiltro = document.getElementById('doc-seguimiento-estado')?.value || 'TODOS';
+            let trabajadorFiltro = (document.getElementById('doc-seguimiento-trabajador')?.value || '').trim().toLocaleLowerCase();
             if (!contenedor) return;
             contenedor.innerHTML = '';
             if (documentosPDF.length === 0) {
@@ -7032,6 +7058,7 @@
                 if (tipoFiltro !== 'TODOS' && doc.tipo !== tipoFiltro) return;
                 let destinatarios = obtenerDestinatariosDocParaSeguimiento(doc);
                 destinatarios.forEach(dest => {
+                    if (trabajadorFiltro && !dest.nombre.toLocaleLowerCase().includes(trabajadorFiltro)) return;
                     let key = `${doc.id}_${dest.id}`;
                     let lectura = lecturasDocumentos[key] || null;
                     let estado = lectura ? `SÍ - ${formatDateTime(lectura)}` : 'NO';
@@ -7041,6 +7068,13 @@
                     tbody.appendChild(row);
                 });
             });
+            if (!tbody.rows.length) {
+                const row = tbody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 5;
+                cell.style.cssText = 'padding:10px; color:#475569; text-align:center;';
+                cell.textContent = 'No hay resultados para los filtros seleccionados.';
+            }
             contenedor.appendChild(tabla);
         }
 

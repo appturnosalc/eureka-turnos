@@ -2717,6 +2717,17 @@
             border-color: #94a3b8 !important;
         }
 
+        #pane-documentacion #doc-seguimiento-estado {
+            width: 100%;
+            min-width: 85px;
+            padding: 3px;
+            color: #0f172a !important;
+            background: #f8fafc !important;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            -webkit-text-fill-color: #0f172a !important;
+        }
+
         #pane-documentacion #doc-seguimiento-list td {
             color: #0f172a !important;
             background: #f1f5f9 !important;
@@ -2731,6 +2742,43 @@
         #pane-documentacion .doc-worker-badge-leido {
             color: #bbf7d0 !important;
             background: rgba(16, 185, 129, 0.2) !important;
+        }
+
+        #pane-documentacion .postit-note-card {
+            color: #422006 !important;
+            background: #fff1a8 !important;
+            border: 1px solid #eab308 !important;
+            border-radius: 3px 3px 14px 3px !important;
+            box-shadow: 2px 4px 10px rgba(15, 23, 42, 0.18);
+            font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand", cursive;
+        }
+
+        #pane-documentacion .postit-note-editor-wrap {
+            max-width: 700px;
+            padding: 18px;
+            transform: rotate(-0.4deg);
+        }
+
+        #pane-documentacion #postit-contenido {
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            min-height: 150px;
+            resize: vertical;
+            padding: 12px;
+            color: #422006 !important;
+            background: #fff1a8 !important;
+            border: 1px dashed #ca8a04;
+            font: 20px/1.5 "Comic Sans MS", "Segoe Print", "Bradley Hand", cursive;
+            -webkit-text-fill-color: #422006 !important;
+        }
+
+        #pane-documentacion .postit-note-body {
+            margin: 0;
+            color: #422006 !important;
+            font: 20px/1.5 "Comic Sans MS", "Segoe Print", "Bradley Hand", cursive;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
         }
 
         #pane-vacaciones .compact-table td:not(.col-worker),
@@ -3862,14 +3910,83 @@
 
     <!-- PESTAÑA DOCUMENTACIÓN -->
     <div id="pane-documentacion" class="tab-panel">
-        <div class="controls-panel" style="display:flex; gap:16px; flex-wrap:wrap;">
+        <div class="doc-admin-modes" style="display:flex; gap:8px; margin-bottom:12px;">
+            <button id="doc-mode-postit-btn" class="nav-btn active" style="background:#eab308;"
+                onclick="mostrarModoDocumentacion('postit')">Post-it</button>
+            <button id="doc-mode-documentos-btn" class="nav-btn" style="background:#2563eb;"
+                onclick="mostrarModoDocumentacion('documentos')">Documentación</button>
+        </div>
+        <div id="doc-postit-mode" class="controls-panel">
+            <div style="background:#f8fafc; border:1px solid #d1d5db; border-radius:8px; padding:16px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+                    <button class="nav-btn active" style="background:#eab308;"
+                        onclick="mostrarSubseccionPostIt('envio')">Insertar post-it</button>
+                    <button class="nav-btn" style="background:#10b981;"
+                        onclick="mostrarSubseccionPostIt('historial')">Post-it enviados</button>
+                    <button class="nav-btn" style="background:#f59e0b;"
+                        onclick="mostrarSubseccionPostIt('seguimiento')">Seguimiento</button>
+                </div>
+                <div id="postit-envio-panel" class="doc-subpanel">
+                    <div class="postit-note-card postit-note-editor-wrap">
+                        <label for="postit-contenido" style="display:block; font-weight:bold; margin-bottom:8px;">Escribe
+                            el mensaje del post-it</label>
+                        <textarea id="postit-contenido" class="postit-note-editor" maxlength="500"
+                            oninput="actualizarContadorPostIt()"
+                            placeholder="Escribe aquí una nota breve..."></textarea>
+                        <div style="text-align:right; font-size:11px; margin-top:4px;"><span
+                                id="postit-contador">0</span>/500</div>
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:16px;">
+                        <div style="flex:1 1 260px; background:#ffffff; border:1px solid #d1d5db; border-radius:8px; padding:12px;">
+                            <p style="font-weight:bold; margin:0 0 8px;">Destinatarios por Función</p>
+                            <div id="postit-funciones-list"
+                                style="display:grid; grid-template-columns:repeat(2, minmax(120px, 1fr)); gap:8px;"></div>
+                        </div>
+                        <div style="flex:1 1 360px; min-width:0; background:#ffffff; border:1px solid #d1d5db; border-radius:8px; padding:12px;">
+                            <p style="font-weight:bold; margin:0 0 8px;">Destinatarios Individuales</p>
+                            <div class="dual-listbox" style="height:250px; gap:12px;">
+                                <div class="listbox-col">
+                                    <div class="listbox-filter">
+                                        <input type="text" id="postit-filtro-disponibles"
+                                            placeholder="Filtro (Disponibles)..."
+                                            oninput="renderizarDestinatariosPostIt()"><br>
+                                        <span style="color:#2563eb; font-weight:bold;">→</span>
+                                    </div>
+                                    <ul class="listbox-items" id="postit-trabajadores-disponibles"></ul>
+                                </div>
+                                <div class="listbox-col">
+                                    <div class="listbox-filter">
+                                        <input type="text" id="postit-filtro-seleccionados"
+                                            placeholder="Filtro (Seleccionados)..."
+                                            oninput="renderizarDestinatariosPostIt()"><br>
+                                        <span style="color:#2563eb; font-weight:bold;">←</span>
+                                    </div>
+                                    <ul class="listbox-items" id="postit-trabajadores-seleccionados"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+                        <button class="nav-btn" style="background:#ca8a04;" onclick="enviarPostIt()">Insertar
+                            post-it</button>
+                    </div>
+                </div>
+                <div id="postit-historial-panel" class="doc-subpanel" style="display:none;">
+                    <div id="postit-historial-list" style="display:grid; gap:12px;"></div>
+                </div>
+                <div id="postit-seguimiento-panel" class="doc-subpanel" style="display:none;">
+                    <div id="postit-seguimiento-list" style="overflow:auto; max-height:420px; border:1px solid #d1d5db; border-radius:8px;"></div>
+                </div>
+            </div>
+        </div>
+        <div id="doc-documentos-mode" class="controls-panel" style="display:flex; gap:16px; flex-wrap:wrap;">
             <div style="flex:1 1 320px; background:#f8fafc; border:1px solid #d1d5db; border-radius:8px; padding:16px;">
                 <div
                     style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:16px;">
                     <h3 style="margin:0; color: var(--primary);">Documentación</h3>
                     <div style="display:flex; gap:8px;">
                         <button class="nav-btn" style="background:#2563eb; min-width:130px;"
-                            onclick="mostrarSubseccionDoc('envio')">Enviar</button>
+                            onclick="mostrarSubseccionDoc('envio')">Envíos</button>
                         <button class="nav-btn" style="background:#10b981; min-width:130px;"
                             onclick="mostrarSubseccionDoc('historial')">Documentos</button>
                         <button class="nav-btn" style="background:#f59e0b; min-width:130px;"
@@ -3957,15 +4074,6 @@
                             <select id="doc-seguimiento-tipo" class="form-control"
                                 onchange="renderizarSeguimientoDocumentos()"></select>
                         </div>
-                        <div style="flex:1; min-width:180px;">
-                            <label style="font-weight:bold; display:block; margin-bottom:4px;">Estado</label>
-                            <select id="doc-seguimiento-estado" class="form-control"
-                                onchange="renderizarSeguimientoDocumentos()">
-                                <option value="TODOS">Todos</option>
-                                <option value="SI">Leído</option>
-                                <option value="NO">No leído</option>
-                            </select>
-                        </div>
                         <div style="margin-left:auto; display:flex; gap:10px; flex-wrap:wrap;">
                             <button class="nav-btn" style="background:#2563eb;"
                                 onclick="renderizarSeguimientoDocumentos()">Ver en pantalla</button>
@@ -4018,11 +4126,23 @@
             <!-- Banner de aviso si hay pendientes -->
             <div id="doc-worker-bloqueo-aviso"
                 style="display:none; background:#fef2f2; border:2px solid #ef4444; border-radius:10px; padding:14px 18px; margin-bottom:16px; text-align:center;">
-                <strong style="font-size:15px; color:#b91c1c;">⛔ Tienes documentos pendientes de leer</strong>
+                <strong id="doc-worker-bloqueo-titulo" style="font-size:15px; color:#b91c1c;">⛔ Tienes avisos pendientes de leer</strong>
                 <p style="margin:6px 0 0; font-size:13px; color:#7f1d1d;">Las pestañas <strong>Turnos</strong> y
                     <strong>Vacaciones y Libranzas</strong> están deshabilitadas hasta que confirmes la lectura de todos
-                    los documentos pendientes.
+                    los avisos pendientes.
                 </p>
+            </div>
+            <div id="postit-worker-pendientes-section" style="margin-bottom:24px;">
+                <h3 style="color:#a16207; margin:0 0 10px;">🟨 Post-it pendientes de leer</h3>
+                <div id="postit-worker-pendientes-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+                <p id="postit-worker-sin-pendientes" style="display:none; color:#10b981; font-size:13px;">No tienes
+                    post-it pendientes.</p>
+            </div>
+            <div style="margin:0 0 24px;">
+                <h3 style="color:#a16207; margin:0 0 10px;">📚 Biblioteca — Post-it leídos</h3>
+                <div id="postit-worker-biblioteca-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+                <p id="postit-worker-sin-biblioteca" style="display:none; color:#6b7280; font-size:13px; font-style:italic;">
+                    Aún no has leído ningún post-it.</p>
             </div>
             <!-- Documentos pendientes -->
             <div id="doc-worker-pendientes-section">
@@ -4030,7 +4150,7 @@
                 <div id="doc-worker-pendientes-list" style="display:flex; flex-direction:column; gap:10px;"></div>
                 <p id="doc-worker-sin-pendientes"
                     style="display:none; color:#10b981; font-weight:bold; font-size:14px;">✅ No tienes documentos
-                    pendientes. Puedes acceder a Turnos y Vacaciones.</p>
+                    pendientes.</p>
             </div>
             <!-- Biblioteca: docs ya leídos -->
             <div style="margin-top:24px;">
@@ -5707,8 +5827,12 @@
         let documentTypes = ['NOTA'];
         let documentosPDF = [];
         let lecturasDocumentos = {};
+        let postIts = [];
+        let lecturasPostIts = {};
+        let documentacionModoActivo = 'postit';
         let vacYLibranzasPublicadas = []; // Array de años publicados, ej: [2026, 2027]
         let destinatariosIndividualesDoc = new Set();
+        let destinatariosIndividualesPostIt = new Set();
 
         // SISTEMA DE DESHACER / REHACER
         let historyUndo = [];
@@ -6030,6 +6154,8 @@
                 documentTypes: documentTypes,
                 documentosPDF: documentosPDF,
                 lecturasDocumentos: lecturasDocumentos,
+                postIts: postIts,
+                lecturasPostIts: lecturasPostIts,
                 vacYLibranzasPublicadas: vacYLibranzasPublicadas,
                 estadosConfig: estadosConfig,
                 puntosVacacionesConfig: puntosVacacionesConfig,
@@ -6127,6 +6253,8 @@
             documentTypes = datos.documentTypes || ['NOTA'];
             documentosPDF = datos.documentosPDF || [];
             lecturasDocumentos = datos.lecturasDocumentos || {};
+            postIts = datos.postIts || [];
+            lecturasPostIts = datos.lecturasPostIts || {};
             vacYLibranzasPublicadas = datos.vacYLibranzasPublicadas || [];
             if (Array.isArray(datos.estadosConfig)) estadosConfig = datos.estadosConfig;
             if (Array.isArray(datos.puntosVacacionesConfig)) puntosVacacionesConfig = datos.puntosVacacionesConfig;
@@ -6439,6 +6567,34 @@
             if (subseccion === 'ajustes') renderizarTiposDocumentos();
         }
 
+        function mostrarModoDocumentacion(modo) {
+            const esPostIt = modo === 'postit';
+            documentacionModoActivo = esPostIt ? 'postit' : 'documentos';
+            const panelPostIt = document.getElementById('doc-postit-mode');
+            const panelDocumentos = document.getElementById('doc-documentos-mode');
+            const botonPostIt = document.getElementById('doc-mode-postit-btn');
+            const botonDocumentos = document.getElementById('doc-mode-documentos-btn');
+            if (panelPostIt) panelPostIt.style.display = esPostIt ? '' : 'none';
+            if (panelDocumentos) panelDocumentos.style.display = esPostIt ? 'none' : 'flex';
+            if (botonPostIt) botonPostIt.classList.toggle('active', esPostIt);
+            if (botonDocumentos) botonDocumentos.classList.toggle('active', !esPostIt);
+            if (esPostIt) {
+                renderizarHistorialPostIts();
+                renderizarSeguimientoPostIts();
+            }
+        }
+
+        function mostrarSubseccionPostIt(subseccion) {
+            ['envio', 'historial', 'seguimiento'].forEach(sec => {
+                const panel = document.getElementById(`postit-${sec}-panel`);
+                const boton = document.querySelector(`button[onclick="mostrarSubseccionPostIt('${sec}')"]`);
+                if (panel) panel.style.display = sec === subseccion ? 'block' : 'none';
+                if (boton) boton.classList.toggle('active', sec === subseccion);
+            });
+            if (subseccion === 'historial') renderizarHistorialPostIts();
+            if (subseccion === 'seguimiento') renderizarSeguimientoPostIts();
+        }
+
         function validarArchivoPDF(event) {
             let input = event.target;
             if (!input.files || input.files.length === 0) return;
@@ -6465,10 +6621,12 @@
         }
 
         function inicializarSeccionDocumentacion() {
+            const modosAdmin = document.querySelector('#pane-documentacion .doc-admin-modes');
             if (sesionActual && sesionActual.role === 'trabajador') {
                 // Vista trabajador: solo docs pendientes + biblioteca
                 let docWorkerView = document.getElementById('doc-worker-view');
                 if (docWorkerView) docWorkerView.style.display = 'block';
+                if (modosAdmin) modosAdmin.style.display = 'none';
                 let allAdminPanels = document.querySelectorAll('#pane-documentacion > .controls-panel');
                 allAdminPanels.forEach(p => p.style.display = 'none');
                 renderizarDocumentacionWorker();
@@ -6477,17 +6635,22 @@
             // Admin / gestor: vista completa
             let docWorkerView = document.getElementById('doc-worker-view');
             if (docWorkerView) docWorkerView.style.display = 'none';
+            if (modosAdmin) modosAdmin.style.display = 'flex';
             let allAdminPanels = document.querySelectorAll('#pane-documentacion > .controls-panel');
             allAdminPanels.forEach(p => p.style.display = '');
             renderizarTiposDocumentos();
             popularFuncionesDocumentacion();
+            popularFuncionesDocumentacion('postit-funciones-list', 'postit-func');
             destinatariosIndividualesDoc.clear();
+            destinatariosIndividualesPostIt.clear();
             renderizarDestinatariosTrabajadores();
-            mostrarSubseccionDoc('envio');
+            renderizarDestinatariosPostIt();
+            mostrarModoDocumentacion(documentacionModoActivo);
+            mostrarSubseccionPostIt('envio');
         }
 
-        function popularFuncionesDocumentacion() {
-            let contenedor = document.getElementById('doc-funciones-list');
+        function popularFuncionesDocumentacion(contenedorId = 'doc-funciones-list', idPrefix = 'doc-func') {
+            let contenedor = document.getElementById(contenedorId);
             if (!contenedor) return;
             contenedor.replaceChildren();
             let funciones = new Set(opcionesRRHH.funciones);
@@ -6516,7 +6679,7 @@
                 label.style.cssText = 'display:flex; align-items:center; gap:6px; font-size:13px;';
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.id = `doc-func-${index}`;
+                checkbox.id = `${idPrefix}-${index}`;
                 checkbox.value = valor;
                 checkbox.checked = false;
                 label.append(checkbox, document.createTextNode(` ${etiqueta}`));
@@ -6525,18 +6688,26 @@
         }
 
         function renderizarDestinatariosTrabajadores() {
-            const disponibles = document.getElementById('doc-trabajadores-disponibles');
-            const seleccionados = document.getElementById('doc-trabajadores-seleccionados');
+            renderizarListaDestinatariosTrabajadores('doc', destinatariosIndividualesDoc, renderizarDestinatariosTrabajadores);
+        }
+
+        function renderizarDestinatariosPostIt() {
+            renderizarListaDestinatariosTrabajadores('postit', destinatariosIndividualesPostIt, renderizarDestinatariosPostIt);
+        }
+
+        function renderizarListaDestinatariosTrabajadores(prefijo, seleccionadosIds, volverARenderizar) {
+            const disponibles = document.getElementById(`${prefijo}-trabajadores-disponibles`);
+            const seleccionados = document.getElementById(`${prefijo}-trabajadores-seleccionados`);
             if (!disponibles || !seleccionados) return;
-            const filtroDisponibles = (document.getElementById('doc-filtro-disponibles')?.value || '').trim().toLocaleLowerCase();
-            const filtroSeleccionados = (document.getElementById('doc-filtro-seleccionados')?.value || '').trim().toLocaleLowerCase();
+            const filtroDisponibles = (document.getElementById(`${prefijo}-filtro-disponibles`)?.value || '').trim().toLocaleLowerCase();
+            const filtroSeleccionados = (document.getElementById(`${prefijo}-filtro-seleccionados`)?.value || '').trim().toLocaleLowerCase();
             disponibles.replaceChildren();
             seleccionados.replaceChildren();
             let sorted = [...listaTrabajadores].sort(compararTrabajadoresPorApellido);
             sorted.forEach(emp => {
                 const nombre = `${emp.apellidos || ''}, ${emp.nombre || ''}`.trim().replace(/^,\s*/, '');
                 const coincidencia = nombre.toLocaleLowerCase();
-                const estaSeleccionado = destinatariosIndividualesDoc.has(emp.id);
+                const estaSeleccionado = seleccionadosIds.has(emp.id);
                 const filtro = estaSeleccionado ? filtroSeleccionados : filtroDisponibles;
                 if (!coincidencia.includes(filtro)) return;
 
@@ -6546,21 +6717,24 @@
                     ? 'Pulsa para quitar de destinatarios'
                     : 'Pulsa para añadir como destinatario';
                 elemento.addEventListener('click', () => {
-                    if (destinatariosIndividualesDoc.has(emp.id)) destinatariosIndividualesDoc.delete(emp.id);
-                    else destinatariosIndividualesDoc.add(emp.id);
-                    renderizarDestinatariosTrabajadores();
+                    if (seleccionadosIds.has(emp.id)) seleccionadosIds.delete(emp.id);
+                    else seleccionadosIds.add(emp.id);
+                    volverARenderizar();
                 });
                 (estaSeleccionado ? seleccionados : disponibles).appendChild(elemento);
             });
         }
 
-        function obtenerDestinatariosDoc() {
+        function obtenerSeleccionDestinatarios(prefijo, seleccionadosIds) {
             let filtros = [];
-            document.querySelectorAll('#doc-funciones-list input[type=checkbox]').forEach(chk => {
+            document.querySelectorAll(`#${prefijo}-funciones-list input[type=checkbox]`).forEach(chk => {
                 if (chk.checked) filtros.push(chk.value);
             });
-            let trabajadores = Array.from(destinatariosIndividualesDoc);
-            return { filtros, trabajadores };
+            return { filtros, trabajadores: Array.from(seleccionadosIds) };
+        }
+
+        function obtenerDestinatariosDoc() {
+            return obtenerSeleccionDestinatarios('doc', destinatariosIndividualesDoc);
         }
 
         function enviarDocumentoPDF() {
@@ -6611,6 +6785,121 @@
             reader.readAsDataURL(file);
         }
 
+        function actualizarContadorPostIt() {
+            const contenido = document.getElementById('postit-contenido');
+            const contador = document.getElementById('postit-contador');
+            if (contenido && contador) contador.textContent = String(contenido.value.length);
+        }
+
+        async function enviarPostIt() {
+            const contenido = document.getElementById('postit-contenido')?.value.trim() || '';
+            if (!contenido) {
+                alert('Escribe el mensaje del post-it.');
+                return;
+            }
+            const destinatarios = obtenerSeleccionDestinatarios('postit', destinatariosIndividualesPostIt);
+            if (destinatarios.filtros.length === 0 && destinatarios.trabajadores.length === 0) {
+                alert('Selecciona al menos un destinatario.');
+                return;
+            }
+            const fechaHora = new Date().toISOString();
+            postIts.push({
+                id: `postit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                contenido,
+                fechaHora,
+                filtros: destinatarios.filtros,
+                trabajadores: destinatarios.trabajadores
+            });
+            postIts.sort((a, b) => b.fechaHora.localeCompare(a.fechaHora));
+            const guardado = await autoSaveToSupabase();
+            if (!guardado) {
+                alert('No se pudo confirmar el guardado del post-it. Revisa el estado de sincronización antes de cerrar la aplicación.');
+                return;
+            }
+            document.getElementById('postit-contenido').value = '';
+            document.querySelectorAll('#postit-funciones-list input[type=checkbox]').forEach(checkbox => { checkbox.checked = false; });
+            destinatariosIndividualesPostIt.clear();
+            renderizarDestinatariosPostIt();
+            actualizarContadorPostIt();
+            renderizarHistorialPostIts();
+            renderizarSeguimientoPostIts();
+            alert('Post-it enviado correctamente.');
+        }
+
+        function renderizarHistorialPostIts() {
+            const contenedor = document.getElementById('postit-historial-list');
+            if (!contenedor) return;
+            contenedor.replaceChildren();
+            if (postIts.length === 0) {
+                contenedor.innerHTML = '<p style="color:#6b7280;">No hay post-it enviados.</p>';
+                return;
+            }
+            postIts.forEach(postIt => {
+                const card = document.createElement('div');
+                card.className = 'postit-note-card';
+                card.style.cssText = 'padding:14px; display:flex; gap:12px; align-items:flex-start; justify-content:space-between;';
+                const content = document.createElement('div');
+                const date = document.createElement('div');
+                date.style.cssText = 'font:12px Arial,sans-serif; margin-bottom:8px;';
+                date.textContent = formatDateTime(postIt.fechaHora);
+                const message = document.createElement('p');
+                message.className = 'postit-note-body';
+                message.textContent = postIt.contenido;
+                content.append(date, message);
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'btn-rojo-peq';
+                removeButton.style.cssText = 'font:11px Arial,sans-serif; padding:3px 7px; flex:none;';
+                removeButton.textContent = 'Eliminar';
+                removeButton.addEventListener('click', () => eliminarPostIt(postIt.id));
+                card.append(content, removeButton);
+                contenedor.appendChild(card);
+            });
+        }
+
+        function eliminarPostIt(postItId) {
+            const postIt = postIts.find(item => item.id === postItId);
+            if (!postIt) return;
+            if (!confirm('¿Eliminar este post-it? Dejará de estar disponible para los trabajadores y se borrará su seguimiento de lectura.')) return;
+            postIts = postIts.filter(item => item.id !== postItId);
+            Object.keys(lecturasPostIts).forEach(key => {
+                if (key.startsWith(`${postItId}_`)) delete lecturasPostIts[key];
+            });
+            autoSaveToSupabase();
+            renderizarHistorialPostIts();
+            renderizarSeguimientoPostIts();
+            renderizarPostItsWorker();
+        }
+
+        function renderizarSeguimientoPostIts() {
+            const contenedor = document.getElementById('postit-seguimiento-list');
+            if (!contenedor) return;
+            contenedor.replaceChildren();
+            if (postIts.length === 0) {
+                contenedor.innerHTML = '<p style="color:#6b7280; padding:10px;">No hay post-it para seguimiento.</p>';
+                return;
+            }
+            const tabla = document.createElement('table');
+            tabla.className = 'doc-followup-table';
+            tabla.style.cssText = 'width:100%; border-collapse:collapse; background:#f1f5f9;';
+            tabla.innerHTML = '<thead><tr style="background:#eff6ff;"><th style="padding:6px; border:1px solid #d1d5db;">Trabajador</th><th style="padding:6px; border:1px solid #d1d5db;">Post-it</th><th style="padding:6px; border:1px solid #d1d5db;">Leído</th></tr></thead><tbody></tbody>';
+            const tbody = tabla.querySelector('tbody');
+            postIts.forEach(postIt => {
+                obtenerDestinatariosPostItParaSeguimiento(postIt).forEach(destinatario => {
+                    const lectura = lecturasPostIts[`${postIt.id}_${destinatario.id}`] || null;
+                    const fila = document.createElement('tr');
+                    [destinatario.nombre, postIt.contenido, lectura ? `SÍ - ${formatDateTime(lectura)}` : 'NO'].forEach(texto => {
+                        const celda = document.createElement('td');
+                        celda.style.cssText = 'padding:6px; border:1px solid #cbd5e1; color:#0f172a; text-align:left;';
+                        celda.textContent = texto;
+                        fila.appendChild(celda);
+                    });
+                    tbody.appendChild(fila);
+                });
+            });
+            contenedor.appendChild(tabla);
+        }
+
         function renderizarHistorialDocumentos() {
             let contenedor = document.getElementById('doc-historial-list');
             let filtro = (document.getElementById('doc-historial-buscar')?.value || '').trim().toLowerCase();
@@ -6649,21 +6938,30 @@
                 tabla.style.width = '100%';
                 tabla.style.borderCollapse = 'collapse';
                 tabla.style.marginTop = '10px';
-                tabla.innerHTML = `<thead><tr style="background:#eff6ff;"><th style="padding:6px; border:1px solid #d1d5db; text-align:left;">Fecha y hora</th><th style="padding:6px; border:1px solid #d1d5db; text-align:left;">Tipo</th><th style="padding:6px; border:1px solid #d1d5db; text-align:left;">Numeración</th><th style="padding:6px; border:1px solid #d1d5db; text-align:left;">Título</th><th style="padding:6px; border:1px solid #d1d5db; text-align:center;">Ver archivo</th><th style="padding:6px; border:1px solid #d1d5db; text-align:center;">Mi lectura</th><th style="padding:6px; border:1px solid #d1d5db; text-align:center;">Acción</th></tr></thead><tbody></tbody>`;
+                tabla.innerHTML = `<thead><tr style="background:#eff6ff;"><th style="padding:6px; border:1px solid #d1d5db; text-align:left;">Fecha y hora</th><th style="padding:6px; border:1px solid #d1d5db; text-align:left;">Tipo</th><th style="padding:6px; border:1px solid #d1d5db; text-align:left;">Numeración</th><th style="padding:6px; border:1px solid #d1d5db; text-align:left;">Título</th><th style="padding:6px; border:1px solid #d1d5db; text-align:center;">Ver archivo</th><th style="padding:6px; border:1px solid #d1d5db; text-align:center;">Eliminar</th></tr></thead><tbody></tbody>`;
                 bloque.forEach(doc => {
-                    let destinatarioActual = sesionActual && sesionActual.empleadoId && obtenerDestinatariosDocParaSeguimiento(doc).some(dest => dest.id === sesionActual.empleadoId);
-                    let lecturaActual = destinatarioActual ? !!lecturasDocumentos[`${doc.id}_${sesionActual.empleadoId}`] : false;
-                    let accionHtml = '';
-                    if (destinatarioActual && !lecturaActual) {
-                        accionHtml = `<button class="nav-btn" style="background:#10b981; padding:4px 8px;" onclick="marcarDocumentoLeido('${doc.id}')">Marcar leído</button>`;
-                    }
                     let row = document.createElement('tr');
-                    row.innerHTML = `<td style="padding:6px; border:1px solid #d1d5db;">${formatDateTime(doc.fechaHora)}</td><td style="padding:6px; border:1px solid #d1d5db;">${doc.tipo}</td><td style="padding:6px; border:1px solid #d1d5db;">${doc.numeracion}</td><td style="padding:6px; border:1px solid #d1d5db;">${doc.descripcion}</td><td style="padding:6px; border:1px solid #d1d5db; text-align:center;"><button class="nav-btn" style="background:#2563eb; padding:4px 8px;" onclick="verDocumentoPDF('${doc.id}')">Ver</button></td><td style="padding:6px; border:1px solid #d1d5db; text-align:center;">${destinatarioActual ? (lecturaActual ? 'SÍ' : 'NO') : '—'}</td><td style="padding:6px; border:1px solid #d1d5db; text-align:center;">${accionHtml}</td>`;
+                    row.innerHTML = `<td style="padding:6px; border:1px solid #d1d5db;">${formatDateTime(doc.fechaHora)}</td><td style="padding:6px; border:1px solid #d1d5db;">${doc.tipo}</td><td style="padding:6px; border:1px solid #d1d5db;">${doc.numeracion}</td><td style="padding:6px; border:1px solid #d1d5db;">${doc.descripcion}</td><td style="padding:6px; border:1px solid #d1d5db; text-align:center;"><button class="nav-btn" style="background:#2563eb; padding:4px 8px;" onclick="verDocumentoPDF('${doc.id}')">Ver</button></td><td style="padding:6px; border:1px solid #d1d5db; text-align:center;"><button type="button" class="btn-rojo-peq" data-doc-id="${doc.id}" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; padding:2px 6px; font-size:11px;">Eliminar</button></td>`;
+                    row.querySelector('button[data-doc-id]').addEventListener('click', () => eliminarDocumentoPDF(doc.id));
                     tabla.querySelector('tbody').appendChild(row);
                 });
                 card.appendChild(tabla);
                 contenedor.appendChild(card);
             });
+        }
+
+        function eliminarDocumentoPDF(docId) {
+            let doc = documentosPDF.find(documento => documento.id === docId);
+            if (!doc) return;
+            if (!confirm(`¿Eliminar el documento "${doc.descripcion}"? Dejará de estar disponible para los trabajadores y se borrará su seguimiento de lectura.`)) return;
+
+            documentosPDF = documentosPDF.filter(documento => documento.id !== docId);
+            Object.keys(lecturasDocumentos).forEach(key => {
+                if (key.startsWith(`${docId}_`)) delete lecturasDocumentos[key];
+            });
+            autoSaveToSupabase();
+            renderizarHistorialDocumentos();
+            renderizarSeguimientoDocumentos();
         }
 
         function verDocumentoPDF(docId) {
@@ -6717,7 +7015,7 @@
         function renderizarSeguimientoDocumentos() {
             let contenedor = document.getElementById('doc-seguimiento-list');
             let tipoFiltro = document.getElementById('doc-seguimiento-tipo').value;
-            let estadoFiltro = document.getElementById('doc-seguimiento-estado').value;
+            let estadoFiltro = document.getElementById('doc-seguimiento-estado')?.value || 'TODOS';
             if (!contenedor) return;
             contenedor.innerHTML = '';
             if (documentosPDF.length === 0) {
@@ -6728,7 +7026,7 @@
             tabla.className = 'doc-followup-table';
             tabla.style.width = '100%';
             tabla.style.borderCollapse = 'collapse';
-            tabla.innerHTML = `<thead><tr style="background:#eff6ff;"><th style="padding:6px; border:1px solid #d1d5db;">Nombre Completo</th><th style="padding:6px; border:1px solid #d1d5db;">Tipo de Nota</th><th style="padding:6px; border:1px solid #d1d5db;">Código / Numeración</th><th style="padding:6px; border:1px solid #d1d5db;">Título</th><th style="padding:6px; border:1px solid #d1d5db;">Leído</th></tr></thead><tbody></tbody>`;
+            tabla.innerHTML = `<thead><tr style="background:#eff6ff;"><th style="padding:6px; border:1px solid #d1d5db;">Nombre Completo</th><th style="padding:6px; border:1px solid #d1d5db;">Tipo de Nota</th><th style="padding:6px; border:1px solid #d1d5db;">Código / Numeración</th><th style="padding:6px; border:1px solid #d1d5db;">Título</th><th style="padding:3px; border:1px solid #d1d5db;"><select id="doc-seguimiento-estado" aria-label="Filtrar por lectura" onchange="renderizarSeguimientoDocumentos()"><option value="TODOS" ${estadoFiltro === 'TODOS' ? 'selected' : ''}>Leído: Todos</option><option value="SI" ${estadoFiltro === 'SI' ? 'selected' : ''}>Sí</option><option value="NO" ${estadoFiltro === 'NO' ? 'selected' : ''}>No</option></select></th></tr></thead><tbody></tbody>`;
             let tbody = tabla.querySelector('tbody');
             documentosPDF.forEach(doc => {
                 if (tipoFiltro !== 'TODOS' && doc.tipo !== tipoFiltro) return;
@@ -6747,18 +7045,26 @@
         }
 
         function obtenerDestinatariosDocParaSeguimiento(doc) {
+            return obtenerDestinatariosPorSeleccion(doc.filtros || [], doc.trabajadores || []);
+        }
+
+        function obtenerDestinatariosPostItParaSeguimiento(postIt) {
+            return obtenerDestinatariosPorSeleccion(postIt.filtros || [], postIt.trabajadores || []);
+        }
+
+        function obtenerDestinatariosPorSeleccion(filtros, trabajadores) {
             let destinatarios = [];
-            doc.trabajadores.forEach(empId => {
+            trabajadores.forEach(empId => {
                 let emp = listaTrabajadores.find(e => e.id === empId);
                 if (emp) destinatarios.push({ id: emp.id, nombre: `${emp.apellidos}, ${emp.nombre}` });
             });
-            if (doc.filtros.includes('Todos')) {
+            if (filtros.includes('Todos')) {
                 listaTrabajadores.forEach(emp => {
-                    if (!doc.trabajadores.includes(emp.id)) destinatarios.push({ id: emp.id, nombre: `${emp.apellidos}, ${emp.nombre}` });
+                    if (!trabajadores.includes(emp.id)) destinatarios.push({ id: emp.id, nombre: `${emp.apellidos}, ${emp.nombre}` });
                 });
                 return destinatarios;
             }
-            doc.filtros.forEach(f => {
+            filtros.forEach(f => {
                 if (f === 'Todos') return;
                 listaTrabajadores.forEach(emp => {
                     const funcionEmpleado = (emp.funcion || '').trim();
@@ -6773,7 +7079,7 @@
 
         function exportarSeguimiento(formato) {
             let tipoFiltro = document.getElementById('doc-seguimiento-tipo').value;
-            let estadoFiltro = document.getElementById('doc-seguimiento-estado').value;
+            let estadoFiltro = document.getElementById('doc-seguimiento-estado')?.value || 'TODOS';
             let filas = [];
             documentosPDF.forEach(doc => {
                 if (tipoFiltro !== 'TODOS' && doc.tipo !== tipoFiltro) return;
@@ -14139,18 +14445,101 @@
         function inicializarSeccionDocumentacionWorker() {
             // Mostrar/ocultar secciones según rol
             let esWorker = sesionActual && sesionActual.role === 'trabajador';
-            let docAdminPanel = document.querySelector('#pane-documentacion .controls-panel');
+            let modosAdmin = document.querySelector('#pane-documentacion .doc-admin-modes');
             let docWorkerView = document.getElementById('doc-worker-view');
 
             // Ocultar panel admin y mostrar vista trabajador (o viceversa)
-            if (docAdminPanel) docAdminPanel.closest('.controls-panel') ? null : null; // el panel principal
             let allAdminPanels = document.querySelectorAll('#pane-documentacion > .controls-panel');
             allAdminPanels.forEach(p => p.style.display = esWorker ? 'none' : '');
+            if (modosAdmin) modosAdmin.style.display = esWorker ? 'none' : 'flex';
             if (docWorkerView) docWorkerView.style.display = esWorker ? 'block' : 'none';
 
             if (esWorker) {
                 renderizarDocumentacionWorker();
             }
+        }
+
+        function getPostItsParaWorker() {
+            if (!sesionActual || !sesionActual.empleadoId) return { pendientes: [], leidos: [] };
+            const empId = sesionActual.empleadoId;
+            const pendientes = [];
+            const leidos = [];
+            postIts.forEach(postIt => {
+                if (!obtenerDestinatariosPostItParaSeguimiento(postIt).some(destinatario => destinatario.id === empId)) return;
+                const lectura = lecturasPostIts[`${postIt.id}_${empId}`];
+                (lectura ? leidos : pendientes).push(postIt);
+            });
+            return { pendientes, leidos };
+        }
+
+        function renderizarPostItsWorker() {
+            const { pendientes, leidos } = getPostItsParaWorker();
+            const listaPendientes = document.getElementById('postit-worker-pendientes-list');
+            const sinPendientes = document.getElementById('postit-worker-sin-pendientes');
+            if (listaPendientes) {
+                listaPendientes.replaceChildren();
+                pendientes.forEach(postIt => {
+                    const card = document.createElement('div');
+                    card.className = 'postit-note-card';
+                    card.style.cssText = 'padding:14px; display:flex; flex-direction:column; gap:12px;';
+                    const message = document.createElement('p');
+                    message.className = 'postit-note-body';
+                    message.textContent = postIt.contenido;
+                    const date = document.createElement('span');
+                    date.style.cssText = 'font:11px Arial,sans-serif;';
+                    date.textContent = formatDateTime(postIt.fechaHora);
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'nav-btn';
+                    button.style.cssText = 'background:#ca8a04; align-self:flex-end;';
+                    button.textContent = '✅ Leído';
+                    button.addEventListener('click', () => marcarPostItLeido(postIt.id));
+                    card.append(message, date, button);
+                    listaPendientes.appendChild(card);
+                });
+            }
+            if (sinPendientes) sinPendientes.style.display = pendientes.length === 0 ? 'block' : 'none';
+
+            const listaBiblioteca = document.getElementById('postit-worker-biblioteca-list');
+            const sinBiblioteca = document.getElementById('postit-worker-sin-biblioteca');
+            if (listaBiblioteca) {
+                listaBiblioteca.replaceChildren();
+                leidos.forEach(postIt => {
+                    const card = document.createElement('div');
+                    card.className = 'postit-note-card';
+                    card.style.cssText = 'padding:14px;';
+                    const date = document.createElement('div');
+                    date.style.cssText = 'font:11px Arial,sans-serif; margin-bottom:8px;';
+                    date.textContent = `Leído el ${formatDateTime(lecturasPostIts[`${postIt.id}_${sesionActual.empleadoId}`])}`;
+                    const message = document.createElement('p');
+                    message.className = 'postit-note-body';
+                    message.textContent = postIt.contenido;
+                    card.append(date, message);
+                    listaBiblioteca.appendChild(card);
+                });
+            }
+            if (sinBiblioteca) sinBiblioteca.style.display = leidos.length === 0 ? 'block' : 'none';
+            actualizarBloqueoTabsPorDocs();
+        }
+
+        function marcarPostItLeido(postItId) {
+            if (!sesionActual || !sesionActual.empleadoId) {
+                alert('No hay sesión de empleado activa para registrar la lectura.');
+                return;
+            }
+            const postIt = postIts.find(item => item.id === postItId);
+            if (!postIt) {
+                alert('Post-it no encontrado.');
+                return;
+            }
+            if (!obtenerDestinatariosPostItParaSeguimiento(postIt).some(destinatario => destinatario.id === sesionActual.empleadoId)) {
+                alert('No estás registrado como destinatario de este post-it.');
+                return;
+            }
+            lecturasPostIts[`${postIt.id}_${sesionActual.empleadoId}`] = new Date().toISOString();
+            autoSaveToSupabase();
+            renderizarDocumentacionWorker();
+            renderizarSeguimientoPostIts();
         }
 
         function getDocsParaWorker() {
@@ -14173,10 +14562,15 @@
 
         function renderizarDocumentacionWorker() {
             let { pendientes, leidos } = getDocsParaWorker();
+            const pendientesPostIt = getPostItsParaWorker().pendientes;
+            renderizarPostItsWorker();
 
             // Banner bloqueo
             let aviso = document.getElementById('doc-worker-bloqueo-aviso');
-            if (aviso) aviso.style.display = pendientes.length > 0 ? 'block' : 'none';
+            const cantidadPendientes = pendientes.length + pendientesPostIt.length;
+            if (aviso) aviso.style.display = cantidadPendientes > 0 ? 'block' : 'none';
+            const tituloAviso = document.getElementById('doc-worker-bloqueo-titulo');
+            if (tituloAviso) tituloAviso.textContent = `⛔ Tienes ${cantidadPendientes} aviso(s) pendiente(s) de leer`;
 
             // Actualizar estado de pestañas turnos/vacaciones
             actualizarBloqueoTabsPorDocs();
@@ -14229,14 +14623,15 @@
         function actualizarBloqueoTabsPorDocs() {
             if (!sesionActual || sesionActual.role !== 'trabajador') return;
             let { pendientes } = getDocsParaWorker();
-            let hayPendientes = pendientes.length > 0;
+            let pendientesPostIt = getPostItsParaWorker().pendientes;
+            let hayPendientes = pendientes.length + pendientesPostIt.length > 0;
 
             let btnTurnos = document.getElementById('tab-btn-turnos');
             let btnVac = document.getElementById('tab-btn-vacaciones');
 
             if (hayPendientes) {
-                if (btnTurnos) { btnTurnos.classList.add('tab-btn-disabled'); btnTurnos.title = 'Tienes documentos pendientes de leer'; }
-                if (btnVac) { btnVac.classList.add('tab-btn-disabled'); btnVac.title = 'Tienes documentos pendientes de leer'; }
+                if (btnTurnos) { btnTurnos.classList.add('tab-btn-disabled'); btnTurnos.title = 'Tienes avisos pendientes de leer'; }
+                if (btnVac) { btnVac.classList.add('tab-btn-disabled'); btnVac.title = 'Tienes avisos pendientes de leer'; }
                 // Si estamos en turnos o vacaciones, redirigir a documentación
                 let panelActivo = document.querySelector('.tab-panel.active');
                 if (panelActivo && (panelActivo.id === 'pane-turnos' || panelActivo.id === 'pane-vacaciones')) {

@@ -5605,6 +5605,26 @@
                 || (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" });
         }
 
+        function obtenerAbreviaturaFuncion(funcion) {
+            const clave = String(funcion || "").trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const abreviaturas = {
+                "CENTRO DE GESTION": "CG",
+                "SUPERVISION": "SUP",
+                "CON": "AMB",
+                "CONDUCTOR": "AMB",
+                "AMBULIFT": "AMB",
+                "FURGONETA": "FUR",
+                "AGENTE": "AG",
+                "AGENTE ETT": "AG ETT"
+            };
+            return abreviaturas[clave] || "";
+        }
+
+        function etiquetaFuncionConAbreviatura(funcion) {
+            const abreviatura = obtenerAbreviaturaFuncion(funcion);
+            return abreviatura ? `${funcion} (${abreviatura})` : funcion;
+        }
+
         let documentTypes = ['NOTA'];
         let documentosPDF = [];
         let lecturasDocumentos = {};
@@ -8466,7 +8486,7 @@
                 document.getElementById('emp-funcion'),
                 opcionesRRHH.funciones,
                 funcion => funcion,
-                funcion => funcion
+                etiquetaFuncionConAbreviatura
             );
             popularSelectOpciones(
                 document.getElementById('emp-rotacion'),
@@ -8933,14 +8953,7 @@
                 let stColor = esCustom ? `background-color: ${emp.claseColor}; color: white; text-shadow: 1px 1px 2px black;` : '';
                 let clColor = esCustom ? '' : emp.claseColor;
 
-                let funcionVisual = (emp.funcion || "").toUpperCase().trim();
-                const abreviaturasFuncion = {
-                    "CON": "AMB", "CONDUCTOR": "AMB", "AMBULIFT": "AMB",
-                    "SUPERVISIÓN": "SUP", "SUPERVISION": "SUP",
-                    "CENTRO DE GESTIÓN": "CG", "CENTRO GESTION": "CG",
-                    "FURGONETA": "FUR", "AGENTE": "AG", "AGENTE ETT": "AG ETT"
-                };
-                funcionVisual = abreviaturasFuncion[funcionVisual] || funcionVisual;
+                let funcionVisual = obtenerAbreviaturaFuncion(emp.funcion) || (emp.funcion || "").toUpperCase().trim();
                 funcionVisual = escaparHTML(funcionVisual);
                 nameColor = escaparHTML(nameColor);
 
@@ -10821,10 +10834,7 @@
                 let colorFondoHoras = obtenerFondoRotacion(colorClase);
                 let estiloColorCustomWorker = (colorClase.startsWith('#')) ? `background-color: ${colorClase} !important; border-right: 3px solid #1f2937 !important;` : '';
 
-                let funcionVisual = emp.funcion.toUpperCase().trim();
-                if (funcionVisual === "CON" || funcionVisual === "CONDUCTOR" || funcionVisual === "AMBULIFT") funcionVisual = "AMB";
-                if (funcionVisual === "SUPERVISIÓN" || funcionVisual === "SUPERVISION") funcionVisual = "SUP";
-                if (funcionVisual === "CENTRO DE GESTIÓN" || funcionVisual === "CENTRO GESTION") funcionVisual = "CG";
+                let funcionVisual = obtenerAbreviaturaFuncion(emp.funcion) || (emp.funcion || "").toUpperCase().trim();
 
                 // ── FILA 1: ESTADOS (V, L, B, AJ…) ──────────────────────────────
                 let htmlCeldasDias = '';

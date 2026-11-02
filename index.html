@@ -488,6 +488,13 @@
             background-color: #374151;
         }
 
+        .week-nav-btn {
+            color: #f8fafc;
+            font-size: 12px;
+            font-weight: normal;
+            letter-spacing: 0.2px;
+        }
+
         .search-box {
             display: flex;
             align-items: center;
@@ -4341,8 +4348,8 @@
             <div class="panel-row">
                 <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
                     <div id="turnos-nav-semanas">
-                        <button class="nav-btn" onclick="desplazarRango(-7)">◀ Retroceder Sem.</button>
-                        <button class="nav-btn" onclick="desplazarRango(7)">Avanzar Sem. ▶</button>
+                        <button class="nav-btn week-nav-btn" onclick="desplazarRango(-7)">◀ Retroceder Sem.</button>
+                        <button class="nav-btn week-nav-btn" onclick="desplazarRango(7)">Avanzar Sem. ▶</button>
                         <button type="button" class="nav-btn" onclick="irASemanaActual()"
                             style="background-color: #3b82f6; font-weight: bold; margin-left: 4px;">Semana
                             Actual</button>
@@ -4355,7 +4362,7 @@
                     </div>
 
                     <div id="turnos-limites-config-btn"
-                        style="display: flex; align-items: center; gap: 6px; font-weight: bold; cursor: pointer; color: var(--secondary); background: #f3f4f6; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; margin-left: auto;"
+                        style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; color: #f8fafc; background: #1e3a5f; padding: 4px 8px; border: 1px solid #2563eb; border-radius: 4px; margin-left: auto;"
                         onclick="document.getElementById('limites-config-box').style.display = document.getElementById('limites-config-box').style.display === 'none' ? 'flex' : 'none'">
                         <span>⚙️ Configuración de Limitaciones e Incompatibilidades</span>
                     </div>
@@ -4432,9 +4439,9 @@
             <div class="panel-row">
                 <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
                     <div style="display:flex; gap:8px;">
-                        <button class="nav-btn" type="button" onclick="desplazarRangoPlanificar(-7)">◀ Retroceder
+                        <button class="nav-btn week-nav-btn" type="button" onclick="desplazarRangoPlanificar(-7)">◀ Retroceder
                             Sem.</button>
-                        <button class="nav-btn" type="button" onclick="desplazarRangoPlanificar(7)">Avanzar Sem.
+                        <button class="nav-btn week-nav-btn" type="button" onclick="desplazarRangoPlanificar(7)">Avanzar Sem.
                             ▶</button>
                         <button type="button" class="nav-btn" onclick="irASemanaActualPlanificar()"
                             style="background-color: #3b82f6; font-weight: bold;">Semana Actual</button>
@@ -4478,8 +4485,8 @@
             <div class="panel-row">
                 <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
                     <div>
-                        <button class="nav-btn" onclick="desplazarRangoFunciones(-7)">◀ Retroceder Sem.</button>
-                        <button class="nav-btn" onclick="desplazarRangoFunciones(7)">Avanzar Sem. ▶</button>
+                        <button class="nav-btn week-nav-btn" onclick="desplazarRangoFunciones(-7)">◀ Retroceder Sem.</button>
+                        <button class="nav-btn week-nav-btn" onclick="desplazarRangoFunciones(7)">Avanzar Sem. ▶</button>
                     </div>
                     <div
                         style="font-weight: bold; font-size: 15px; color: var(--primary); text-transform: uppercase; margin-left: 10px;">
@@ -4882,9 +4889,9 @@
         <div class="controls-panel">
             <div class="panel-row">
                 <div>
-                    <button type="button" class="nav-btn" onclick="desplazarSemanaCobertura(-7)">◀ Semana
+                    <button type="button" class="nav-btn week-nav-btn" onclick="desplazarSemanaCobertura(-7)">◀ Semana
                         Anterior</button>
-                    <button type="button" class="nav-btn" onclick="desplazarSemanaCobertura(7)">Semana Siguiente
+                    <button type="button" class="nav-btn week-nav-btn" onclick="desplazarSemanaCobertura(7)">Semana Siguiente
                         ▶</button>
                 </div>
                 <div style="display: flex; gap: 4px;" id="botones-semanas-cobertura">
@@ -5003,7 +5010,7 @@
                     <div style="font-weight: bold; font-size: 15px; color: #22d3ee; text-transform: uppercase; margin-left: 10px;"
                         id="titulo-mes-variables">JUNIO 2026</div>
                 </div>
-                <div style="font-weight: bold; cursor: pointer; color: var(--secondary); background: #fefce8; padding: 4px 8px; border: 1px solid #eab308; border-radius: 4px;"
+                <div style="font-weight: normal; cursor: pointer; color: #f8fafc; background: #1e3a5f; padding: 4px 8px; border: 1px solid #2563eb; border-radius: 4px;"
                     onclick="document.getElementById(&#39;reglas-variables-box&#39;).style.display = document.getElementById(&#39;reglas-variables-box&#39;).style.display === &#39;none&#39; ? &#39;flex&#39; : &#39;none&#39;">
                     <span>⚙️ Reglas de Pluses</span>
                 </div>
@@ -7860,7 +7867,7 @@
                     <tr class="row-estado ${visibleClass}" data-emp="${empIdx}" data-row-tipo="0">
                         <td rowspan="3" style="width: 22px; text-align: center; font-weight: bold; font-size: 10px; background: #f3f4f6; color: #4b5563; border: 1px solid #7f7f7f;">${numFilaActual}</td>
                         <td class="col-worker" rowspan="3" style="${estiloColorCustomWorker} white-space: normal; padding: 2px !important;">
-                            <span style="font-size: 11px; font-weight: 900; color: #111827; line-height: 1.1; display: block; margin-bottom: 1px;">${emp.apellidos}, ${emp.nombre}</span>
+                            <span style="font-size: 11px; font-weight: 500; color: #111827; line-height: 1.1; display: block; margin-bottom: 1px;">${emp.apellidos}, ${emp.nombre}</span>
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <small style="color: #2563eb; font-weight: bold;">${emp.contrato || '-'}</small>
                                 <small style="color: #4b5563; font-weight: bold;">${funcionVisual}</small>
@@ -8125,7 +8132,7 @@
                     <tr class="row-estado ${visibleClass}" data-emp="${empIdx}" data-row-tipo="0">
                         <td rowspan="3" style="width: 22px; text-align: center; font-weight: bold; font-size: 10px; background: #f3f4f6; color: #4b5563; border: 1px solid #7f7f7f;">${numFilaActual}</td>
                         <td class="col-worker" rowspan="3" style="${estiloColorCustomWorker} white-space: normal; padding: 2px !important;">
-                            <span style="font-size: 11px; font-weight: 900; color: #111827; line-height: 1.1; display: block; margin-bottom: 1px;">${emp.apellidos}, ${emp.nombre}</span>
+                            <span style="font-size: 11px; font-weight: 500; color: #111827; line-height: 1.1; display: block; margin-bottom: 1px;">${emp.apellidos}, ${emp.nombre}</span>
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <small style="color: #2563eb; font-weight: bold;">${emp.contrato || '-'}</small>
                                 <small style="color: #4b5563; font-weight: bold;">${funcionVisual}</small>

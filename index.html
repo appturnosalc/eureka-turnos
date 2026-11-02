@@ -2777,6 +2777,13 @@
             -webkit-text-fill-color: #422006 !important;
         }
 
+        #pane-documentacion .postit-note-editor-wrap label,
+        #pane-documentacion .postit-note-editor-wrap .postit-note-counter,
+        #pane-documentacion #postit-contador {
+            color: #422006 !important;
+            -webkit-text-fill-color: #422006 !important;
+        }
+
         #pane-documentacion .postit-note-body {
             margin: 0;
             color: #422006 !important;
@@ -3937,7 +3944,7 @@
                         <textarea id="postit-contenido" class="postit-note-editor" maxlength="500"
                             oninput="actualizarContadorPostIt()"
                             placeholder="Escribe aquí una nota breve..."></textarea>
-                        <div style="text-align:right; font-size:11px; margin-top:4px;"><span
+                        <div class="postit-note-counter" style="text-align:right; font-size:11px; margin-top:4px;"><span
                                 id="postit-contador">0</span>/500</div>
                     </div>
                     <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:16px;">
@@ -3995,9 +4002,9 @@
                     <h3 style="margin:0; color: var(--primary);">Documentación</h3>
                     <div style="display:flex; gap:8px;">
                         <button class="nav-btn" style="background:#2563eb; min-width:130px;"
-                            onclick="mostrarSubseccionDoc('envio')">Envíos</button>
+                            onclick="mostrarSubseccionDoc('envio')">Insertar documento</button>
                         <button class="nav-btn" style="background:#10b981; min-width:130px;"
-                            onclick="mostrarSubseccionDoc('historial')">Documentos</button>
+                            onclick="mostrarSubseccionDoc('historial')">Documentos enviados</button>
                         <button class="nav-btn" style="background:#f59e0b; min-width:130px;"
                             onclick="mostrarSubseccionDoc('seguimiento')">Seguimiento</button>
                         <button class="nav-btn" style="background:#6b7280; min-width:130px;"

@@ -3850,9 +3850,28 @@
                             </div>
                         </div>
                         <div
-                            style="flex:1 1 260px; background:#ffffff; border:1px solid #d1d5db; border-radius:8px; padding:12px; max-height:320px; overflow:auto;">
+                            style="flex:1 1 360px; min-width:0; background:#ffffff; border:1px solid #d1d5db; border-radius:8px; padding:12px;">
                             <p style="font-weight:bold; margin:0 0 8px;">Destinatarios Individuales</p>
-                            <div id="doc-trabajadores-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+                            <div class="dual-listbox" style="height:250px; gap:12px;">
+                                <div class="listbox-col">
+                                    <div class="listbox-filter">
+                                        <input type="text" id="doc-filtro-disponibles"
+                                            placeholder="Filtro (Disponibles)..."
+                                            oninput="renderizarDestinatariosTrabajadores()"><br>
+                                        <span style="color:#2563eb; font-weight:bold;">→</span>
+                                    </div>
+                                    <ul class="listbox-items" id="doc-trabajadores-disponibles"></ul>
+                                </div>
+                                <div class="listbox-col">
+                                    <div class="listbox-filter">
+                                        <input type="text" id="doc-filtro-seleccionados"
+                                            placeholder="Filtro (Seleccionados)..."
+                                            oninput="renderizarDestinatariosTrabajadores()"><br>
+                                        <span style="color:#2563eb; font-weight:bold;">←</span>
+                                    </div>
+                                    <ul class="listbox-items" id="doc-trabajadores-seleccionados"></ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div style="display:flex; justify-content:flex-end; margin-top:16px; gap:10px;">
@@ -5609,6 +5628,7 @@
             const clave = String(funcion || "").trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             const abreviaturas = {
                 "CENTRO DE GESTION": "CG",
+                "CENTRO GESTION": "CG",
                 "SUPERVISION": "SUP",
                 "CON": "AMB",
                 "CONDUCTOR": "AMB",
@@ -5629,6 +5649,7 @@
         let documentosPDF = [];
         let lecturasDocumentos = {};
         let vacYLibranzasPublicadas = []; // Array de años publicados, ej: [2026, 2027]
+        let destinatariosIndividualesDoc = new Set();
 
         // SISTEMA DE DESHACER / REHACER
         let historyUndo = [];
@@ -6401,6 +6422,7 @@
             allAdminPanels.forEach(p => p.style.display = '');
             renderizarTiposDocumentos();
             popularFuncionesDocumentacion();
+            destinatariosIndividualesDoc.clear();
             renderizarDestinatariosTrabajadores();
             mostrarSubseccionDoc('envio');
         }
@@ -6408,27 +6430,68 @@
         function popularFuncionesDocumentacion() {
             let contenedor = document.getElementById('doc-funciones-list');
             if (!contenedor) return;
-            contenedor.innerHTML = '';
+            contenedor.replaceChildren();
             let funciones = new Set(opcionesRRHH.funciones);
             listaTrabajadores.forEach(emp => {
                 let func = (emp.funcion || '').trim();
                 if (func) funciones.add(func);
             });
-            funciones = ['Todos', ...[...funciones].sort()];
-            funciones.forEach(func => {
-                let id = `doc-func-${func.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
-                contenedor.innerHTML += `<label style="display:flex; align-items:center; gap:6px; font-size:13px;"><input type="checkbox" id="${id}" value="${func}" ${func === 'Todos' ? 'checked' : ''}> ${func}</label>`;
+
+            const prioridadAbreviatura = { CG: 0, SUP: 1, AMB: 2, FUR: 3, AG: 4, 'AG ETT': 5 };
+            const opciones = new Map();
+            funciones.forEach(funcion => {
+                const abreviatura = obtenerAbreviaturaFuncion(funcion);
+                const valor = abreviatura || funcion;
+                if (!opciones.has(valor)) {
+                    opciones.set(valor, { valor, etiqueta: abreviatura || funcion });
+                }
+            });
+            const opcionesOrdenadas = [...opciones.values()].sort((a, b) => {
+                const prioridadA = prioridadAbreviatura[a.valor] ?? Number.MAX_SAFE_INTEGER;
+                const prioridadB = prioridadAbreviatura[b.valor] ?? Number.MAX_SAFE_INTEGER;
+                return prioridadA - prioridadB || a.etiqueta.localeCompare(b.etiqueta, 'es', { sensitivity: 'base' });
+            });
+
+            [['Todos', 'Todos'], ...opcionesOrdenadas.map(opcion => [opcion.valor, opcion.etiqueta])].forEach(([valor, etiqueta], index) => {
+                const label = document.createElement('label');
+                label.style.cssText = 'display:flex; align-items:center; gap:6px; font-size:13px;';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `doc-func-${index}`;
+                checkbox.value = valor;
+                checkbox.checked = valor === 'Todos';
+                label.append(checkbox, document.createTextNode(` ${etiqueta}`));
+                contenedor.appendChild(label);
             });
         }
 
         function renderizarDestinatariosTrabajadores() {
-            let contenedor = document.getElementById('doc-trabajadores-list');
-            if (!contenedor) return;
-            contenedor.innerHTML = '';
-            let sorted = [...listaTrabajadores].sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+            const disponibles = document.getElementById('doc-trabajadores-disponibles');
+            const seleccionados = document.getElementById('doc-trabajadores-seleccionados');
+            if (!disponibles || !seleccionados) return;
+            const filtroDisponibles = (document.getElementById('doc-filtro-disponibles')?.value || '').trim().toLocaleLowerCase();
+            const filtroSeleccionados = (document.getElementById('doc-filtro-seleccionados')?.value || '').trim().toLocaleLowerCase();
+            disponibles.replaceChildren();
+            seleccionados.replaceChildren();
+            let sorted = [...listaTrabajadores].sort(compararTrabajadoresPorApellido);
             sorted.forEach(emp => {
-                let id = `doc-trab-${emp.id}`;
-                contenedor.innerHTML += `<label style="display:flex; align-items:center; gap:6px; font-size:13px;"><input type="checkbox" id="${id}" value="${emp.id}"> ${emp.apellidos}, ${emp.nombre}</label>`;
+                const nombre = `${emp.apellidos || ''}, ${emp.nombre || ''}`.trim().replace(/^,\s*/, '');
+                const coincidencia = nombre.toLocaleLowerCase();
+                const estaSeleccionado = destinatariosIndividualesDoc.has(emp.id);
+                const filtro = estaSeleccionado ? filtroSeleccionados : filtroDisponibles;
+                if (!coincidencia.includes(filtro)) return;
+
+                const elemento = document.createElement('li');
+                elemento.textContent = nombre;
+                elemento.title = estaSeleccionado
+                    ? 'Pulsa para quitar de destinatarios'
+                    : 'Pulsa para añadir como destinatario';
+                elemento.addEventListener('click', () => {
+                    if (destinatariosIndividualesDoc.has(emp.id)) destinatariosIndividualesDoc.delete(emp.id);
+                    else destinatariosIndividualesDoc.add(emp.id);
+                    renderizarDestinatariosTrabajadores();
+                });
+                (estaSeleccionado ? seleccionados : disponibles).appendChild(elemento);
             });
         }
 
@@ -6437,10 +6500,7 @@
             document.querySelectorAll('#doc-funciones-list input[type=checkbox]').forEach(chk => {
                 if (chk.checked) filtros.push(chk.value);
             });
-            let trabajadores = [];
-            document.querySelectorAll('#doc-trabajadores-list input[type=checkbox]').forEach(chk => {
-                if (chk.checked) trabajadores.push(chk.value);
-            });
+            let trabajadores = Array.from(destinatariosIndividualesDoc);
             return { filtros, trabajadores };
         }
 
@@ -6639,7 +6699,9 @@
             doc.filtros.forEach(f => {
                 if (f === 'Todos') return;
                 listaTrabajadores.forEach(emp => {
-                    if ((emp.funcion || '').trim() === f && !destinatarios.some(d => d.id === emp.id)) {
+                    const funcionEmpleado = (emp.funcion || '').trim();
+                    const coincideFuncion = funcionEmpleado === f || obtenerAbreviaturaFuncion(funcionEmpleado) === f;
+                    if (coincideFuncion && !destinatarios.some(d => d.id === emp.id)) {
                         destinatarios.push({ id: emp.id, nombre: `${emp.apellidos}, ${emp.nombre}` });
                     }
                 });
@@ -8423,7 +8485,7 @@
                 const contenedor = document.getElementById(config.id);
                 if (!contenedor) return;
                 contenedor.replaceChildren();
-                [['TODOS', 'Todos'], ...opcionesRRHH.funciones.map(funcion => [funcion, funcion])].forEach(([valor, etiqueta]) => {
+                [['TODOS', 'Todos'], ...opcionesRRHH.funciones.map(funcion => [funcion, obtenerAbreviaturaFuncion(funcion) || funcion])].forEach(([valor, etiqueta]) => {
                     const boton = document.createElement('button');
                     boton.type = 'button';
                     boton.className = `segment-btn${config.clase ? ` ${config.clase}` : ''}${config.activo === valor ? ' active' : ''}`;

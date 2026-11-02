@@ -2679,6 +2679,50 @@
             color: #0f172a !important;
         }
 
+        #pane-documentacion #doc-historial-list .doc-history-card {
+            color: #0f172a !important;
+            background: #e2e8f0 !important;
+            border-color: #94a3b8 !important;
+        }
+
+        #pane-documentacion #doc-historial-list .doc-history-card strong,
+        #pane-documentacion #doc-historial-list .doc-history-card span {
+            color: #0f172a !important;
+        }
+
+        #pane-documentacion #doc-historial-list .doc-history-card table,
+        #pane-documentacion #doc-historial-list .doc-history-card tbody {
+            background: #f1f5f9 !important;
+        }
+
+        #pane-documentacion #doc-historial-list .doc-history-card th {
+            color: #0f172a !important;
+            background: #e2e8f0 !important;
+            border-color: #94a3b8 !important;
+        }
+
+        #pane-documentacion #doc-historial-list .doc-history-card td {
+            color: #0f172a !important;
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        #pane-documentacion #doc-seguimiento-list table {
+            background: #f1f5f9 !important;
+        }
+
+        #pane-documentacion #doc-seguimiento-list th {
+            color: #0f172a !important;
+            background: #e2e8f0 !important;
+            border-color: #94a3b8 !important;
+        }
+
+        #pane-documentacion #doc-seguimiento-list td {
+            color: #0f172a !important;
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+
         #pane-documentacion .doc-worker-badge-pendiente {
             color: #fecaca !important;
             background: rgba(239, 68, 68, 0.2) !important;
@@ -6589,6 +6633,7 @@
                 });
                 if (bloque.length === 0) return;
                 let card = document.createElement('div');
+                card.className = 'doc-history-card';
                 card.style.border = '1px solid #d1d5db';
                 card.style.borderRadius = '10px';
                 card.style.padding = '12px';
@@ -6600,6 +6645,7 @@
                 header.innerHTML = `<strong style="font-size:14px;">Tipo: ${tipo}</strong><span style="font-size:12px; color:#475569;">${bloque.length} documento(s)</span>`;
                 card.appendChild(header);
                 let tabla = document.createElement('table');
+                tabla.className = 'doc-history-table';
                 tabla.style.width = '100%';
                 tabla.style.borderCollapse = 'collapse';
                 tabla.style.marginTop = '10px';
@@ -6679,6 +6725,7 @@
                 return;
             }
             let tabla = document.createElement('table');
+            tabla.className = 'doc-followup-table';
             tabla.style.width = '100%';
             tabla.style.borderCollapse = 'collapse';
             tabla.innerHTML = `<thead><tr style="background:#eff6ff;"><th style="padding:6px; border:1px solid #d1d5db;">Nombre Completo</th><th style="padding:6px; border:1px solid #d1d5db;">Tipo de Nota</th><th style="padding:6px; border:1px solid #d1d5db;">Código / Numeración</th><th style="padding:6px; border:1px solid #d1d5db;">Título</th><th style="padding:6px; border:1px solid #d1d5db;">Leído</th></tr></thead><tbody></tbody>`;

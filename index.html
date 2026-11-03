@@ -488,11 +488,16 @@
             background-color: #374151;
         }
 
-        .week-nav-btn {
+        .period-nav-btn {
             color: #f8fafc;
             font-size: 12px;
             font-weight: normal;
             letter-spacing: 0.2px;
+        }
+
+        .period-current-btn {
+            padding: 3px 8px;
+            font-size: 10px;
         }
 
         .search-box {
@@ -2441,6 +2446,11 @@
         .compact-table td.col-worker small:last-child {
             background: rgba(71, 85, 105, 0.55);
             color: #cbd5e1 !important;
+        }
+
+        #pane-turnos .compact-table td.col-worker .worker-contract-label,
+        #pane-turnos .compact-table td.col-worker .worker-function-label {
+            font-weight: 200 !important;
         }
 
         /* Botones de información del trabajador en Turnos y Planificar */
@@ -4480,11 +4490,10 @@
             <div class="panel-row">
                 <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
                     <div id="turnos-nav-semanas">
-                        <button class="nav-btn week-nav-btn" onclick="desplazarRango(-7)">◀ Retroceder Sem.</button>
-                        <button class="nav-btn week-nav-btn" onclick="desplazarRango(7)">Avanzar Sem. ▶</button>
-                        <button type="button" class="nav-btn week-nav-btn" onclick="irASemanaActual()"
-                            style="background-color: #3b82f6; margin-left: 4px;">Semana
-                            Actual</button>
+                        <button class="nav-btn period-nav-btn" onclick="desplazarRango(-7)">◀ Semana anterior</button>
+                        <button type="button" class="nav-btn period-nav-btn period-current-btn" onclick="irASemanaActual()"
+                            style="background-color: #3b82f6; margin-left: 4px;">Semana actual</button>
+                        <button class="nav-btn period-nav-btn" onclick="desplazarRango(7)">Semana siguiente ▶</button>
                     </div>
                     <div id="turnos-nav-fechas" class="search-box">
                         <label>Desde:</label>
@@ -4571,12 +4580,10 @@
             <div class="panel-row">
                 <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
                     <div style="display:flex; gap:8px;">
-                        <button class="nav-btn week-nav-btn" type="button" onclick="desplazarRangoPlanificar(-7)">◀ Retroceder
-                            Sem.</button>
-                        <button class="nav-btn week-nav-btn" type="button" onclick="desplazarRangoPlanificar(7)">Avanzar Sem.
-                            ▶</button>
-                        <button type="button" class="nav-btn week-nav-btn" onclick="irASemanaActualPlanificar()"
-                            style="background-color: #3b82f6;">Semana Actual</button>
+                        <button class="nav-btn period-nav-btn" type="button" onclick="desplazarRangoPlanificar(-7)">◀ Semana anterior</button>
+                        <button type="button" class="nav-btn period-nav-btn period-current-btn" onclick="irASemanaActualPlanificar()"
+                            style="background-color: #3b82f6;">Semana actual</button>
+                        <button class="nav-btn period-nav-btn" type="button" onclick="desplazarRangoPlanificar(7)">Semana siguiente ▶</button>
                     </div>
                 </div>
             </div>
@@ -4613,8 +4620,9 @@
             <div class="panel-row">
                 <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
                     <div>
-                        <button class="nav-btn week-nav-btn" onclick="desplazarRangoFunciones(-7)">◀ Retroceder Sem.</button>
-                        <button class="nav-btn week-nav-btn" onclick="desplazarRangoFunciones(7)">Avanzar Sem. ▶</button>
+                        <button class="nav-btn period-nav-btn" onclick="desplazarRangoFunciones(-7)">◀ Semana anterior</button>
+                        <button type="button" class="nav-btn period-nav-btn period-current-btn" onclick="irASemanaActual()">Semana actual</button>
+                        <button class="nav-btn period-nav-btn" onclick="desplazarRangoFunciones(7)">Semana siguiente ▶</button>
                     </div>
                     <div style="margin-left: auto;">
                         <button class="nav-btn" onclick="abrirAjustesFunciones()"
@@ -4777,8 +4785,9 @@
             <div class="panel-row">
                 <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
                     <div>
-                        <button class="nav-btn" onclick="desplazarRangoHoras(-1)">◀ Retroceder</button>
-                        <button class="nav-btn" onclick="desplazarRangoHoras(1)">Avanzar ▶</button>
+                        <button class="nav-btn period-nav-btn" id="btn-horas-anterior" onclick="desplazarRangoHoras(-1)">◀ Semana anterior</button>
+                        <button class="nav-btn period-nav-btn period-current-btn" id="btn-horas-actual" onclick="irAPeriodoActualHoras()">Semana actual</button>
+                        <button class="nav-btn period-nav-btn" id="btn-horas-siguiente" onclick="desplazarRangoHoras(1)">Semana siguiente ▶</button>
                     </div>
                     <div style="display: flex; gap: 4px;">
                         <button type="button" class="btn-semana-cob active" id="btn-horas-vista-semana"
@@ -5013,10 +5022,9 @@
         <div class="controls-panel">
             <div class="panel-row">
                 <div>
-                    <button type="button" class="nav-btn week-nav-btn" onclick="desplazarSemanaCobertura(-7)">◀ Semana
-                        Anterior</button>
-                    <button type="button" class="nav-btn week-nav-btn" onclick="desplazarSemanaCobertura(7)">Semana Siguiente
-                        ▶</button>
+                    <button type="button" class="nav-btn period-nav-btn" onclick="desplazarSemanaCobertura(-7)">◀ Semana anterior</button>
+                    <button type="button" class="nav-btn period-nav-btn period-current-btn" onclick="irASemanaActualCobertura()">Semana actual</button>
+                    <button type="button" class="nav-btn period-nav-btn" onclick="desplazarSemanaCobertura(7)">Semana siguiente ▶</button>
                 </div>
                 <div style="display: flex; gap: 4px;" id="botones-semanas-cobertura">
                     <button type="button" class="btn-semana-cob active" id="btn-cob-s1"
@@ -5045,21 +5053,43 @@
                 onclick="cambiarSubpestanaVacaciones('HORAS')">Horas</button>
         </div>
         <div class="controls-panel">
-            <div id="vac-controls-calendar" class="panel-row" style="justify-content: space-between;">
+            <div class="panel-row" style="justify-content:flex-start;">
+                <div id="vac-controles-segmentacion" class="panel-row vac-controles-segmentacion" style="justify-content:flex-start;">
+                    <div class="segmentation-nav" id="vacaciones-function-filters">
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                        <strong>Ordenar filas por:</strong>
+                        <button type="button" class="segment-btn active" id="btn-ord-vac-alfa"
+                            onclick="cambiarOrdenacionVac(&#39;ALFABETICO&#39;)">A-Z</button>
+                        <button type="button" class="segment-btn" id="btn-ord-vac-rot"
+                            onclick="cambiarOrdenacionVac(&#39;ROTACION&#39;)">Rotación</button>
+                        <button type="button" class="segment-btn" id="btn-ord-vac-con"
+                            onclick="cambiarOrdenacionVac(&#39;CONTRATO&#39;)">Contrato</button>
+
+                        <input type="text" placeholder="🔍 Buscar trabajador (Scroll Auto)..."
+                            style="margin-left: 15px; padding: 4px 8px; border-radius: 3px; border: 1px solid var(--border); font-size: 11px; width: 200px; outline: none;"
+                            oninput="globalScrollToWorker(this)">
+                    </div>
+                </div>
+                <div id="vac-controls-calendar-actions" style="margin-left:auto;">
+                    <button class="nav-btn" style="background:#64748b; padding: 6px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: background 0.2s;"
+                        onclick="abrirModalCiclos()"
+                        onmouseover="this.style.background='#475569'"
+                        onmouseout="this.style.background='#64748b'">
+                        ⚙️ Diseñador de Ciclos
+                    </button>
+                </div>
+            </div>
+            <div id="vac-controls-calendar-nav" class="panel-row" style="justify-content:flex-start;">
                 <div style="display: flex; gap: 4px; align-items: center;">
-                    <button class="nav-btn" onclick="desplazarMesVacaciones(-1)">◀ Mes Anterior</button>
-                    <button class="nav-btn" onclick="desplazarMesVacaciones(1)">Mes Siguiente ▶</button>
+                    <button class="nav-btn period-nav-btn" onclick="desplazarMesVacaciones(-1)">◀ Mes anterior</button>
+                    <button class="nav-btn period-nav-btn period-current-btn" onclick="irAMesActualVacaciones()">Mes actual</button>
+                    <button class="nav-btn period-nav-btn" onclick="desplazarMesVacaciones(1)">Mes siguiente ▶</button>
                     <div style="font-weight: bold; font-size: 15px; color: #22d3ee; text-transform: uppercase; margin-left: 10px;"
                         id="titulo-mes-vacaciones">
                         Cargando mes...
                     </div>
                 </div>
-                <button class="nav-btn" style="background:#64748b; padding: 6px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: background 0.2s;"
-                    onclick="abrirModalCiclos()"
-                    onmouseover="this.style.background='#475569'"
-                    onmouseout="this.style.background='#64748b'">
-                    ⚙️ Diseñador de Ciclos
-                </button>
             </div>
             <div id="vac-controls-hours" class="panel-row" style="display:none; justify-content: space-between;">
                 <div style="font-weight: bold; font-size: 15px; color: #22d3ee; text-transform: uppercase;">
@@ -5071,23 +5101,6 @@
                     onmouseout="this.style.background='#64748b'">
                     📊 Gestión de Puntos
                 </button>
-            </div>
-            <div id="vac-controles-segmentacion" class="panel-row" style="margin-top:8px;">
-                <div class="segmentation-nav" id="vacaciones-function-filters">
-                </div>
-                <div style="display: flex; gap: 6px; align-items: center;">
-                    <strong>Ordenar filas por:</strong>
-                    <button type="button" class="segment-btn active" id="btn-ord-vac-alfa"
-                        onclick="cambiarOrdenacionVac(&#39;ALFABETICO&#39;)">A-Z</button>
-                    <button type="button" class="segment-btn" id="btn-ord-vac-rot"
-                        onclick="cambiarOrdenacionVac(&#39;ROTACION&#39;)">Rotación</button>
-                    <button type="button" class="segment-btn" id="btn-ord-vac-con"
-                        onclick="cambiarOrdenacionVac(&#39;CONTRATO&#39;)">Contrato</button>
-
-                    <input type="text" placeholder="🔍 Buscar trabajador (Scroll Auto)..."
-                        style="margin-left: 15px; padding: 4px 8px; border-radius: 3px; border: 1px solid var(--border); font-size: 11px; width: 200px; outline: none;"
-                        oninput="globalScrollToWorker(this)">
-                </div>
             </div>
         </div>
         <div id="vac-calendar-view" class="table-wrapper">
@@ -5128,11 +5141,22 @@
         </style>
         <div class="controls-panel">
             <div class="panel-row" style="justify-content: space-between;">
-                <div style="display: flex; gap: 4px; align-items: center;">
-                    <button class="nav-btn" onclick="desplazarMesVariables(-1)">◀ Mes Anterior</button>
-                    <button class="nav-btn" onclick="desplazarMesVariables(1)">Mes Siguiente ▶</button>
-                    <div style="font-weight: bold; font-size: 15px; color: #22d3ee; text-transform: uppercase; margin-left: 10px;"
-                        id="titulo-mes-variables">JUNIO 2026</div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <div class="segmentation-nav" id="variables-function-filters">
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center; flex-wrap:wrap;">
+                        <strong>Ordenar filas por:</strong>
+                        <button type="button" class="segment-btn active" id="btn-ord-var-alfa"
+                            onclick="cambiarOrdenacionVar(&#39;ALFABETICO&#39;)">A-Z</button>
+                        <button type="button" class="segment-btn" id="btn-ord-var-rot"
+                            onclick="cambiarOrdenacionVar(&#39;ROTACION&#39;)">Rotación</button>
+                        <button type="button" class="segment-btn" id="btn-ord-var-con"
+                            onclick="cambiarOrdenacionVar(&#39;CONTRATO&#39;)">Contrato</button>
+
+                        <input type="text" placeholder="🔍 Buscar trabajador (Scroll Auto)..."
+                            style="margin-left: 8px; padding: 4px 8px; border-radius: 3px; border: 1px solid var(--border); font-size: 11px; width: 200px; outline: none;"
+                            oninput="globalScrollToWorker(this)">
+                    </div>
                 </div>
                 <div style="font-weight: normal; cursor: pointer; color: #f8fafc; background: #1e3a5f; padding: 4px 8px; border: 1px solid #2563eb; border-radius: 4px;"
                     onclick="document.getElementById(&#39;reglas-variables-box&#39;).style.display = document.getElementById(&#39;reglas-variables-box&#39;).style.display === &#39;none&#39; ? &#39;flex&#39; : &#39;none&#39;">
@@ -5140,21 +5164,13 @@
                 </div>
             </div>
 
-            <div class="panel-row" style="margin-top:8px;">
-                <div class="segmentation-nav" id="variables-function-filters">
-                </div>
-                <div style="display: flex; gap: 6px; align-items: center;">
-                    <strong>Ordenar filas por:</strong>
-                    <button type="button" class="segment-btn active" id="btn-ord-var-alfa"
-                        onclick="cambiarOrdenacionVar(&#39;ALFABETICO&#39;)">A-Z</button>
-                    <button type="button" class="segment-btn" id="btn-ord-var-rot"
-                        onclick="cambiarOrdenacionVar(&#39;ROTACION&#39;)">Rotación</button>
-                    <button type="button" class="segment-btn" id="btn-ord-var-con"
-                        onclick="cambiarOrdenacionVar(&#39;CONTRATO&#39;)">Contrato</button>
-
-                    <input type="text" placeholder="🔍 Buscar trabajador (Scroll Auto)..."
-                        style="margin-left: 15px; padding: 4px 8px; border-radius: 3px; border: 1px solid var(--border); font-size: 11px; width: 200px; outline: none;"
-                        oninput="globalScrollToWorker(this)">
+            <div class="panel-row" style="justify-content:flex-start;">
+                <div style="display: flex; gap: 4px; align-items: center;">
+                    <button class="nav-btn period-nav-btn" onclick="desplazarMesVariables(-1)">◀ Mes anterior</button>
+                    <button class="nav-btn period-nav-btn period-current-btn" onclick="irAMesActualVariables()">Mes actual</button>
+                    <button class="nav-btn period-nav-btn" onclick="desplazarMesVariables(1)">Mes siguiente ▶</button>
+                    <div style="font-weight: bold; font-size: 15px; color: #22d3ee; text-transform: uppercase; margin-left: 10px;"
+                        id="titulo-mes-variables">JUNIO 2026</div>
                 </div>
             </div>
 
@@ -5304,28 +5320,30 @@
     <div id="pane-registro-jornada" class="tab-panel">
         <!-- CONTROLES SUPERIORES: estilo Vacaciones -->
         <div class="controls-panel">
-            <!-- Fila 1: Selector de Vista + Navegación (Mes o Día) + Título + Exportar -->
+            <!-- Fila 1: filtros + ordenación + buscador + selector de vista + exportar -->
             <div class="panel-row" style="justify-content: space-between;">
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <div style="display: flex; gap: 4px; align-items: center; margin-right: 12px;">
+                    <div id="reg-controles-segmentacion" class="panel-row" style="justify-content:flex-start; gap:8px;">
+                        <div class="segmentation-nav" id="registro-function-filters">
+                        </div>
+                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap:wrap;">
+                            <strong style="font-size: 11px;">Ordenar filas por:</strong>
+                            <button type="button" class="segment-btn sort-btn-reg active" id="btn-ord-reg-az"
+                                onclick="ordenarRegistroJornada('AZ')">A-Z</button>
+                            <button type="button" class="segment-btn sort-btn-reg" id="btn-ord-reg-rot"
+                                onclick="ordenarRegistroJornada('ROT')">Rotación</button>
+                            <input type="text" id="buscador-registro-jornada" placeholder="🔍 Buscar trabajador..."
+                                style="margin-left: 4px; padding: 4px 8px; border-radius: 3px; border: 1px solid var(--border); font-size: 11px; width: 200px; outline: none;"
+                                oninput="buscarRegistroJornada()">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 4px; align-items: center; margin-left: 24px;">
                         <strong style="font-size: 11px;">Vista:</strong>
                         <button class="segment-btn view-btn-reg active" id="btn-vista-reg-trabajador"
                             onclick="cambiarVistaRegistroJornada('TRABAJADOR', this)">👤 Trabajador</button>
                         <button class="segment-btn view-btn-reg" id="btn-vista-reg-dia"
                             onclick="cambiarVistaRegistroJornada('DIA', this)">📅 Día</button>
                     </div>
-                    <div id="reg-nav-mes-controles" style="display: flex; gap: 4px; align-items: center;">
-                        <button class="nav-btn" onclick="desplazarMesRegistroJornada(-1)">◀ Mes Anterior</button>
-                        <button class="nav-btn" onclick="desplazarMesRegistroJornada(1)">Mes Siguiente ▶</button>
-                    </div>
-                    <div id="reg-nav-dia-controles" style="display: none; gap: 4px; align-items: center;">
-                        <button class="nav-btn" onclick="desplazarDiaRegistroJornada(-1)">◀ Día Anterior</button>
-                        <button class="nav-btn" onclick="desplazarDiaRegistroJornada(1)">Día Siguiente ▶</button>
-                        <button class="nav-btn" style="background:#0e7490;"
-                            onclick="irAHoyRegistroJornada()">Hoy</button>
-                    </div>
-                    <div style="font-weight: 800; font-size: 15px; color: #22d3ee; text-transform: uppercase; margin-left: 6px; letter-spacing: 0.5px;"
-                        id="titulo-mes-registro-jornada">CARGANDO...</div>
                 </div>
                 <div style="display: flex; gap: 6px; align-items: center;">
                     <span id="reg-contador-fichas" style="font-size: 11px; color: #94a3b8; font-weight: 600;"></span>
@@ -5333,20 +5351,21 @@
                         Exportar Excel</button>
                 </div>
             </div>
-            <!-- Fila 2: filtros de función + ordenación + buscador -->
-            <div id="reg-controles-segmentacion" class="panel-row" style="margin-top: 8px;">
-                <div class="segmentation-nav" id="registro-function-filters">
+            <!-- Fila 2: navegación del mes o del día -->
+            <div class="panel-row" style="justify-content:flex-start;">
+                <div id="reg-nav-mes-controles" style="display: flex; gap: 4px; align-items: center;">
+                    <button class="nav-btn period-nav-btn" onclick="desplazarMesRegistroJornada(-1)">◀ Mes anterior</button>
+                    <button class="nav-btn period-nav-btn period-current-btn" onclick="irAMesActualRegistroJornada()">Mes actual</button>
+                    <button class="nav-btn period-nav-btn" onclick="desplazarMesRegistroJornada(1)">Mes siguiente ▶</button>
                 </div>
-                <div style="display: flex; gap: 6px; align-items: center;">
-                    <strong style="font-size: 11px;">Ordenar filas por:</strong>
-                    <button type="button" class="segment-btn sort-btn-reg active" id="btn-ord-reg-az"
-                        onclick="ordenarRegistroJornada('AZ')">A-Z</button>
-                    <button type="button" class="segment-btn sort-btn-reg" id="btn-ord-reg-rot"
-                        onclick="ordenarRegistroJornada('ROT')">Rotación</button>
-                    <input type="text" id="buscador-registro-jornada" placeholder="🔍 Buscar trabajador..."
-                        style="margin-left: 12px; padding: 4px 8px; border-radius: 3px; border: 1px solid var(--border); font-size: 11px; width: 200px; outline: none;"
-                        oninput="buscarRegistroJornada()">
+                <div id="reg-nav-dia-controles" style="display: none; gap: 4px; align-items: center;">
+                    <button class="nav-btn period-nav-btn" onclick="desplazarDiaRegistroJornada(-1)">◀ Día Anterior</button>
+                    <button class="nav-btn period-nav-btn period-current-btn" style="background:#0e7490;"
+                        onclick="irAHoyRegistroJornada()">Hoy</button>
+                    <button class="nav-btn period-nav-btn" onclick="desplazarDiaRegistroJornada(1)">Día Siguiente ▶</button>
                 </div>
+                <div style="font-weight: 800; font-size: 15px; color: #22d3ee; text-transform: uppercase; margin-left: 6px; letter-spacing: 0.5px;"
+                    id="titulo-mes-registro-jornada">CARGANDO...</div>
             </div>
         </div>
 
@@ -5503,8 +5522,8 @@
                     fila representa a un trabajador y cada columna representa un día o franja del calendario. Las celdas
                     contienen los turnos asignados.</p>
                 <ul>
-                    <li><strong>Cómo navegar:</strong> hay botones para retroceder semana, avanzar semana y volver a la
-                        semana actual.</li>
+                    <li><strong>Cómo navegar:</strong> hay botones para ir a la semana anterior o siguiente y volver a
+                        la semana actual.</li>
                     <li><strong>Cómo cambiar un turno:</strong> se selecciona la celda correcta, se modifica el turno y
                         se confirma el cambio.</li>
                     <li><strong>Cómo copiar un turno:</strong> se reutiliza un patrón de horario sobre otra celda o
@@ -6283,6 +6302,7 @@
         let appStateReconnectInProgress = false;
         let appStateLifecycleListenersRegistered = false;
         let isRefreshingAppState = false;
+        let appStateRefreshQueued = false;
         let app_state = null;
         let opcionesRRHH = {
             funciones: ['Centro Gestión', 'Supervisión', 'Ambulift', 'Furgoneta', 'Agente', 'Agente ETT'],
@@ -6529,7 +6549,11 @@
         }
 
         async function refrescarEstadoAplicacionDesdeSupabase() {
-            if (!supabaseClient || !appStateSyncReady || isRefreshingAppState) return;
+            if (!supabaseClient || !appStateSyncReady) return;
+            if (isRefreshingAppState) {
+                appStateRefreshQueued = true;
+                return;
+            }
             isRefreshingAppState = true;
             const estadoSincronizadoAlIniciar = lastSyncedAppState;
             try {
@@ -6555,6 +6579,10 @@
                 console.error('Error al comprobar cambios del estado en Supabase:', error);
             } finally {
                 isRefreshingAppState = false;
+                if (appStateRefreshQueued) {
+                    appStateRefreshQueued = false;
+                    setTimeout(refrescarEstadoAplicacionDesdeSupabase, 0);
+                }
             }
         }
 
@@ -6703,21 +6731,13 @@
         }
 
         function recibirCambioEstadoAplicacion(payload) {
-            const datos = extraerEstadoRegistroAppState(payload?.new);
-            if (!datos) {
+            if (!extraerEstadoRegistroAppState(payload?.new)) {
                 if (payload?.new) {
                     console.error('El payload Realtime no contiene un registro app_state válido para esta aplicación.');
                 }
                 return;
             }
-            if (hayCeldaTurnoEnEdicion()) return;
-            if (serializarEstadoAplicacion(obtenerEstadoAplicacion()) !== lastSyncedAppState) return;
-            if (serializarEstadoAplicacion(datos) === lastSyncedAppState) return;
-
-            if (aplicarEstadoAplicacion(datos)) {
-                lastSyncedAppState = serializarEstadoAplicacion(obtenerEstadoAplicacion());
-                actualizarEstadoSincronizacion('🟢 Actualizado desde otro dispositivo', '#86efac');
-            }
+            refrescarEstadoAplicacionDesdeSupabase();
         }
 
         function mostrarSubseccionDoc(subseccion) {
@@ -8005,8 +8025,8 @@
                         <td class="col-worker" rowspan="3" style="${estiloColorCustomWorker} white-space: normal; padding: 2px !important;">
                             <span style="font-size: 11px; font-weight: 500; color: #111827; line-height: 1.1; display: block; margin-bottom: 1px;">${emp.apellidos}, ${emp.nombre}</span>
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <small style="color: #2563eb; font-weight: bold;">${emp.contrato || '-'}</small>
-                                <small style="color: #4b5563; font-weight: bold;">${funcionVisual}</small>
+                                <small class="worker-contract-label" style="color: #2563eb; font-weight: bold;">${emp.contrato || '-'}</small>
+                                <small class="worker-function-label" style="color: #4b5563; font-weight: bold;">${funcionVisual}</small>
                             </div>
                             ${btnIdiomas}
                             ${btnAdap}
@@ -8262,13 +8282,7 @@
                 let colorClase = emp.claseColor || "cell-blanco";
                 let estiloColorCustomWorker = (colorClase.startsWith('#')) ? `background-color: ${colorClase} !important; border-right: 3px solid #22d3ee !important;` : '';
 
-                let funcionVisual = (emp.funcion || "").toUpperCase().trim();
-                if (funcionVisual === "CENTRO DE GESTIÓN" || funcionVisual === "CENTRO GESTION") funcionVisual = "CG";
-                else if (funcionVisual === "SUPERVISIÓN" || funcionVisual === "SUPERVISION") funcionVisual = "SUP";
-                else if (funcionVisual === "CON" || funcionVisual === "CONDUCTOR" || funcionVisual === "AMBULIFT") funcionVisual = "AMB";
-                else if (funcionVisual === "FURGONETA") funcionVisual = "FUR";
-                else if (funcionVisual === "AGENTE ETT") funcionVisual = "AG ETT";
-                else if (funcionVisual === "AGENTE") funcionVisual = "AG";
+                let funcionVisual = obtenerAbreviaturaFuncion(emp.funcion) || (emp.funcion || "").toUpperCase().trim();
 
                 let btnIdiomas = emp.idiomas && emp.idiomas !== "" ? `<button type="button" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:#d1fae5; color:#065f46; border:1px solid #10b981; border-radius:50%; font-size:9px; font-weight:bold; cursor:pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Idiomas" onclick="window.mostrarIdiomas(this.dataset.empId)" data-emp-id="${emp.id}">I</button>` : '';
                 let btnAdap = emp.adaptacion ? `<button type="button" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:#ede9fe; color:#5b21b6; border:1px solid #8b5cf6; border-radius:50%; font-size:9px; font-weight:bold; cursor:pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Adaptación" onclick="window.mostrarAdaptacion(this.dataset.empId)" data-emp-id="${emp.id}">A</button>` : '';
@@ -10575,7 +10589,7 @@
             fechaCoberturaBaseLunes = new Date(fechaDesdePivot);
             fechaCoberturaBaseLunes.setDate(fechaDesdePivot.getDate() + (semanaIndex * 7));
 
-            document.querySelectorAll('.btn-semana-cob').forEach((btn, idx) => {
+            document.querySelectorAll('#botones-semanas-cobertura .btn-semana-cob').forEach((btn, idx) => {
                 btn.classList.toggle('active', idx === semanaIndex);
             });
             setTimeout(() => renderizarEstructuraCoberturaSemanal(), 10);
@@ -10583,7 +10597,16 @@
 
         function desplazarSemanaCobertura(dias) {
             fechaCoberturaBaseLunes.setDate(fechaCoberturaBaseLunes.getDate() + dias);
-            document.querySelectorAll('.btn-semana-cob').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#botones-semanas-cobertura .btn-semana-cob').forEach(btn => btn.classList.remove('active'));
+            setTimeout(() => renderizarEstructuraCoberturaSemanal(), 10);
+        }
+
+        function irASemanaActualCobertura() {
+            const hoy = new Date();
+            const diferenciaLunes = hoy.getDay() === 0 ? -6 : 1 - hoy.getDay();
+            fechaCoberturaBaseLunes = new Date(hoy);
+            fechaCoberturaBaseLunes.setDate(hoy.getDate() + diferenciaLunes);
+            document.querySelectorAll('#botones-semanas-cobertura .btn-semana-cob').forEach(btn => btn.classList.remove('active'));
             setTimeout(() => renderizarEstructuraCoberturaSemanal(), 10);
         }
 
@@ -11216,7 +11239,8 @@
             let mostrarHoras = vistaVacacionesActiva === "HORAS";
             document.getElementById('btn-vac-subtab-vacaciones').classList.toggle('active', !mostrarHoras);
             document.getElementById('btn-vac-subtab-horas').classList.toggle('active', mostrarHoras);
-            document.getElementById('vac-controls-calendar').style.display = mostrarHoras ? 'none' : '';
+            document.getElementById('vac-controls-calendar-nav').style.display = mostrarHoras ? 'none' : '';
+            document.getElementById('vac-controls-calendar-actions').style.display = mostrarHoras ? 'none' : '';
             document.getElementById('vac-controls-hours').style.display = mostrarHoras ? 'flex' : 'none';
             document.getElementById('vac-calendar-view').style.display = mostrarHoras ? 'none' : '';
             document.getElementById('vac-hours-view').style.display = mostrarHoras ? '' : 'none';
@@ -11274,6 +11298,13 @@
             if (!vacYLibranzasPublicadas.includes(fechaDestino.getFullYear())) return;
             window.fechaBaseVacaciones = fechaDestino;
             renderizarVacacionesWorkerAnual(fechaDestino.getFullYear());
+        }
+
+        function irAMesActualVacacionesWorker() {
+            const hoy = new Date();
+            if (!vacYLibranzasPublicadas.includes(hoy.getFullYear())) return;
+            window.fechaBaseVacaciones = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            renderizarVacacionesWorkerAnual(hoy.getFullYear());
         }
 
         function renderizarVacacionesWorkerAnual(anioSeleccionado) {
@@ -11380,9 +11411,10 @@
                 celdasCalendario += '</tr>';
 
                 html += `<div class="vac-worker-month-nav">
-                    <button type="button" class="nav-btn week-nav-btn" onclick="desplazarMesVacacionesWorker(-1)" ${mes === 0 && !aniosDisponibles.includes(anio - 1) ? 'disabled' : ''}>◀ Mes anterior</button>
                     <div class="vac-worker-month-title">${nombresMesesLargo[mes]} ${anio}</div>
-                    <button type="button" class="nav-btn week-nav-btn" onclick="desplazarMesVacacionesWorker(1)" ${mes === 11 && !aniosDisponibles.includes(anio + 1) ? 'disabled' : ''}>Mes siguiente ▶</button>
+                    <button type="button" class="nav-btn period-nav-btn" onclick="desplazarMesVacacionesWorker(-1)" ${mes === 0 && !aniosDisponibles.includes(anio - 1) ? 'disabled' : ''}>◀ Mes anterior</button>
+                    <button type="button" class="nav-btn period-nav-btn period-current-btn" onclick="irAMesActualVacacionesWorker()" ${!aniosDisponibles.includes(new Date().getFullYear()) ? 'disabled' : ''}>Mes actual</button>
+                    <button type="button" class="nav-btn period-nav-btn" onclick="desplazarMesVacacionesWorker(1)" ${mes === 11 && !aniosDisponibles.includes(anio + 1) ? 'disabled' : ''}>Mes siguiente ▶</button>
                 </div>
                 <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
                     <table class="vac-tabla-mensual-worker">
@@ -11447,6 +11479,12 @@
             if (sesionActual && sesionActual.role === 'trabajador') {
                 setTimeout(aplicarRestriccionVacWorker, 30);
             }
+        }
+
+        function irAMesActualVacaciones() {
+            const hoy = new Date();
+            window.fechaBaseVacaciones = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            desplazarMesVacaciones(0);
         }
 
         function filtrarPorFuncionVac(codigoFuncion, btnElement) {
@@ -11727,6 +11765,12 @@
 
         function desplazarMesVariables(meses) {
             window.fechaBaseVariables.setMonth(window.fechaBaseVariables.getMonth() + meses);
+            inicializarVariables();
+        }
+
+        function irAMesActualVariables() {
+            const hoy = new Date();
+            window.fechaBaseVariables = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
             inicializarVariables();
         }
 
@@ -12556,6 +12600,10 @@
             horasVistaActiva = vista;
             document.getElementById('btn-horas-vista-semana').classList.toggle('active', vista === 'SEMANAL');
             document.getElementById('btn-horas-vista-mes').classList.toggle('active', vista === 'MENSUAL');
+            const periodo = vista === 'MENSUAL' ? 'Mes' : 'Semana';
+            document.getElementById('btn-horas-anterior').textContent = `◀ ${periodo} anterior`;
+            document.getElementById('btn-horas-actual').textContent = `${periodo} actual`;
+            document.getElementById('btn-horas-siguiente').textContent = `${periodo} siguiente ▶`;
 
             if (vista === 'MENSUAL') {
                 horasFechaDesde = new Date(fechaDesdePivot.getFullYear(), fechaDesdePivot.getMonth(), 1);
@@ -12563,6 +12611,21 @@
             } else {
                 horasFechaDesde = new Date(fechaDesdePivot);
                 horasFechaHasta = new Date(fechaHastaPivot);
+            }
+            inicializarHoras();
+        }
+
+        function irAPeriodoActualHoras() {
+            const hoy = new Date();
+            if (horasVistaActiva === 'MENSUAL') {
+                horasFechaDesde = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+                horasFechaHasta = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+            } else {
+                const diferenciaLunes = hoy.getDay() === 0 ? -6 : 1 - hoy.getDay();
+                horasFechaDesde = new Date(hoy);
+                horasFechaDesde.setDate(hoy.getDate() + diferenciaLunes);
+                horasFechaHasta = new Date(horasFechaDesde);
+                horasFechaHasta.setDate(horasFechaDesde.getDate() + 20);
             }
             inicializarHoras();
         }
@@ -13889,6 +13952,13 @@
             mesActualRegistro += offset;
             if (mesActualRegistro > 11) { mesActualRegistro = 0; anioActualRegistro++; }
             else if (mesActualRegistro < 0) { mesActualRegistro = 11; anioActualRegistro--; }
+            renderizarFichasJornada();
+        }
+
+        function irAMesActualRegistroJornada() {
+            const hoy = new Date();
+            mesActualRegistro = hoy.getMonth();
+            anioActualRegistro = hoy.getFullYear();
             renderizarFichasJornada();
         }
 

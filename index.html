@@ -2221,7 +2221,8 @@
         }
 
         #pane-turnos .compact-table th.header-holiday,
-        #pane-planificar .compact-table th.header-holiday {
+        #pane-planificar .compact-table th.header-holiday,
+        #pane-vacaciones #vac-calendar-view .compact-table th.header-holiday {
             background-color: #fecaca !important;
             background-image: none !important;
             background-clip: border-box !important;
@@ -5099,10 +5100,10 @@
                     <button class="nav-btn period-nav-btn" onclick="desplazarMesVacaciones(-1)">◀ Mes anterior</button>
                     <button class="nav-btn period-nav-btn period-current-btn" onclick="irAMesActualVacaciones()">Mes actual</button>
                     <button class="nav-btn period-nav-btn" onclick="desplazarMesVacaciones(1)">Mes siguiente ▶</button>
-                    <div style="font-weight: bold; font-size: 15px; color: #22d3ee; text-transform: uppercase; margin-left: 10px;"
-                        id="titulo-mes-vacaciones">
-                        Cargando mes...
-                    </div>
+                </div>
+                <div style="font-weight: bold; font-size: 15px; color: #22d3ee; text-transform: uppercase;"
+                    id="titulo-mes-vacaciones">
+                    Cargando mes...
                 </div>
             </div>
             <div id="vac-controls-hours" class="panel-row" style="display:none; justify-content: space-between;">

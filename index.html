@@ -664,11 +664,11 @@
         }
 
         .header-holiday {
-            background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%) !important;
-            color: #fff7ed !important;
-            border: 2px solid #fda4af !important;
-            border-radius: 8px;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            background: #fecaca !important;
+            color: #111827 !important;
+            border: 2px solid #22d3ee !important;
+            border-radius: 0;
+            box-shadow: none;
             font-weight: 700;
         }
 
@@ -1492,6 +1492,89 @@
             border-radius: 8px;
         }
 
+        .vac-worker-view-toggle,
+        .vac-worker-month-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .vac-worker-view-toggle {
+            margin-right: auto;
+        }
+
+        .vac-worker-month-title {
+            min-width: 150px;
+            color: #22d3ee;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .vac-tabla-mensual-worker {
+            width: 100%;
+            min-width: 620px;
+            border-collapse: collapse;
+            table-layout: fixed;
+            color: #0f172a;
+        }
+
+        .vac-tabla-mensual-worker th {
+            padding: 8px 4px;
+            background: #153d64;
+            color: #f8fafc;
+            border: 1px solid #22d3ee;
+            text-align: center;
+        }
+
+        .vac-tabla-mensual-worker td {
+            height: 74px;
+            padding: 4px;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            vertical-align: top;
+        }
+
+        .vac-tabla-mensual-worker td.vac-worker-dia-vacio {
+            background: #f1f5f9;
+        }
+
+        .vac-tabla-mensual-worker td.vac-worker-dia-sin-estado {
+            background: #fcd5b4 !important;
+        }
+
+        .vac-tabla-mensual-worker td.vac-worker-dia-festivo {
+            background: #fee2e2 !important;
+        }
+
+        .vac-worker-dia-numero {
+            display: block;
+            color: #334155;
+            font-size: 11px;
+            text-align: right;
+        }
+
+        .vac-worker-dia-estado {
+            display: block;
+            margin-top: 8px;
+            padding: 5px 2px;
+            color: #000;
+            font-size: 12px;
+            font-weight: 400;
+            text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            .vac-tabla-mensual-worker {
+                min-width: 560px;
+            }
+
+            .vac-tabla-mensual-worker td {
+                height: 58px;
+            }
+        }
+
         .vac-anual-selector {
             display: flex;
             gap: 10px;
@@ -1593,6 +1676,10 @@
 
         .vac-tabla-anual td.vac-celda-fin-semana {
             background: #f1f5f9 !important;
+        }
+
+        .vac-tabla-anual td.vac-celda-sin-estado {
+            background: #fcd5b4 !important;
         }
 
         .vac-tabla-anual td.vac-celda-festivo {
@@ -2118,6 +2205,17 @@
             border-color: #22d3ee !important;
         }
 
+        #pane-turnos .compact-table th.header-holiday,
+        #pane-planificar .compact-table th.header-holiday {
+            background-color: #fecaca !important;
+            background-image: none !important;
+            background-clip: border-box !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            color: #111827 !important;
+            border-color: #22d3ee !important;
+        }
+
         #pane-turnos .compact-table tbody tr[data-row-tipo] .turno-grid-cell,
         #pane-planificar .compact-table tbody tr[data-row-tipo] .turno-grid-cell {
             border-color: #111827 !important;
@@ -2159,11 +2257,11 @@
         }
 
         .header-holiday {
-            background: linear-gradient(135deg, #8f1d1d 0%, #b91c1c 100%) !important;
-            color: #fff7ed !important;
-            border: 2px solid #fda4af !important;
-            border-radius: 8px;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            background: #fecaca !important;
+            color: #111827 !important;
+            border: 2px solid #22d3ee !important;
+            border-radius: 0;
+            box-shadow: none;
             font-weight: 700;
         }
 
@@ -2527,40 +2625,74 @@
         }
 
         .compact-table tr.row-estado td.estado-v input[data-campo="est"] {
-            background: #92d050 !important;
-            color: #17320c !important;
-            border-color: #b7e58a;
+            background: transparent !important;
+            color: #000000 !important;
+            border-color: transparent !important;
         }
 
         .compact-table tr.row-estado td.estado-l input[data-campo="est"] {
-            background: #fbbf24 !important;
-            color: #422006 !important;
-            border-color: #fde68a;
+            background: transparent !important;
+            color: #000000 !important;
+            border-color: transparent !important;
         }
 
         .compact-table tr.row-estado td.estado-b input[data-campo="est"] {
-            background: #00b050 !important;
-            color: #ecfdf5 !important;
-            border-color: #34d399;
+            background: transparent !important;
+            color: #000000 !important;
+            border-color: transparent !important;
         }
 
         .compact-table tr.row-estado td.estado-aj input[data-campo="est"] {
-            background: #ff7a00 !important;
+            background: transparent !important;
             color: #000000 !important;
-            border-color: #ff983f;
+            border-color: transparent !important;
         }
 
         .compact-table tr.row-estado td.estado-pr input[data-campo="est"] {
-            background: #7030a0 !important;
-            color: #f5f3ff !important;
-            border-color: #a855f7;
+            background: transparent !important;
+            color: #000000 !important;
+            border-color: transparent !important;
         }
 
         .compact-table tr.row-estado td.estado-f input[data-campo="est"] {
-            background: #ff0000 !important;
-            color: #ffffff !important;
-            border-color: #fca5a5;
+            background: transparent !important;
+            color: #000000 !important;
+            border-color: transparent !important;
         }
+
+        #pane-turnos .compact-table tr.row-estado td:has(input[data-campo="est"]),
+        #pane-vacaciones .compact-table tr.row-vac-estado td:has(input[data-campo="est"]) {
+            padding: 0 !important;
+        }
+
+        #pane-turnos .compact-table tr.row-estado input[data-campo="est"],
+        #pane-vacaciones .compact-table tr.row-vac-estado input[data-campo="est"] {
+            width: 100%;
+            max-width: none;
+            height: 100%;
+            min-height: 0;
+            padding: 0;
+            border: 0 !important;
+            border-radius: 0;
+            background: transparent !important;
+            box-shadow: none !important;
+            font-weight: 400 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+        }
+
+        #pane-turnos .compact-table tr.row-estado td:has(input[data-campo="est"]).estado-v,
+        #pane-vacaciones .compact-table tr.row-vac-estado td:has(input[data-campo="est"]).estado-v { background: #92d050 !important; }
+        #pane-turnos .compact-table tr.row-estado td:has(input[data-campo="est"]).estado-l,
+        #pane-vacaciones .compact-table tr.row-vac-estado td:has(input[data-campo="est"]).estado-l { background: #fbbf24 !important; }
+        #pane-turnos .compact-table tr.row-estado td:has(input[data-campo="est"]).estado-b,
+        #pane-vacaciones .compact-table tr.row-vac-estado td:has(input[data-campo="est"]).estado-b { background: #00b050 !important; }
+        #pane-turnos .compact-table tr.row-estado td:has(input[data-campo="est"]).estado-aj,
+        #pane-vacaciones .compact-table tr.row-vac-estado td:has(input[data-campo="est"]).estado-aj { background: #ff7a00 !important; }
+        #pane-turnos .compact-table tr.row-estado td:has(input[data-campo="est"]).estado-pr,
+        #pane-vacaciones .compact-table tr.row-vac-estado td:has(input[data-campo="est"]).estado-pr { background: #7030a0 !important; }
+        #pane-turnos .compact-table tr.row-estado td:has(input[data-campo="est"]).estado-f,
+        #pane-vacaciones .compact-table tr.row-vac-estado td:has(input[data-campo="est"]).estado-f { background: #ff0000 !important; }
 
         .compact-table tr:not(.row-estado) td:not(.col-worker):not(.col-total) {
             background: #123b5d !important;
@@ -2596,7 +2728,7 @@
         .compact-table tr.row-estado td.estado-vacio input[data-campo="est"] {
             background: transparent !important;
             border-color: transparent !important;
-            color: #f8fafc !important;
+            color: #000000 !important;
         }
 
         #quadrant-matrix>tr:last-child {
@@ -2807,33 +2939,33 @@
         }
 
         #pane-vacaciones .compact-table td.estado-l input[data-campo="est"] {
-            background: #fbbf24 !important;
-            color: #422006 !important;
+            background: transparent !important;
+            color: #000000 !important;
         }
 
         #pane-vacaciones .compact-table td.estado-v input[data-campo="est"] {
-            background: #92d050 !important;
-            color: #17320c !important;
+            background: transparent !important;
+            color: #000000 !important;
         }
 
         #pane-vacaciones .compact-table td.estado-b input[data-campo="est"] {
-            background: #00b050 !important;
-            color: #ecfdf5 !important;
+            background: transparent !important;
+            color: #000000 !important;
         }
 
         #pane-vacaciones .compact-table td.estado-aj input[data-campo="est"] {
-            background: #ff7a00 !important;
+            background: transparent !important;
             color: #000 !important;
         }
 
         #pane-vacaciones .compact-table td.estado-pr input[data-campo="est"] {
-            background: #7030a0 !important;
-            color: #fff !important;
+            background: transparent !important;
+            color: #000000 !important;
         }
 
         #pane-vacaciones .compact-table td.estado-f input[data-campo="est"] {
-            background: #f00 !important;
-            color: #fff !important;
+            background: transparent !important;
+            color: #000000 !important;
         }
 
         /* =============================================
@@ -7867,7 +7999,6 @@
                 let btnAdap = emp.adaptacion ? `<button type="button" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:#ede9fe; color:#5b21b6; border:1px solid #8b5cf6; border-radius:50%; font-size:9px; font-weight:bold; cursor:pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Adaptación" onclick="window.mostrarAdaptacion(this.dataset.empId)" data-emp-id="${emp.id}">A</button>` : '';
                 let btnRest = emp.restricciones ? `<button type="button" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:#fee2e2; color:#991b1b; border:1px solid #f87171; border-radius:50%; font-size:9px; font-weight:bold; cursor:pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Restricciones" onclick="window.mostrarRestricciones(this.dataset.empId)" data-emp-id="${emp.id}">R</button>` : '';
                 let btnCompensa = calcularSaldoCompensacion(emp.id) > 0 ? `<button type="button" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:#fef3c7; color:#92400e; border:1px solid #f59e0b; border-radius:50%; font-size:9px; font-weight:bold; cursor:pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Compensación de horas" onclick="abrirModalCompensacion('${emp.id}')" data-emp-id="${emp.id}">C</button>` : '';
-
                 let htmlBloque = `
                     <tr class="row-estado ${visibleClass}" data-emp="${empIdx}" data-row-tipo="0">
                         <td rowspan="3" style="width: 22px; text-align: center; font-weight: bold; font-size: 10px; background: #f3f4f6; color: #4b5563; border: 1px solid #7f7f7f;">${numFilaActual}</td>
@@ -8051,11 +8182,22 @@
             `;
             headerMonths.innerHTML = thMesesHtml;
 
-            headerWeeks.innerHTML = `
-                <th class="week-title separador-semana" style="background:#374151; border-top: 2px solid #1f2937;" colspan="${tBloque}">SEMANA ${sem1}</th>
-                <th class="week-title separador-semana" style="background:#2563eb; border-top: 2px solid #1f2937;" colspan="${tBloque}">SEMANA ${sem2}</th>
-                <th class="week-title" style="background:#1e3a8a; border-top: 2px solid #1f2937;" colspan="${fechas.length - (tBloque * 2)}">SEMANA ${sem3}</th>
-            `;
+            const coloresSemana = ['#374151', '#2563eb', '#1e3a8a'];
+            let bloquesSemana = [];
+            fechas.forEach(fecha => {
+                let numeroSemana = getNumeroSemanaISO8601(fecha);
+                let ultimoBloque = bloquesSemana[bloquesSemana.length - 1];
+                if (ultimoBloque && ultimoBloque.numero === numeroSemana) {
+                    ultimoBloque.span++;
+                } else {
+                    bloquesSemana.push({ numero: numeroSemana, span: 1 });
+                }
+            });
+            headerWeeks.innerHTML = bloquesSemana.map((bloque, idx) => `
+                <th class="week-title${idx < bloquesSemana.length - 1 ? ' separador-semana' : ''}"
+                    style="background:${coloresSemana[idx % coloresSemana.length]}; border-top: 2px solid #1f2937;"
+                    colspan="${bloque.span}">SEMANA ${bloque.numero}</th>
+            `).join('');
 
             fechas.forEach((fecha, i) => {
                 let th = document.createElement('th');
@@ -8132,20 +8274,25 @@
                 let btnAdap = emp.adaptacion ? `<button type="button" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:#ede9fe; color:#5b21b6; border:1px solid #8b5cf6; border-radius:50%; font-size:9px; font-weight:bold; cursor:pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Adaptación" onclick="window.mostrarAdaptacion(this.dataset.empId)" data-emp-id="${emp.id}">A</button>` : '';
                 let btnRest = emp.restricciones ? `<button type="button" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:#fee2e2; color:#991b1b; border:1px solid #f87171; border-radius:50%; font-size:9px; font-weight:bold; cursor:pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Restricciones" onclick="window.mostrarRestricciones(this.dataset.empId)" data-emp-id="${emp.id}">R</button>` : '';
                 let btnCompensa = calcularSaldoCompensacion(emp.id) > 0 ? `<button type="button" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:#fef3c7; color:#92400e; border:1px solid #f59e0b; border-radius:50%; font-size:9px; font-weight:bold; cursor:pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Compensación de horas" onclick="abrirModalCompensacion('${emp.id}')" data-emp-id="${emp.id}">C</button>` : '';
+                let contenidoColaborador = sesionActual?.role === 'trabajador'
+                    ? `${emp.apellidos}, ${emp.nombre}`
+                    : `
+                        <span style="font-size: 11px; font-weight: 500; color: #111827; line-height: 1.1; display: block; margin-bottom: 1px;">${emp.apellidos}, ${emp.nombre}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <small style="color: #2563eb; font-weight: bold;">${emp.contrato || '-'}</small>
+                            <small style="color: #4b5563; font-weight: bold;">${funcionVisual}</small>
+                        </div>
+                        ${btnIdiomas}
+                        ${btnAdap}
+                        ${btnRest}
+                        ${btnCompensa}
+                    `;
 
                 let htmlBloque = `
                     <tr class="row-estado ${visibleClass}" data-emp="${empIdx}" data-row-tipo="0">
                         <td rowspan="3" style="width: 22px; text-align: center; font-weight: bold; font-size: 10px; background: #f3f4f6; color: #4b5563; border: 1px solid #7f7f7f;">${numFilaActual}</td>
                         <td class="col-worker" rowspan="3" style="${estiloColorCustomWorker} white-space: normal; padding: 2px !important;">
-                            <span style="font-size: 11px; font-weight: 500; color: #111827; line-height: 1.1; display: block; margin-bottom: 1px;">${emp.apellidos}, ${emp.nombre}</span>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <small style="color: #2563eb; font-weight: bold;">${emp.contrato || '-'}</small>
-                                <small style="color: #4b5563; font-weight: bold;">${funcionVisual}</small>
-                            </div>
-                            ${btnIdiomas}
-                            ${btnAdap}
-                            ${btnRest}
-                            ${btnCompensa}
+                            ${contenidoColaborador}
                         </td>
                         ${generarCeldasInputs(empIdx, 0, emp.id, 'est', colorClase, fechas)}
                         <td class="col-total" rowspan="3" id="total_s1_${emp.id}">00:00</td>
@@ -8231,6 +8378,9 @@
                     : ((rowTipo === 0) ? 'cell-blanco' : (esCustomHex || sinColorRotacion ? '' : colorClase));
                 if (rowTipo === 0) claseAplicada += getEstadoVisualClass(valorPrevio);
                 if (esPublicado && rowTipo === 0) claseAplicada += ' published-turno';
+                if (rowTipo === 0 && !customBg && autoBg) {
+                    colorFondoTd = `background-color: ${autoBg} !important;`;
+                }
 
                 let notaKey = storageId + '_nota';
                 let tieneNotaClase = (rowTipo === 0 && baseDatosTurnos[notaKey]) ? ' has-note' : '';
@@ -8242,10 +8392,9 @@
                 let textoTooltip = (rowTipo === 0 && baseDatosTurnos[notaKey]) ? `title="📌 NOTA: ${baseDatosTurnos[notaKey]}"` : '';
 
                 let contextAccion = `oncontextmenu="handleRightClickGlobal(event, this, '${empId}', '${dateKey}', ${rowTipo})"`;
-                let autoTextColor = (rowTipo === 0) ? getAutoTextColor(valorPrevio) : null;
                 let textoNegro = rowTipo > 0 && dateActive;
                 let claseTextoRotacion = textoNegro ? ' input-tramo-color-rotacion' : '';
-                let inputStyle = `${!dateActive ? 'cursor:not-allowed;' : ''}${autoTextColor ? `color:${autoTextColor};font-weight:900;` : ''}`;
+                let inputStyle = `${!dateActive ? 'cursor:not-allowed;' : ''}${rowTipo === 0 ? 'color:#000000;font-weight:400;' : ''}`;
 
                 celdas += `
                     <td class="turno-grid-cell ${claseAplicada}${claseExtraSeparador}${tieneNotaClase}${tieneExtraClase}" style="${colorFondoTd}" ${textoTooltip}>
@@ -8412,22 +8561,13 @@
                 let bgKey = inputElement.dataset.empid + "_bg_" + inputElement.dataset.fecha + "_0";
                 let customBg = baseDatosTurnos[bgKey];
                 let autoBg = getAutoColor(inputElement.value);
-                let autoTxt = getAutoTextColor(inputElement.value);
                 let td = inputElement.parentElement;
                 if (customBg) td.style.setProperty('background-color', customBg, 'important');
+                else if (autoBg) td.style.setProperty('background-color', autoBg, 'important');
                 else td.style.setProperty('background-color', '#12283a', 'important');
                 // Color de texto del input
-                inputElement.style.color = autoTxt || '';
-                // Peso tipografico: negrita para estados, normal para funciones
-                let primeraParteVal = inputElement.value.split('/')[0].trim().toUpperCase();
-                let esEstRec = estadosConfig.some(e => e.codigo.toUpperCase() === primeraParteVal);
-                if (esEstRec) {
-                    inputElement.style.fontWeight = '700';
-                    inputElement.style.color = autoTxt || '';
-                } else {
-                    inputElement.style.fontWeight = '400';
-                    inputElement.style.color = '';
-                }
+                inputElement.style.color = '#000000';
+                inputElement.style.fontWeight = '400';
             }
 
             calcularSumatoriosHoras();
@@ -11107,6 +11247,35 @@
             }
         }
 
+        let vistaVacacionesWorker = 'ANUAL';
+
+        function cambiarVistaVacacionesWorker(vista) {
+            vistaVacacionesWorker = vista === 'MENSUAL' ? 'MENSUAL' : 'ANUAL';
+            if (vistaVacacionesWorker === 'MENSUAL') {
+                let anio = window.fechaBaseVacaciones?.getFullYear() || new Date().getFullYear();
+                window.fechaBaseVacaciones = new Date(anio, new Date().getMonth(), 1);
+            }
+            renderizarVacacionesWorkerAnual(window.fechaBaseVacaciones?.getFullYear() || new Date().getFullYear());
+        }
+
+        function seleccionarAnioVacacionesWorker(anio) {
+            let mes = vistaVacacionesWorker === 'MENSUAL' && window.fechaBaseVacaciones
+                ? window.fechaBaseVacaciones.getMonth()
+                : 0;
+            window.fechaBaseVacaciones = new Date(anio, mes, 1);
+            renderizarVacacionesWorkerAnual(anio);
+        }
+
+        function desplazarMesVacacionesWorker(desplazamiento) {
+            if (!window.fechaBaseVacaciones) return;
+            let fechaDestino = new Date(window.fechaBaseVacaciones);
+            fechaDestino.setDate(1);
+            fechaDestino.setMonth(fechaDestino.getMonth() + desplazamiento);
+            if (!vacYLibranzasPublicadas.includes(fechaDestino.getFullYear())) return;
+            window.fechaBaseVacaciones = fechaDestino;
+            renderizarVacacionesWorkerAnual(fechaDestino.getFullYear());
+        }
+
         function renderizarVacacionesWorkerAnual(anioSeleccionado) {
             if (!sesionActual || !sesionActual.empleadoId) return;
             let empId = sesionActual.empleadoId;
@@ -11134,7 +11303,13 @@
                 return;
             }
             if (!aniosDisponibles.includes(anioSeleccionado)) anioSeleccionado = aniosDisponibles[0];
-            window.fechaBaseVacaciones = new Date(anioSeleccionado, 0, 1);
+            if (vistaVacacionesWorker === 'MENSUAL') {
+                if (!window.fechaBaseVacaciones || window.fechaBaseVacaciones.getFullYear() !== anioSeleccionado) {
+                    window.fechaBaseVacaciones = new Date(anioSeleccionado, new Date().getMonth(), 1);
+                }
+            } else {
+                window.fechaBaseVacaciones = new Date(anioSeleccionado, 0, 1);
+            }
 
             const nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
             const nombresMesesLargo = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -11146,9 +11321,14 @@
 
             // Construir HTML
             let html = `<div class="vac-anual-selector">
+                <div class="vac-worker-view-toggle">
+                    <strong>Vista:</strong>
+                    <button class="vac-anual-btn-anio ${vistaVacacionesWorker === 'ANUAL' ? 'active' : ''}" onclick="cambiarVistaVacacionesWorker('ANUAL')">Anual</button>
+                    <button class="vac-anual-btn-anio ${vistaVacacionesWorker === 'MENSUAL' ? 'active' : ''}" onclick="cambiarVistaVacacionesWorker('MENSUAL')">Mensual</button>
+                </div>
                 <strong>📅 Año:</strong>`;
             aniosDisponibles.forEach(a => {
-                html += `<button class="vac-anual-btn-anio ${a === anioSeleccionado ? 'active' : ''}" onclick="renderizarVacacionesWorkerAnual(${a})">${a}</button>`;
+                html += `<button class="vac-anual-btn-anio ${a === anioSeleccionado ? 'active' : ''}" onclick="seleccionarAnioVacacionesWorker(${a})">${a}</button>`;
             });
             html += `</div>`;
 
@@ -11160,8 +11340,59 @@
                 <div class="vac-anual-leyenda-item"><div class="vac-anual-leyenda-color" style="background:#FFC000;"></div> AJ - Ajuste</div>
                 <div class="vac-anual-leyenda-item"><div class="vac-anual-leyenda-color" style="background:#7030A0;"></div> <span style="color:#7030A0;font-weight:700;">PR - Permiso Retribuido</span></div>
                 <div class="vac-anual-leyenda-item"><div class="vac-anual-leyenda-color" style="background:#FF0000;"></div> <span style="color:#FF0000;font-weight:700;">F - Festivo</span></div>
-                <div class="vac-anual-leyenda-item"><div class="vac-anual-leyenda-color" style="background:#f1f5f9; border:1px solid #cbd5e1;"></div> Fin de semana</div>
+                <div class="vac-anual-leyenda-item"><div class="vac-anual-leyenda-color" style="background:#fcd5b4; border:1px solid #cbd5e1;"></div> Día sin estado</div>
             </div>`;
+
+            if (vistaVacacionesWorker === 'MENSUAL') {
+                let mes = window.fechaBaseVacaciones.getMonth();
+                let anio = window.fechaBaseVacaciones.getFullYear();
+                let primerDia = new Date(anio, mes, 1);
+                let diasMes = new Date(anio, mes + 1, 0).getDate();
+                let desplazamientoInicio = (primerDia.getDay() + 6) % 7;
+                let totalCeldas = Math.ceil((desplazamientoInicio + diasMes) / 7) * 7;
+                let celdasCalendario = '<tr>';
+
+                for (let indice = 0; indice < totalCeldas; indice++) {
+                    let dia = indice - desplazamientoInicio + 1;
+                    if (dia < 1 || dia > diasMes) {
+                        celdasCalendario += '<td class="vac-worker-dia-vacio"></td>';
+                    } else {
+                        let fecha = new Date(anio, mes, dia);
+                        let dateKey = formataFechaKey(fecha);
+                        let val = (baseDatosTurnos[empId + '_est_' + dateKey] || '').toUpperCase().trim();
+                        let autoBg = getAutoColor(val);
+                        let colorRotacionDia = val && colorRotacion ? colorRotacion : '';
+                        let contenidoVisible = val && esCodigoVacacionVisibleEnPortal(val) ? val : '';
+                        let estiloCelda = autoBg
+                            ? ` style="background:${autoBg} !important;"`
+                            : (colorRotacionDia ? ` style="background:${colorRotacionDia} !important;"` : '');
+                        let esFestivo = !!baseDatosTurnos['festivo_' + dateKey];
+                        let claseCelda = esFestivo ? 'vac-worker-dia-festivo' : (!val ? 'vac-worker-dia-sin-estado' : '');
+                        let festivo = esFestivo ? ' title="Festivo"' : '';
+
+                        celdasCalendario += `<td${claseCelda ? ` class="${claseCelda}"` : ''}${estiloCelda}${festivo}>
+                            <span class="vac-worker-dia-numero">${dia}</span>
+                            ${contenidoVisible ? `<span class="vac-worker-dia-estado">${contenidoVisible}</span>` : ''}
+                        </td>`;
+                    }
+                    if (indice % 7 === 6 && indice < totalCeldas - 1) celdasCalendario += '</tr><tr>';
+                }
+                celdasCalendario += '</tr>';
+
+                html += `<div class="vac-worker-month-nav">
+                    <button type="button" class="nav-btn week-nav-btn" onclick="desplazarMesVacacionesWorker(-1)" ${mes === 0 && !aniosDisponibles.includes(anio - 1) ? 'disabled' : ''}>◀ Mes anterior</button>
+                    <div class="vac-worker-month-title">${nombresMesesLargo[mes]} ${anio}</div>
+                    <button type="button" class="nav-btn week-nav-btn" onclick="desplazarMesVacacionesWorker(1)" ${mes === 11 && !aniosDisponibles.includes(anio + 1) ? 'disabled' : ''}>Mes siguiente ▶</button>
+                </div>
+                <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+                    <table class="vac-tabla-mensual-worker">
+                        <thead><tr>${['LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'].map(dia => `<th>${dia}</th>`).join('')}</tr></thead>
+                        <tbody>${celdasCalendario}</tbody>
+                    </table>
+                </div>`;
+                vistaAnual.innerHTML = html;
+                return;
+            }
 
             // Tabla: columnas = meses, filas = días
             html += `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
@@ -11195,7 +11426,7 @@
                     } else if (val && colorRotacion) {
                         bgStyle = `background-color:${colorRotacion};`;
                     }
-                    let extraClass = esFestivo ? 'vac-celda-festivo' : (esFinSemana ? 'vac-celda-fin-semana' : '');
+                    let extraClass = [esFestivo ? 'vac-celda-festivo' : (esFinSemana ? 'vac-celda-fin-semana' : ''), !val ? 'vac-celda-sin-estado' : ''].filter(Boolean).join(' ');
                     let tooltip = `${dia} ${nombresMesesLargo[mes]} (${diasSemana[diaSem]})${esFestivo ? ' 🎉' : ''}`;
                     let contenidoVisible = (sesionActual && sesionActual.role === 'trabajador' && val && !esCodigoVacacionVisibleEnPortal(val)) ? '' : val;
                     html += `<td class="${extraClass}" style="${bgStyle}" title="${tooltip}">${contenidoVisible || (esFinSemana || esFestivo ? '<span style="color:#cbd5e1;font-size:8px;">·</span>' : '')}</td>`;
@@ -11333,24 +11564,22 @@
                     let val = (baseDatosTurnos[emp.id + "_est_" + key] || "").trim();
                     let valorVisible = (sesionActual && sesionActual.role === 'trabajador' && val && !esCodigoVacacionVisibleEnPortal(val)) ? '' : val;
                     let autoBg = getAutoColor(val);
-                    let autoText = getAutoTextColor(val);
-
                     let bgKey = emp.id + "_bg_" + key + "_0";
                     let customBg = baseDatosTurnos[bgKey];
                     let colorFondoTd = '';
-                    let colorTextoFinal = '';
 
                     if (customBg) {
                         colorFondoTd = `background-color: ${customBg} !important;`;
-                        colorTextoFinal = getAutoTextColor(customBg);
                     } else {
                         colorFondoTd = 'background-color: #12283a !important;';
-                        colorTextoFinal = autoText;
                     }
 
                     let claseAplicada = '';
                     claseAplicada += getEstadoVisualClass(val);
-                    let textoInputStyle = colorTextoFinal ? `color:${colorTextoFinal};font-weight:700;` : '';
+                    if (!customBg && autoBg) {
+                        colorFondoTd = `background-color: ${autoBg} !important;`;
+                    }
+                    let textoInputStyle = 'color:#000000;font-weight:400;';
 
                     htmlCeldasDias += `
                         <td class="${claseAplicada}" style="${colorFondoTd}">
@@ -12754,8 +12983,18 @@
                 cssRules += `
                     .compact-table tr.row-estado td.estado-${codigoLower} input[data-campo="est"] {
                         background: ${estado.color} !important;
-                        color: ${estado.colorTexto} !important;
+                        color: #000000 !important;
                         border-color: ${estado.color};
+                    }
+                    #pane-turnos .compact-table tr.row-estado td:has(input[data-campo="est"]).estado-${codigoLower},
+                    #pane-vacaciones .compact-table tr.row-vac-estado td:has(input[data-campo="est"]).estado-${codigoLower} {
+                        background: ${estado.color} !important;
+                    }
+                    #pane-turnos .compact-table tr.row-estado td.estado-${codigoLower} input[data-campo="est"],
+                    #pane-vacaciones .compact-table tr.row-vac-estado td.estado-${codigoLower} input[data-campo="est"] {
+                        background: transparent !important;
+                        color: #000000 !important;
+                        border-color: transparent !important;
                     }
                 `;
             });

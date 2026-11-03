@@ -1517,6 +1517,16 @@
             text-transform: uppercase;
         }
 
+        #vac-controls-calendar-nav {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+        }
+
+        #vac-controls-calendar-nav #titulo-mes-vacaciones {
+            grid-column: 2;
+            justify-self: center;
+        }
+
         .vac-tabla-mensual-worker {
             width: 100%;
             min-width: 620px;
@@ -2529,6 +2539,10 @@
             width: 110px !important;
             min-width: 110px !important;
             max-width: 110px !important;
+        }
+
+        #pane-turnos .compact-table #header-months>th.col-worker {
+            font-size: 14px !important;
         }
 
         #pane-turnos .compact-table #header-months>th.col-total,

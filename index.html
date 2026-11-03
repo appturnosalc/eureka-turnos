@@ -4350,8 +4350,8 @@
                     <div id="turnos-nav-semanas">
                         <button class="nav-btn week-nav-btn" onclick="desplazarRango(-7)">◀ Retroceder Sem.</button>
                         <button class="nav-btn week-nav-btn" onclick="desplazarRango(7)">Avanzar Sem. ▶</button>
-                        <button type="button" class="nav-btn" onclick="irASemanaActual()"
-                            style="background-color: #3b82f6; font-weight: bold; margin-left: 4px;">Semana
+                        <button type="button" class="nav-btn week-nav-btn" onclick="irASemanaActual()"
+                            style="background-color: #3b82f6; margin-left: 4px;">Semana
                             Actual</button>
                     </div>
                     <div id="turnos-nav-fechas" class="search-box">
@@ -4443,12 +4443,8 @@
                             Sem.</button>
                         <button class="nav-btn week-nav-btn" type="button" onclick="desplazarRangoPlanificar(7)">Avanzar Sem.
                             ▶</button>
-                        <button type="button" class="nav-btn" onclick="irASemanaActualPlanificar()"
-                            style="background-color: #3b82f6; font-weight: bold;">Semana Actual</button>
-                    </div>
-                    <div
-                        style="font-weight: bold; font-size: 15px; color: var(--primary); text-transform: uppercase; margin-left: 10px;">
-                        PLANIFICAR
+                        <button type="button" class="nav-btn week-nav-btn" onclick="irASemanaActualPlanificar()"
+                            style="background-color: #3b82f6;">Semana Actual</button>
                     </div>
                 </div>
             </div>
@@ -4487,10 +4483,6 @@
                     <div>
                         <button class="nav-btn week-nav-btn" onclick="desplazarRangoFunciones(-7)">◀ Retroceder Sem.</button>
                         <button class="nav-btn week-nav-btn" onclick="desplazarRangoFunciones(7)">Avanzar Sem. ▶</button>
-                    </div>
-                    <div
-                        style="font-weight: bold; font-size: 15px; color: var(--primary); text-transform: uppercase; margin-left: 10px;">
-                        PLANIFICACIÓN DE POSICIONES
                     </div>
                     <div style="margin-left: auto;">
                         <button class="nav-btn" onclick="abrirAjustesFunciones()"
@@ -6017,6 +6009,9 @@
 
             // RESTRICCIONES ROL TRABAJADOR
             if (sesionActual && sesionActual.role === 'trabajador') {
+                if (panelId === 'pane-planificar') {
+                    panelId = 'pane-turnos';
+                }
                 if (panelId === 'pane-turnos' || panelId === 'pane-vacaciones') {
                     let docsData = getDocsParaWorker ? getDocsParaWorker() : { pendientes: [] };
                     if (docsData.pendientes.length > 0) {
@@ -6404,6 +6399,7 @@
         async function refrescarEstadoAplicacionDesdeSupabase() {
             if (!supabaseClient || !appStateSyncReady || isRefreshingAppState) return;
             isRefreshingAppState = true;
+            const estadoSincronizadoAlIniciar = lastSyncedAppState;
             try {
                 const { data, error } = await supabaseClient
                     .from('app_state')
@@ -6414,6 +6410,9 @@
                 if (error) throw error;
                 const datos = extraerEstadoRegistroAppState(data);
                 if (!datos) return;
+                if (lastSyncedAppState !== estadoSincronizadoAlIniciar) return;
+                if (hayCeldaTurnoEnEdicion()) return;
+                if (serializarEstadoAplicacion(obtenerEstadoAplicacion()) !== lastSyncedAppState) return;
                 if (serializarEstadoAplicacion(datos) === lastSyncedAppState) return;
 
                 if (aplicarEstadoAplicacion(datos)) {
@@ -6425,6 +6424,10 @@
             } finally {
                 isRefreshingAppState = false;
             }
+        }
+
+        function hayCeldaTurnoEnEdicion() {
+            return document.activeElement?.matches('#quadrant-matrix .navigation-input, #planificar-quadrant-matrix .navigation-input') || false;
         }
 
         function extraerEstadoRegistroAppState(registro) {
@@ -6575,6 +6578,8 @@
                 }
                 return;
             }
+            if (hayCeldaTurnoEnEdicion()) return;
+            if (serializarEstadoAplicacion(obtenerEstadoAplicacion()) !== lastSyncedAppState) return;
             if (serializarEstadoAplicacion(datos) === lastSyncedAppState) return;
 
             if (aplicarEstadoAplicacion(datos)) {
@@ -7553,7 +7558,7 @@
         function aplicarPermisosRol() {
             let adminTabs = ['tab-btn-turnos', 'tab-btn-planificar', 'tab-btn-funciones', 'tab-btn-cobertura', 'tab-btn-vacaciones', 'tab-btn-rrhh', 'tab-btn-variables', 'tab-btn-registro-jornada', 'tab-btn-listados', 'tab-btn-documentacion', 'tab-btn-portal-empleado'];
             let gestorTabs = ['tab-btn-turnos', 'tab-btn-planificar', 'tab-btn-funciones', 'tab-btn-cobertura', 'tab-btn-vacaciones', 'tab-btn-rrhh', 'tab-btn-registro-jornada', 'tab-btn-listados', 'tab-btn-documentacion', 'tab-btn-portal-empleado'];
-            let trabajadorTabs = ['tab-btn-turnos', 'tab-btn-planificar', 'tab-btn-vacaciones', 'tab-btn-documentacion', 'tab-btn-portal-empleado'];
+            let trabajadorTabs = ['tab-btn-turnos', 'tab-btn-vacaciones', 'tab-btn-documentacion', 'tab-btn-portal-empleado'];
             let inspeccionTabs = ['tab-btn-registro-jornada'];
 
             document.querySelectorAll('.main-nav .tab-btn').forEach(btn => btn.style.display = 'none');
@@ -8285,6 +8290,7 @@
                 calcularSumatoriosHoras();
                 if (document.getElementById('pane-planificar').classList.contains('active')) calcularSumatoriosPlanificar();
                 if (document.getElementById('pane-funciones').classList.contains('active')) renderizarMatrizFunciones();
+                autoSaveToSupabase();
                 return;
             }
             if (partes.some(hora => hora === '')) {
@@ -8304,6 +8310,7 @@
             calcularSumatoriosHoras();
             if (document.getElementById('pane-planificar').classList.contains('active')) calcularSumatoriosPlanificar();
             if (document.getElementById('pane-funciones').classList.contains('active')) renderizarMatrizFunciones();
+            autoSaveToSupabase();
         }
 
         function guardarYCalcular(inputElement, storageId) {
@@ -8426,6 +8433,7 @@
             calcularSumatoriosHoras();
             if (document.getElementById('pane-planificar').classList.contains('active')) calcularSumatoriosPlanificar();
             if (document.getElementById('pane-funciones').classList.contains('active')) renderizarMatrizFunciones();
+            autoSaveToSupabase();
         }
 
         function calcularSumatoriosHoras() {

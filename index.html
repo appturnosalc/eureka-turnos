@@ -57,8 +57,27 @@
             z-index: 200;
         }
 
+        .header-clock-weather {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 14px;
+            margin-left: auto;
+            padding-left: 12px;
+            color: #d1d5db;
+            font-size: 11px;
+            line-height: 1;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .header-weather-icon {
+            font-size: 13px;
+        }
+
         .main-nav {
             display: flex;
+            align-items: center;
             gap: 4px;
             margin-bottom: 0;
             border-bottom: 3px solid var(--primary);
@@ -78,7 +97,6 @@
         #pane-cobertura>.controls-panel {
             position: sticky;
             top: 93px;
-            /* header(57) + nav(~36) */
             z-index: 198;
             background: white;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
@@ -3954,7 +3972,7 @@
         <h1 class="header-eureka">EUREKA</h1>
         <span class="header-sub">Gestión Operativa PMR</span>
 
-        <div style="margin-left: auto; display: flex; align-items: baseline; gap: 12px;">
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
             <span id="supabase-sync-status" role="status" aria-live="polite"
                 style="font-size:11px; color:#d1d5db; white-space:nowrap;">⚪ Conectando con la nube...</span>
             <span class="header-sub">AEROPUERTO DE</span>
@@ -3986,6 +4004,13 @@
             onclick="cambiarPestañaSistema('pane-documentacion')">Documentación</button>
         <button id="tab-btn-portal-empleado" class="tab-btn"
             onclick="cambiarPestañaSistema('pane-portal-empleado')">🧑‍💼 Portal Empleado</button>
+        <div class="header-clock-weather" aria-label="Hora y tiempo actual del aeropuerto de Alicante">
+            <time id="header-clock" aria-label="Hora local"></time>
+            <span id="header-weather" role="status" aria-live="polite"
+                title="Tiempo actual en el aeropuerto de Alicante">
+                <span class="header-weather-icon" aria-hidden="true">⌛</span> --°C
+            </span>
+        </div>
     </div>
 
     <!-- PESTAÑA PORTAL DEL EMPLEADO -->
@@ -13729,11 +13754,68 @@
             document.head.appendChild(styleElement);
         }
 
+        function obtenerDescripcionTiempo(codigo, esDia) {
+            if (codigo === 0) return { icono: esDia ? '☀️' : '🌙', descripcion: esDia ? 'Despejado' : 'Despejado' };
+            if (codigo === 1) return { icono: esDia ? '🌤️' : '🌙', descripcion: 'Mayormente despejado' };
+            if (codigo === 2) return { icono: '⛅', descripcion: 'Parcialmente nuboso' };
+            if (codigo === 3) return { icono: '☁️', descripcion: 'Nuboso' };
+            if ([45, 48].includes(codigo)) return { icono: '🌫️', descripcion: 'Niebla' };
+            if ([51, 53, 55, 56, 57].includes(codigo)) return { icono: '🌦️', descripcion: 'Llovizna' };
+            if ([61, 63, 65, 66, 67, 80, 81, 82].includes(codigo)) return { icono: '🌧️', descripcion: 'Lluvia' };
+            if ([71, 73, 75, 77, 85, 86].includes(codigo)) return { icono: '🌨️', descripcion: 'Nieve' };
+            if ([95, 96, 99].includes(codigo)) return { icono: '⛈️', descripcion: 'Tormenta' };
+            return { icono: '🌡️', descripcion: 'Tiempo actual' };
+        }
+
+        function actualizarRelojCabecera() {
+            const reloj = document.getElementById('header-clock');
+            if (reloj) {
+                reloj.textContent = new Intl.DateTimeFormat('es-ES', {
+                    timeZone: 'Europe/Madrid',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }).format(new Date());
+            }
+        }
+
+        async function actualizarTiempoAeropuerto() {
+            const indicador = document.getElementById('header-weather');
+            if (!indicador) return;
+
+            try {
+                const respuesta = await fetch('https://api.open-meteo.com/v1/forecast?latitude=38.2822&longitude=-0.5582&current=temperature_2m,weather_code,is_day&timezone=Europe%2FMadrid');
+                if (!respuesta.ok) throw new Error(`Open-Meteo respondió con HTTP ${respuesta.status}`);
+                const datos = await respuesta.json();
+                if (!datos.current || !Number.isFinite(datos.current.temperature_2m)) {
+                    throw new Error('La respuesta de Open-Meteo no contiene la temperatura actual');
+                }
+
+                const tiempo = obtenerDescripcionTiempo(datos.current.weather_code, datos.current.is_day === 1);
+                const temperatura = Math.round(datos.current.temperature_2m);
+                indicador.innerHTML = `<span class="header-weather-icon" aria-hidden="true">${tiempo.icono}</span> ${temperatura}°C`;
+                indicador.title = `${tiempo.descripcion} en el aeropuerto de Alicante`;
+                indicador.setAttribute('aria-label', `${tiempo.descripcion}, ${temperatura} grados Celsius en el aeropuerto de Alicante`);
+            } catch (error) {
+                indicador.innerHTML = '<span class="header-weather-icon" aria-hidden="true">🌡️</span> --°C';
+                indicador.title = 'No se pudo consultar el tiempo actual del aeropuerto de Alicante';
+                indicador.setAttribute('aria-label', indicador.title);
+                console.warn('No se pudo actualizar el tiempo del aeropuerto de Alicante.', error);
+            }
+        }
+
+        function iniciarRelojYTiempoAeropuerto() {
+            actualizarRelojCabecera();
+            actualizarTiempoAeropuerto();
+            window.setInterval(actualizarRelojCabecera, 15000);
+            window.setInterval(actualizarTiempoAeropuerto, 15 * 60 * 1000);
+        }
+
         // Inicializar estilos al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             cargarEstadosDesdeStorage();
             actualizarEstilosEstados();
             cargarPuntosDesdeStorage();
+            iniciarRelojYTiempoAeropuerto();
         });
 
         // ==================== FIN GESTIÓN DE ESTADOS ====================

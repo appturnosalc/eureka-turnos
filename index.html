@@ -4554,10 +4554,10 @@
                         <button class="nav-btn period-nav-btn" onclick="desplazarRango(7)">Semana siguiente ▶</button>
                     </div>
                     <div id="turnos-nav-fechas" class="search-box">
-                        <label>Desde:</label>
-                        <input type="date" id="fecha-desde" class="date-picker" onchange="actualizarRangoManual()">
-                        <label>Hasta:</label>
-                        <input type="date" id="fecha-hasta" class="date-picker" onchange="actualizarRangoManual()">
+                        <label for="fecha-desde">Buscar turno día:</label>
+                        <input type="text" id="fecha-desde" class="date-picker" aria-label="Buscar turno día"
+                            placeholder="dd/mm/aaaa" inputmode="numeric" maxlength="10" autocomplete="off"
+                            onchange="buscarTurnoDia()">
                     </div>
 
                     <div style="display:flex; flex-direction:column; gap:6px; margin-left:auto;">
@@ -7860,7 +7860,7 @@
 
             const elFilters = document.getElementById('function-filters'); if (elFilters) elFilters.style.display = displayValue;
             const elOrdSearch = document.getElementById('turnos-ord-search'); if (elOrdSearch) elOrdSearch.style.display = displayValue;
-            const elEdicion = document.getElementById('turnos-edicion-controles'); if (elEdicion) elEdicion.style.display = displayValue;
+            const elEdicion = document.getElementById('turnos-edicion-controles'); if (elEdicion) elEdicion.style.display = esTrabajador ? 'none' : 'flex';
             const elBackup = document.getElementById('turnos-backup-controles'); if (elBackup) elBackup.style.display = displayValue;
             const elLimitsBtn = document.getElementById('turnos-limites-config-btn'); if (elLimitsBtn) elLimitsBtn.style.display = displayValue;
             const elLimitsBox = document.getElementById('limites-config-box'); if (elLimitsBox) elLimitsBox.style.display = 'none';
@@ -8243,9 +8243,10 @@
 
         function sincronizarInputsFecha() {
             let elD = document.getElementById('fecha-desde');
-            let elH = document.getElementById('fecha-hasta');
-            if (elD) elD.value = formataFechaKey(fechaDesdePivot);
-            if (elH) elH.value = formataFechaKey(fechaHastaPivot);
+            if (elD) {
+                elD.value = '';
+                elD.setCustomValidity('');
+            }
         }
 
         function getFechasVisibles() {
@@ -8888,19 +8889,40 @@
             }
         }
 
-        function actualizarRangoManual() {
-            let desdeVal = document.getElementById('fecha-desde').value;
-            if (desdeVal) {
-                let nuevaFechaBase = new Date(desdeVal);
-                let diaSemana = nuevaFechaBase.getDay();
-                let difLunes = diaSemana === 0 ? -6 : 1 - diaSemana;
-                fechaDesdePivot = new Date(nuevaFechaBase);
-                fechaDesdePivot.setDate(nuevaFechaBase.getDate() + difLunes);
-                fechaHastaPivot = new Date(fechaDesdePivot);
-                fechaHastaPivot.setDate(fechaDesdePivot.getDate() + 20);
-                inicializarCuadrante();
-                if (document.getElementById('pane-funciones').classList.contains('active')) renderizarMatrizFunciones();
+        function buscarTurnoDia() {
+            const inputFecha = document.getElementById('fecha-desde');
+            const desdeVal = inputFecha.value.trim();
+            inputFecha.setCustomValidity('');
+            if (!desdeVal) return;
+
+            const coincidencia = desdeVal.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (!coincidencia) {
+                inputFecha.setCustomValidity('Introduce la fecha con formato dd/mm/aaaa.');
+                inputFecha.reportValidity();
+                return;
             }
+
+            const [, diaTexto, mesTexto, anioTexto] = coincidencia;
+            const dia = Number(diaTexto);
+            const mes = Number(mesTexto);
+            const anio = Number(anioTexto);
+            const nuevaFechaBase = new Date(anio, mes - 1, dia);
+            if (nuevaFechaBase.getFullYear() !== anio
+                || nuevaFechaBase.getMonth() !== mes - 1
+                || nuevaFechaBase.getDate() !== dia) {
+                inputFecha.setCustomValidity('Introduce una fecha válida con formato dd/mm/aaaa.');
+                inputFecha.reportValidity();
+                return;
+            }
+
+            const diaSemana = nuevaFechaBase.getDay();
+            const difLunes = diaSemana === 0 ? -6 : 1 - diaSemana;
+            fechaDesdePivot = new Date(nuevaFechaBase);
+            fechaDesdePivot.setDate(nuevaFechaBase.getDate() + difLunes);
+            fechaHastaPivot = new Date(fechaDesdePivot);
+            fechaHastaPivot.setDate(fechaDesdePivot.getDate() + 20);
+            inicializarCuadrante();
+            if (document.getElementById('pane-funciones').classList.contains('active')) renderizarMatrizFunciones();
         }
 
         function desplazarRango(dias) {
@@ -13498,9 +13520,11 @@
                 
                 fila.innerHTML = `
                     <td style="padding: 9px 12px;">
-                        <div style="display:inline-block; background:${color}; color:#153D64; padding:4px 10px; border-radius:6px; font-weight:700; font-size:12px; min-width:38px; text-align:center;">
-                            ${codigo}
-                        </div>
+                        <input type="text" value="${codigo}" maxlength="6"
+                            onchange="actualizarEstadoCodigo(${idx}, this.value)"
+                            aria-label="Código del estado"
+                            title="Puedes modificar el código del estado"
+                            style="display:inline-block; width:70px; padding:5px 7px; border:1px solid #c5d9f1; border-radius:8px; font-weight:700; font-size:12px; color:#153D64; text-align:center; text-transform:uppercase; background:${color}; box-sizing:border-box;">
                     </td>
                     <td style="padding: 7px 12px;">
                         <input type="text" value="${motivo}" maxlength="80"
@@ -13535,6 +13559,54 @@
             estadosConfig[idx][campo] = valor;
             guardarEstadosEnStorage();
             renderizarTablaEstados();
+        }
+
+        function actualizarEstadoCodigo(idx, valor) {
+            const codigoAnterior = estadosConfig[idx]?.codigo;
+            if (!codigoAnterior) return;
+
+            const codigoNuevo = valor.trim().toUpperCase();
+            if (!/^[A-Z0-9]{1,6}$/.test(codigoNuevo)) {
+                alert('El código debe tener entre 1 y 6 letras o números, sin espacios ni símbolos.');
+                renderizarTablaEstados();
+                return;
+            }
+            if (estadosConfig.some((estado, estadoIdx) =>
+                estadoIdx !== idx && estado.codigo.toUpperCase() === codigoNuevo
+            )) {
+                alert('Ya existe un estado con ese código.');
+                renderizarTablaEstados();
+                return;
+            }
+            if (Object.prototype.hasOwnProperty.call(LIMITES_FUNCIONES, codigoNuevo)) {
+                alert('Ese código ya está asignado a una función. Elige otro código.');
+                renderizarTablaEstados();
+                return;
+            }
+
+            if (codigoAnterior.toUpperCase() !== codigoNuevo) {
+                Object.keys(baseDatosTurnos).forEach(key => {
+                    if (!key.includes('_est_') || key.endsWith('_nota')
+                        || typeof baseDatosTurnos[key] !== 'string') return;
+                    const valorActual = baseDatosTurnos[key];
+                    const valorActualizado = valorActual.split('/').map(parte => {
+                        const codigo = parte.trim();
+                        return codigo.toUpperCase() === codigoAnterior.toUpperCase()
+                            ? parte.replace(codigo, codigoNuevo)
+                            : parte;
+                    }).join('/');
+                    if (valorActualizado !== valorActual) baseDatosTurnos[key] = valorActualizado;
+                });
+            }
+
+            estadosConfig[idx].codigo = codigoNuevo;
+            guardarEstadosEnStorage();
+            renderizarTablaEstados();
+            inicializarCuadrante();
+            if (document.getElementById('pane-vacaciones').classList.contains('active')
+                && window.fechaBaseVacaciones) {
+                renderizarMatrizVacaciones();
+            }
         }
 
         // Eliminar un estado

@@ -893,6 +893,22 @@
             color: #1e3a8a !important;
         }
 
+        #pane-turnos .compact-table td:has(.copy-selected-input) {
+            background-image: linear-gradient(rgba(250, 204, 21, 0.42), rgba(250, 204, 21, 0.42)) !important;
+            box-shadow: inset 0 0 0 2px #facc15 !important;
+        }
+
+        #pane-turnos .compact-table td:has(.paste-target-input) {
+            background-image: linear-gradient(rgba(52, 211, 153, 0.42), rgba(52, 211, 153, 0.42)) !important;
+            box-shadow: inset 0 0 0 2px #34d399 !important;
+        }
+
+        #pane-turnos .copy-selected-input,
+        #pane-turnos .paste-target-input {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
         .marcado-swap-1 {
             background-color: #e9d5ff !important;
             outline: 2px dashed #a855f7 !important;
@@ -4446,6 +4462,12 @@
                         <button type="button" class="nav-btn"
                             style="background:#64748b; font-size: 14px; padding: 2px 8px;" onclick="redoAction()"
                             title="Rehacer (Ctrl+Y)">↪️</button>
+                        <button type="button" class="nav-btn" id="btn-copiar-horario"
+                            style="background:#0e7490; padding: 4px 10px; font-size: 12px;"
+                            onclick="copiarSeleccionTurnos()" title="Copiar selección (Ctrl+C)" disabled>Copiar</button>
+                        <button type="button" class="nav-btn" id="btn-pegar-horario"
+                            style="background:#0e7490; padding: 4px 10px; font-size: 12px;"
+                            onclick="pegarSeleccionTurnos()" title="Pegar selección (Ctrl+V)" disabled>Pegar</button>
                         <button type="button" class="nav-btn" 
                             style="background:#64748b; margin-left: 5px; padding: 6px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; transition: background 0.2s;"
                             onclick="iniciarCambioTurno()"
@@ -6073,7 +6095,6 @@
         // SISTEMA DE DESHACER / REHACER
         let historyUndo = [];
         let historyRedo = [];
-        let lastRightClickTimer = null;
 
         // VARIABLES PESTAÑA HORAS
         let horasVistaActiva = "SEMANAL";
@@ -7873,11 +7894,15 @@
         fechaHastaPlanificar.setDate(fechaDesdePlanificar.getDate() + 6);
 
         function inicializarCuadrante() {
+            seleccionandoCeldasTurnos = false;
+            destinoPegadoTurnos = null;
+            destinosPegadoTurnos.clear();
             sincronizarInputsFecha();
             renderizarHeadersFechas();
             renderizarMatrizTrabajadores();
             calcularSumatoriosHoras();
             configurarManejadoresTeclado();
+            aplicarSeleccionCeldasTurnos();
             if (typeof memoriaBloqueDias !== 'undefined' && memoriaBloqueDias !== null) {
                 dibujarSeleccionArrastre();
             }
@@ -8899,6 +8924,14 @@
                     const target = e.target;
                     if (!target.classList.contains('navigation-input')) return;
                     if (e.ctrlKey && (e.key.toLowerCase() === 'c' || e.key.toLowerCase() === 'v')) {
+                        const tecla = e.key.toLowerCase();
+                        const copiarCelda = tableId === 'quadrant-matrix' && tecla === 'c'
+                            && (seleccionCeldasTurnos.size > 0 || destinosPegadoTurnos.size > 0);
+                        const pegarCeldas = tableId === 'quadrant-matrix' && tecla === 'v' && bufferCopiaCeldasTurnos.length > 0;
+                        if (copiarCelda || pegarCeldas) {
+                            e.preventDefault();
+                            return;
+                        }
                         if (e.key.toLowerCase() === 'v') {
                             setTimeout(() => {
                                 target.value = target.value.toUpperCase();
@@ -8928,8 +8961,25 @@
                     const target = e.target;
                     if (target.classList.contains('navigation-input')) {
                         target.select();
+                        if (tableId === 'quadrant-matrix' && bufferCopiaCeldasTurnos.length === 0) {
+                            destinoPegadoTurnos = obtenerCoordenadasCeldaTurnos(target);
+                            actualizarBotonesCopiarPegarTurnos();
+                        }
                     }
                 });
+
+                if (tableId === 'quadrant-matrix') {
+                    matrix.addEventListener('dragstart', function (e) {
+                        if (e.target && e.target.classList.contains('navigation-input')) {
+                            e.preventDefault();
+                        }
+                    });
+                    matrix.addEventListener('drop', function (e) {
+                        if (e.target && e.target.classList.contains('navigation-input')) {
+                            e.preventDefault();
+                        }
+                    });
+                }
 
                 matrix.dataset.keyboardConfigured = '1';
             });
@@ -9979,6 +10029,14 @@
         let swapRange2 = null;
         let swapCeldasSeleccionadas = [];
 
+        let seleccionCeldasTurnos = new Map();
+        let seleccionandoCeldasTurnos = false;
+        let bufferCopiaCeldasTurnos = [];
+        let filaOrigenBufferTurnos = null;
+        let destinosPegadoTurnos = new Map();
+        let destinoPegadoTurnos = null;
+        let rangoSeleccionTurnos = null;
+
         let dragStartData = null;
         let dragEndData = null;
 
@@ -10050,7 +10108,38 @@
                 return;
             }
 
-            if (e.button === 2 && !modoPintarActivado) {
+            if (e.button === 0 && !modoPintarActivado && !swapState && target.closest('#quadrant-matrix')) {
+                seleccionandoCeldasTurnos = true;
+                const coordenadas = obtenerCoordenadasCeldaTurnos(target);
+                if (!coordenadas) return;
+                if (bufferCopiaCeldasTurnos.length > 0) {
+                    if (e.ctrlKey || e.metaKey) {
+                        seleccionarDestinoPegadoTurnos(target, true);
+                    } else {
+                        destinosPegadoTurnos.clear();
+                        destinoPegadoTurnos = coordenadas;
+                        aplicarSeleccionCeldasTurnos();
+                    }
+                    rangoSeleccionTurnos = {
+                        inicio: coordenadas,
+                        base: new Map(destinosPegadoTurnos),
+                        destinos: true
+                    };
+                    if (e.ctrlKey || e.metaKey) e.preventDefault();
+                    return;
+                }
+                destinoPegadoTurnos = null;
+                seleccionarCeldaTurnos(target, e.ctrlKey || e.metaKey);
+                rangoSeleccionTurnos = {
+                    inicio: coordenadas,
+                    base: new Map(seleccionCeldasTurnos),
+                    destinos: false
+                };
+                if (e.ctrlKey || e.metaKey) e.preventDefault();
+                return;
+            }
+
+            if (e.button === 2 && !modoPintarActivado && !target.closest('#quadrant-matrix')) {
                 if (memoriaBloqueDias !== null) {
                     pegarBloqueEnDestino(target);
                 } else {
@@ -10074,6 +10163,11 @@
                 let color = document.getElementById('color-picker-manual').value;
                 baseDatosTurnos[empId + "_bg_" + dateKey + "_" + rowType] = color;
                 target.parentElement.style.setProperty('background-color', color, 'important');
+                return;
+            }
+
+            if (seleccionandoCeldasTurnos && (e.buttons & 1) && target.closest('#quadrant-matrix')) {
+                if (rangoSeleccionTurnos) actualizarRangoSeleccionTurnos(target);
                 return;
             }
 
@@ -10108,6 +10202,10 @@
             if (e.button === 2 && isRightDragging) {
                 isRightDragging = false;
                 guardarSeleccionEnMemoria();
+            }
+            if (e.button === 0) {
+                seleccionandoCeldasTurnos = false;
+                rangoSeleccionTurnos = null;
             }
         });
 
@@ -10344,6 +10442,337 @@
             else inicializarCuadrante();
         }
 
+        function obtenerCoordenadasCeldaTurnos(input) {
+            if (!input || !input.classList.contains('navigation-input')) return null;
+            const emp = Number(input.dataset.emp);
+            const row = Number(input.dataset.row);
+            const col = Number(input.dataset.col);
+            if (!Number.isInteger(emp) || !Number.isInteger(row) || !Number.isInteger(col)) return null;
+            return { emp, row, col };
+        }
+
+        function buscarCeldaTurnos(row, col) {
+            const empIndex = Math.floor(row / 3);
+            const rowType = row % 3;
+            return document.querySelector(`#quadrant-matrix input.navigation-input[data-emp="${empIndex}"][data-row="${rowType}"][data-col="${col}"]`);
+        }
+
+        function actualizarBotonesCopiarPegarTurnos() {
+            const botonCopiar = document.getElementById('btn-copiar-horario');
+            const botonPegar = document.getElementById('btn-pegar-horario');
+            if (botonCopiar) botonCopiar.disabled = seleccionCeldasTurnos.size === 0 && destinosPegadoTurnos.size === 0;
+            if (botonPegar) botonPegar.disabled = bufferCopiaCeldasTurnos.length === 0 || (!destinoPegadoTurnos && destinosPegadoTurnos.size === 0);
+        }
+
+        function limpiarSeleccionCopiarPegarTurnos(mantenerCopia = false) {
+            const matriz = document.getElementById('quadrant-matrix');
+            if (matriz) {
+                matriz.querySelectorAll('.copy-selected-input, .paste-target-input, .marcado-copiar').forEach(input => {
+                    input.classList.remove('copy-selected-input', 'paste-target-input', 'marcado-copiar');
+                });
+            }
+            if (!mantenerCopia) {
+                bufferCopiaCeldasTurnos = [];
+                filaOrigenBufferTurnos = null;
+            }
+            seleccionCeldasTurnos.clear();
+            destinosPegadoTurnos.clear();
+            destinoPegadoTurnos = null;
+            actualizarBotonesCopiarPegarTurnos();
+        }
+
+        function aplicarSeleccionCeldasTurnos() {
+            const matriz = document.getElementById('quadrant-matrix');
+            if (!matriz) return;
+            matriz.querySelectorAll('.copy-selected-input').forEach(input => input.classList.remove('copy-selected-input'));
+            matriz.querySelectorAll('.paste-target-input').forEach(input => input.classList.remove('paste-target-input'));
+            seleccionCeldasTurnos.forEach(celda => {
+                const input = buscarCeldaTurnos(celda.emp * 3 + celda.row, celda.col);
+                if (input) input.classList.add('copy-selected-input');
+            });
+            destinosPegadoTurnos.forEach(celda => {
+                const input = buscarCeldaTurnos(celda.emp * 3 + celda.row, celda.col);
+                if (input) input.classList.add('paste-target-input');
+            });
+            if (destinoPegadoTurnos && destinosPegadoTurnos.size === 0) {
+                const input = buscarCeldaTurnos(destinoPegadoTurnos.emp * 3 + destinoPegadoTurnos.row, destinoPegadoTurnos.col);
+                if (input) input.classList.add('paste-target-input');
+            }
+            actualizarBotonesCopiarPegarTurnos();
+        }
+
+        function seleccionarCeldaTurnos(input, toggle) {
+            const coordenadas = obtenerCoordenadasCeldaTurnos(input);
+            if (!coordenadas) return;
+            const key = `${coordenadas.emp}:${coordenadas.row}:${coordenadas.col}`;
+            if (!toggle) seleccionCeldasTurnos.clear();
+            if (toggle && seleccionCeldasTurnos.has(key)) seleccionCeldasTurnos.delete(key);
+            else seleccionCeldasTurnos.set(key, coordenadas);
+            aplicarSeleccionCeldasTurnos();
+        }
+
+        function agregarCeldaSeleccionTurnos(input) {
+            const coordenadas = obtenerCoordenadasCeldaTurnos(input);
+            if (!coordenadas) return;
+            const key = `${coordenadas.emp}:${coordenadas.row}:${coordenadas.col}`;
+            if (!seleccionCeldasTurnos.has(key)) {
+                seleccionCeldasTurnos.set(key, coordenadas);
+                aplicarSeleccionCeldasTurnos();
+            }
+        }
+
+        function seleccionarDestinoPegadoTurnos(input, toggle) {
+            const coordenadas = obtenerCoordenadasCeldaTurnos(input);
+            if (!coordenadas) return;
+            destinoPegadoTurnos = null;
+            const key = `${coordenadas.emp}:${coordenadas.row}:${coordenadas.col}`;
+            if (toggle && destinosPegadoTurnos.has(key)) destinosPegadoTurnos.delete(key);
+            else destinosPegadoTurnos.set(key, coordenadas);
+            aplicarSeleccionCeldasTurnos();
+        }
+
+        function agregarDestinoPegadoTurnos(input) {
+            const coordenadas = obtenerCoordenadasCeldaTurnos(input);
+            if (!coordenadas) return;
+            destinoPegadoTurnos = null;
+            const key = `${coordenadas.emp}:${coordenadas.row}:${coordenadas.col}`;
+            if (!destinosPegadoTurnos.has(key)) {
+                destinosPegadoTurnos.set(key, coordenadas);
+                aplicarSeleccionCeldasTurnos();
+            }
+        }
+
+        function actualizarRangoSeleccionTurnos(input) {
+            const fin = obtenerCoordenadasCeldaTurnos(input);
+            if (!fin || !rangoSeleccionTurnos) return;
+
+            const inicioFila = rangoSeleccionTurnos.inicio.emp * 3 + rangoSeleccionTurnos.inicio.row;
+            const finFila = fin.emp * 3 + fin.row;
+            const filaMin = Math.min(inicioFila, finFila);
+            const filaMax = Math.max(inicioFila, finFila);
+            const colMin = Math.min(rangoSeleccionTurnos.inicio.col, fin.col);
+            const colMax = Math.max(rangoSeleccionTurnos.inicio.col, fin.col);
+            const seleccion = new Map(rangoSeleccionTurnos.base);
+
+            for (let fila = filaMin; fila <= filaMax; fila++) {
+                for (let col = colMin; col <= colMax; col++) {
+                    const emp = Math.floor(fila / 3);
+                    const row = fila % 3;
+                    const key = `${emp}:${row}:${col}`;
+                    seleccion.set(key, { emp, row, col });
+                }
+            }
+            const seleccionOrdenada = new Map([...seleccion.entries()].sort(([, a], [, b]) => {
+                const filaA = a.emp * 3 + a.row;
+                const filaB = b.emp * 3 + b.row;
+                return filaA - filaB || a.col - b.col;
+            }));
+
+            if (rangoSeleccionTurnos.destinos) {
+                destinosPegadoTurnos = seleccionOrdenada;
+                destinoPegadoTurnos = null;
+            } else {
+                seleccionCeldasTurnos = seleccionOrdenada;
+            }
+            aplicarSeleccionCeldasTurnos();
+        }
+
+        function copiarSeleccionTurnos() {
+            const seleccion = [...(destinosPegadoTurnos.size > 0
+                ? destinosPegadoTurnos.values()
+                : seleccionCeldasTurnos.values())];
+            if (seleccion.length === 0) {
+                alert('Selecciona primero una o varias celdas de Turnos.');
+                return;
+            }
+            const origen = seleccion[0];
+            const origenFila = origen.emp * 3 + origen.row;
+            const copia = [];
+            seleccion.forEach(celda => {
+                const input = buscarCeldaTurnos(celda.emp * 3 + celda.row, celda.col);
+                if (!input) return;
+                copia.push({
+                    fila: celda.emp * 3 + celda.row - origenFila,
+                    columna: celda.col - origen.col,
+                    valor: input.value,
+                    campo: input.dataset.campo
+                });
+            });
+            if (copia.length === 0) {
+                alert('No se han encontrado las celdas seleccionadas en la matriz de Turnos.');
+                return;
+            }
+            bufferCopiaCeldasTurnos = copia;
+            filaOrigenBufferTurnos = origen.row;
+            destinoPegadoTurnos = null;
+            destinosPegadoTurnos.clear();
+            seleccionCeldasTurnos.clear();
+            seleccion.forEach(celda => {
+                const key = `${celda.emp}:${celda.row}:${celda.col}`;
+                seleccionCeldasTurnos.set(key, celda);
+            });
+            aplicarSeleccionCeldasTurnos();
+        }
+
+        function pegarSeleccionTurnos() {
+            if (bufferCopiaCeldasTurnos.length === 0) {
+                alert('Copia primero una o varias celdas de Turnos.');
+                return;
+            }
+            if (!destinoPegadoTurnos && destinosPegadoTurnos.size === 0) {
+                alert('Selecciona una o varias celdas donde quieres pegar.');
+                return;
+            }
+            const pegarEnDestinosSeleccionados = destinosPegadoTurnos.size > 0;
+            if (!pegarEnDestinosSeleccionados && destinoPegadoTurnos.row !== filaOrigenBufferTurnos) {
+                alert('Selecciona una celda de destino en la misma fila de horarios que la primera celda copiada.');
+                return;
+            }
+            const repetirUnaCelda = pegarEnDestinosSeleccionados
+                && bufferCopiaCeldasTurnos.length === 1
+                && destinosPegadoTurnos.size > 1;
+            if (pegarEnDestinosSeleccionados && !repetirUnaCelda && destinosPegadoTurnos.size !== bufferCopiaCeldasTurnos.length) {
+                alert(`Selecciona ${bufferCopiaCeldasTurnos.length} celdas de destino para pegar toda la copia.`);
+                return;
+            }
+
+            const operaciones = [];
+            let omitidas = 0;
+            const celdasDestino = pegarEnDestinosSeleccionados
+                ? [...destinosPegadoTurnos.values()].map(celda => buscarCeldaTurnos(celda.emp * 3 + celda.row, celda.col))
+                : bufferCopiaCeldasTurnos.map(celda => buscarCeldaTurnos(
+                    destinoPegadoTurnos.emp * 3 + destinoPegadoTurnos.row + celda.fila,
+                    destinoPegadoTurnos.col + celda.columna
+                ));
+            const cantidadPegados = repetirUnaCelda ? celdasDestino.length : bufferCopiaCeldasTurnos.length;
+            for (let i = 0; i < cantidadPegados; i++) {
+                const celda = bufferCopiaCeldasTurnos[repetirUnaCelda ? 0 : i];
+                const input = celdasDestino[i];
+                if (!input || input.readOnly) {
+                    omitidas++;
+                    continue;
+                }
+                const campo = input.dataset.campo;
+                if (campo !== celda.campo) {
+                    alert('Cada celda de destino debe corresponder al mismo tipo de dato que su celda copiada.');
+                    return;
+                }
+                let valor = celda.valor.toUpperCase();
+                if (campo === 'tramo1' || campo === 'tramo2') {
+                    if (valor.trim() !== '') {
+                        const partes = valor.trim().split('-').map(normalizarHora);
+                        if (partes.length !== 2 || partes.some(hora => !hora)) {
+                            alert('No se puede pegar una hora incompleta o con formato incorrecto. Revisa las celdas copiadas.');
+                            return;
+                        }
+                        valor = partes.join('-');
+                    } else {
+                        valor = '';
+                    }
+                }
+                operaciones.push({ input, campo, valor });
+            }
+
+            const cambios = operaciones.filter(({ input, campo, valor }) => {
+                const empId = input.dataset.empid;
+                const dateKey = input.dataset.fecha;
+                if (campo === 'est') return (baseDatosTurnos[`${empId}_est_${dateKey}`] || '') !== valor;
+                const prefijo = campo === 'tramo1' ? 't1' : 't2';
+                const partes = valor ? valor.split('-') : ['', ''];
+                return (baseDatosTurnos[`${empId}_${prefijo}i_${dateKey}`] || '') !== partes[0]
+                    || (baseDatosTurnos[`${empId}_${prefijo}f_${dateKey}`] || '') !== partes[1];
+            });
+
+            if (cambios.length === 0) {
+                limpiarSeleccionCopiarPegarTurnos(true);
+                alert(omitidas ? 'No hay celdas editables de destino para pegar la selección.' : 'Las celdas de destino ya tienen esos valores.');
+                return;
+            }
+            if (omitidas > 0) {
+                alert('Una o varias celdas seleccionadas no se pueden editar. No se ha pegado nada.');
+                return;
+            }
+            saveHistoryState();
+            cambios.forEach(({ input, campo, valor }) => {
+                const empId = input.dataset.empid;
+                const dateKey = input.dataset.fecha;
+                if (campo === 'est') {
+                    const key = `${empId}_est_${dateKey}`;
+                    if (valor) baseDatosTurnos[key] = valor;
+                    else delete baseDatosTurnos[key];
+                    if (valor) delete baseDatosTurnos[`${empId}_bg_${dateKey}_0`];
+                    return;
+                }
+                const prefijo = campo === 'tramo1' ? 't1' : 't2';
+                const partes = valor ? valor.split('-') : ['', ''];
+                const keyInicio = `${empId}_${prefijo}i_${dateKey}`;
+                const keyFin = `${empId}_${prefijo}f_${dateKey}`;
+                if (partes[0]) baseDatosTurnos[keyInicio] = partes[0];
+                else delete baseDatosTurnos[keyInicio];
+                if (partes[1]) baseDatosTurnos[keyFin] = partes[1];
+                else delete baseDatosTurnos[keyFin];
+            });
+            limpiarSeleccionCopiarPegarTurnos(true);
+            inicializarCuadrante();
+            autoSaveToSupabase();
+        }
+
+        function borrarSeleccionTurnos() {
+            const seleccion = bufferCopiaCeldasTurnos.length > 0
+                ? (destinosPegadoTurnos.size > 0
+                    ? [...destinosPegadoTurnos.values()]
+                    : (destinoPegadoTurnos ? [destinoPegadoTurnos] : []))
+                : [...seleccionCeldasTurnos.values()];
+            if (seleccion.length === 0) return false;
+
+            const operaciones = seleccion.map(coordenadas => ({
+                input: buscarCeldaTurnos(coordenadas.emp * 3 + coordenadas.row, coordenadas.col)
+            }));
+            if (operaciones.some(({ input }) => !input
+                || input.readOnly
+                || !['est', 'tramo1', 'tramo2'].includes(input.dataset.campo))) {
+                alert('Una o varias celdas seleccionadas no se pueden editar. No se ha borrado nada.');
+                return true;
+            }
+
+            const cambios = operaciones.filter(({ input }) => {
+                const empId = input.dataset.empid;
+                const dateKey = input.dataset.fecha;
+                const campo = input.dataset.campo;
+                if (campo === 'est') return Boolean(input.value || baseDatosTurnos[`${empId}_est_${dateKey}`]);
+                const prefijo = campo === 'tramo1' ? 't1' : 't2';
+                return Boolean(input.value
+                    || baseDatosTurnos[`${empId}_${prefijo}i_${dateKey}`]
+                    || baseDatosTurnos[`${empId}_${prefijo}f_${dateKey}`]);
+            });
+            if (cambios.length === 0) return true;
+
+            saveHistoryState();
+            cambios.forEach(({ input }) => {
+                const empId = input.dataset.empid;
+                const dateKey = input.dataset.fecha;
+                const campo = input.dataset.campo;
+                if (campo === 'est') {
+                    delete baseDatosTurnos[`${empId}_est_${dateKey}`];
+                    return;
+                }
+                const prefijo = campo === 'tramo1' ? 't1' : 't2';
+                delete baseDatosTurnos[`${empId}_${prefijo}i_${dateKey}`];
+                delete baseDatosTurnos[`${empId}_${prefijo}f_${dateKey}`];
+            });
+
+            seleccionCeldasTurnos.clear();
+            seleccion.forEach(celda => {
+                const key = `${celda.emp}:${celda.row}:${celda.col}`;
+                seleccionCeldasTurnos.set(key, celda);
+            });
+            destinosPegadoTurnos.clear();
+            destinoPegadoTurnos = null;
+            inicializarCuadrante();
+            autoSaveToSupabase();
+            return true;
+        }
+
         function handleRightClickGlobal(evento, inputElement, empId, dateKey, rowTipo) {
             if (modoPintarActivado) return;
             evento.preventDefault();
@@ -10352,10 +10781,6 @@
             let sameClick = (rowTipo === 0 && inputElement.id === lastRightClickInfo.id && (now - lastRightClickInfo.time) < 400);
 
             if (sameClick) {
-                if (lastRightClickTimer) {
-                    clearTimeout(lastRightClickTimer);
-                    lastRightClickTimer = null;
-                }
                 if (memoriaBloqueDias !== null || isRightDragging || isSwapDragging) {
                     isRightDragging = false;
                     document.querySelectorAll('.marcado-copiar').forEach(el => el.classList.remove('marcado-copiar'));
@@ -10367,33 +10792,10 @@
             }
 
             lastRightClickInfo = { time: now, id: inputElement.id };
-
-            if (rowTipo === 0 && memoriaBloqueDias === null && !isRightDragging && !isSwapDragging) {
-                if (lastRightClickTimer) clearTimeout(lastRightClickTimer);
-                lastRightClickTimer = setTimeout(() => {
-                    lastRightClickTimer = null;
-                    togglePublicacionTurno(empId, dateKey);
-                }, 350);
-            }
         }
 
         function isTurnoPublicado(empId, dateKey) {
             return !!baseDatosTurnos[empId + "_published_" + dateKey];
-        }
-
-        function togglePublicacionTurno(empId, dateKey) {
-            let key = empId + "_published_" + dateKey;
-            let estabaPublicado = !!baseDatosTurnos[key];
-            saveHistoryState();
-            if (estabaPublicado) {
-                delete baseDatosTurnos[key];
-                alert('Turno despublicado correctamente.');
-            } else {
-                baseDatosTurnos[key] = true;
-                alert('Turno publicado correctamente.');
-            }
-            inicializarCuadrante();
-            if (document.getElementById('pane-funciones').classList.contains('active')) renderizarMatrizFunciones();
         }
 
         let currentExtraEmpId = null;
@@ -10612,7 +11014,29 @@
         }
 
         window.addEventListener('keydown', function (e) {
+            const panelActivo = document.querySelector('.tab-panel.active');
+            if (panelActivo && panelActivo.id === 'pane-turnos' && e.key === 'Delete' && borrarSeleccionTurnos()) {
+                e.preventDefault();
+                return;
+            }
+            if ((e.ctrlKey || e.metaKey) && panelActivo && panelActivo.id === 'pane-turnos') {
+                const tecla = e.key.toLowerCase();
+                if (tecla === 'c' && (seleccionCeldasTurnos.size > 0 || destinosPegadoTurnos.size > 0)) {
+                    e.preventDefault();
+                    copiarSeleccionTurnos();
+                } else if (tecla === 'v' && bufferCopiaCeldasTurnos.length > 0) {
+                    e.preventDefault();
+                    pegarSeleccionTurnos();
+                }
+            }
             if (e.key === "Escape") {
+                bufferCopiaCeldasTurnos = [];
+                filaOrigenBufferTurnos = null;
+                seleccionCeldasTurnos.clear();
+                destinosPegadoTurnos.clear();
+                destinoPegadoTurnos = null;
+                seleccionandoCeldasTurnos = false;
+                aplicarSeleccionCeldasTurnos();
                 if (memoriaBloqueDias !== null || isRightDragging || isSwapDragging || swapState > 0 || typeof memoriaCicloRaton !== 'undefined') {
                     isRightDragging = false;
                     document.querySelectorAll('.marcado-copiar').forEach(el => el.classList.remove('marcado-copiar'));
@@ -11222,6 +11646,7 @@
                         else baseDatosTurnos['cob_' + t + '_' + s + '_' + dateKey + '_' + fila] = el.value;
                     }
                 });
+
             });
         }
 

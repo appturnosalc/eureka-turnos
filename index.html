@@ -3885,6 +3885,35 @@
             font-style: italic;
         }
 
+        /* ---- TICK DE ACEPTACIÓN RÁPIDA EN TABLA ---- */
+        .portal-tick {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border: 1.5px solid #334155;
+            border-radius: 5px;
+            background: #0f172a;
+            cursor: pointer;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        .portal-tick input { display: none; }
+        .portal-tick > span { color: transparent; font-size: 13px; font-weight: 900; line-height: 1; user-select: none; }
+        .portal-tick input:checked + span { color: #4ade80; }
+        .portal-btn-mini {
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(103,232,249,0.4);
+            background: linear-gradient(135deg, #0e7490, #155e75);
+            color: #ecfeff;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .portal-btn-mini:hover { filter: brightness(1.15); }
+
         .portal-form-actions {
             display: flex;
             gap: 10px;
@@ -4148,6 +4177,7 @@
                             <th>Estado</th>
                             <th>Tipo</th>
                             <th>Concepto / Incidencia</th>
+                            <th>Respuesta</th>
                         </tr>
                     </thead>
                     <tbody id="portal-tbody"></tbody>
@@ -16401,7 +16431,7 @@
                 aprobada:  '✅ Aprobada',
                 denegada:  '❌ Denegada',
                 cancelada: '🚫 Cancelada',
-                pdte_companero: '👥 Pdte. Compañero'
+                pdte_companero: '🔄 En proceso'
             };
             return `<span class="portal-badge ${estado}">${labels[estado] || estado}</span>`;
         }
@@ -16427,7 +16457,13 @@
                     if (!esMio && s.estado === 'pdte_companero') return false;
                 }
 
-                if (portalEmpleado_filtroActivo !== 'todos' && s.estado !== portalEmpleado_filtroActivo) return false;
+                if (portalEmpleado_filtroActivo !== 'todos') {
+                    if (portalEmpleado_filtroActivo === 'proceso') {
+                        if (s.estado !== 'proceso' && s.estado !== 'pdte_companero') return false;
+                    } else if (s.estado !== portalEmpleado_filtroActivo) {
+                        return false;
+                    }
+                }
                 if (busq) {
                     let texto = `${s.tipo} ${s.concepto} ${s.estado} ${s.fechaSolicitud} ${portalEmpleado_nombrePorId(s.solicitanteId)} ${portalEmpleado_nombrePorId(s.destinatarioId)} ${s.descripcion}`.toLowerCase();
                     if (!texto.includes(busq)) return false;
@@ -16441,7 +16477,7 @@
             let visibles = filtradas.slice(0, maxN);
 
             if (visibles.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="portal-sin-resultados">No hay solicitudes para los filtros seleccionados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="portal-sin-resultados">No hay solicitudes para los filtros seleccionados.</td></tr>`;
             } else {
                 tbody.innerHTML = visibles.map(s => {
                     let accionRequerida = (typeof sesionActual !== 'undefined' && sesionActual &&
@@ -16462,6 +16498,15 @@
                         <td>${badgeEstado}</td>
                         <td style="font-weight:600;">${s.tipo}</td>
                         <td>${s.concepto}</td>
+                        <td style="white-space:nowrap;">
+                            ${accionRequerida ? `
+                            <span class="portal-tick" title="Marca el tick para aceptar el cambio" onclick="event.stopPropagation()">
+                                <input type="checkbox" id="portal-tick-${s.id}">
+                                <span>✔</span>
+                            </span>
+                            <button class="portal-btn-mini" onclick="event.stopPropagation(); portalEmpleado_aceptarDesdeTabla(${s.id})">Enviar</button>
+                            ` : ''}
+                        </td>
                     </tr>
                     `;
                 }).join('');
@@ -16948,7 +16993,7 @@
         }
 
         // ---- RESPUESTAS COMPAÑERO / ADMIN ----
-        function portalEmpleado_responderCompanero(id, aceptar) {
+        function portalEmpleado_responderCompanero(id, aceptar, quedarseEnTabla) {
             let sol = portalEmpleado_solicitudes.find(s => s.id === id);
             if (!sol) return;
 
@@ -16967,7 +17012,28 @@
             }
 
             portalEmpleado_actualizarNotificaciones();
-            portalEmpleado_verDetalle(id);
+            if (quedarseEnTabla) {
+                portalEmpleado_mostrarTabla();
+                if (aceptar) {
+                    let info = document.getElementById('portal-paginacion-info');
+                    if (info) {
+                        info.innerHTML = `<span style="color:#4ade80;font-weight:700;">✔ Cambio aceptado. La solicitud ha pasado a Coordinación en estado "En espera".</span>`;
+                        setTimeout(() => portalEmpleado_renderTabla(), 4000);
+                    }
+                }
+            } else {
+                portalEmpleado_verDetalle(id);
+            }
+        }
+
+        // Aceptación rápida desde la tabla: exige el tick verde antes de enviar
+        function portalEmpleado_aceptarDesdeTabla(id) {
+            let tick = document.getElementById('portal-tick-' + id);
+            if (!tick || !tick.checked) {
+                alert('Marca primero el tick ✔ para confirmar que aceptas el cambio.');
+                return;
+            }
+            portalEmpleado_responderCompanero(id, true, true);
         }
 
         function portalEmpleado_resolverAdmin(id, aprobar) {

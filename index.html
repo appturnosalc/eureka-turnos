@@ -3805,6 +3805,86 @@
         .portal-form-textarea:focus { border-color: #22d3ee; }
         .portal-form-textarea { min-height: 90px; resize: vertical; }
 
+        /* ---- FRASE DE CAMBIO DE TURNO ---- */
+        .portal-cambio-frase {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 8px;
+            background: rgba(34,211,238,0.05);
+            border: 1px dashed rgba(34,211,238,0.35);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-top: 6px;
+            font-size: 13px;
+            color: #e2e8f0;
+            line-height: 2.4;
+        }
+        .portal-cambio-nombre {
+            font-weight: 800;
+            color: #fcd34d;
+            background: rgba(252,211,77,0.12);
+            border: 1px solid rgba(252,211,77,0.3);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .portal-cambio-punto {
+            font-weight: 800;
+            color: #67e8f9;
+            letter-spacing: 0.04em;
+        }
+        .portal-cambio-inline {
+            width: auto !important;
+            min-width: 118px;
+            padding: 6px 8px !important;
+        }
+        input.portal-cambio-inline-hora { min-width: 84px; max-width: 84px; }
+        .portal-cambio-ayuda {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #7dd3fc;
+            opacity: 0.85;
+        }
+        .portal-cambio-sep {
+            font-weight: 800;
+            color: #7dd3fc;
+            padding: 0 2px;
+        }
+
+        /* ---- BUSCADOR DE COMPAÑERO ---- */
+        .portal-combo { position: relative; }
+        .portal-combo-lista {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #0f172a;
+            border: 1.5px solid #22d3ee;
+            border-radius: 8px;
+            z-index: 60;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .portal-combo-item {
+            padding: 9px 12px;
+            font-size: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(148,163,184,0.12);
+        }
+        .portal-combo-item:hover { background: rgba(34,211,238,0.15); }
+        .portal-combo-item small { color: #7dd3fc; margin-left: 6px; }
+        .portal-combo-vacio {
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+
         .portal-form-actions {
             display: flex;
             gap: 10px;
@@ -4062,8 +4142,9 @@
                     <thead>
                         <tr>
                             <th style="width:44px;">Ver</th>
-                            <th>Fecha Inicio</th>
-                            <th>Fecha Fin</th>
+                            <th>Fecha formulario</th>
+                            <th>Remitente</th>
+                            <th>Compañero implicado</th>
                             <th>Estado</th>
                             <th>Tipo</th>
                             <th>Concepto / Incidencia</th>
@@ -4101,29 +4182,84 @@
                             <option value="Otros">Otros</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="portal-form-label">Remitente</label>
+                        <input id="portal-form-remitente" type="text" class="portal-form-input" readonly
+                            style="background:rgba(34,211,238,0.08); border-style:dashed; color:#7dd3fc; font-weight:700; cursor:default;">
+                    </div>
                     <div id="portal-form-destinatario-container">
-                        <label class="portal-form-label">Compañero implicado</label>
-                        <select id="portal-form-destinatario" class="portal-form-select">
-                            <option value="">-- Selecciona compañero --</option>
-                        </select>
+                        <label class="portal-form-label">Compañero implicado <span style="text-transform:none; font-weight:400; color:#67e8f9;">(misma función)</span></label>
+                        <div class="portal-combo">
+                            <input type="text" id="portal-form-destinatario-buscar" class="portal-form-input"
+                                placeholder="Escribe apellido o selecciona…" autocomplete="off"
+                                oninput="portalEmpleado_filtrarCompaneros()"
+                                onfocus="portalEmpleado_abrirComboCompaneros()"
+                                onblur="portalEmpleado_cerrarComboCompaneros()">
+                            <div class="portal-combo-lista" id="portal-companeros-lista" style="display:none;"></div>
+                            <input type="hidden" id="portal-form-destinatario">
+                        </div>
                     </div>
-                    <div>
-                        <label class="portal-form-label">Fecha Inicio</label>
-                        <input id="portal-form-finicio" type="date" class="portal-form-input">
+
+                    <!-- BLOQUE SOLO PARA CAMBIO DE TURNO -->
+                    <div id="portal-form-cambio-bloque" class="portal-form-full" style="display:none;">
+                        <label class="portal-form-label">Turnos a intercambiar</label>
+                        <div class="portal-cambio-frase">
+                            <span class="portal-cambio-nombre" id="portal-cambio-nombre-remitente">—</span>
+                            <span>con turno el día</span>
+                            <input id="portal-cambio-rfecha" type="date" class="portal-form-input portal-cambio-inline" title="Fecha del turno del remitente" onclick="event.preventDefault(); portalAbrirPicker(this)">
+                            <span>y con horario</span>
+                            <input id="portal-cambio-rh1" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                                class="portal-form-input portal-cambio-inline portal-cambio-inline-hora"
+                                title="Inicio del turno del remitente. Escribe 1030 y se convierte en 10:30"
+                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
+                            <span class="portal-cambio-sep">-</span>
+                            <input id="portal-cambio-rh2" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                                class="portal-form-input portal-cambio-inline portal-cambio-inline-hora"
+                                title="Fin del turno del remitente"
+                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
+                            <span class="portal-cambio-punto">; SOLICITA CAMBIAR SUS TURNOS CON</span>
+                            <span class="portal-cambio-nombre" id="portal-cambio-nombre-dest">—</span>
+                            <span>con turno el día</span>
+                            <input id="portal-cambio-cfecha" type="date" class="portal-form-input portal-cambio-inline" title="Fecha del turno del compañero" onclick="event.preventDefault(); portalAbrirPicker(this)">
+                            <span>con horario</span>
+                            <input id="portal-cambio-ch1" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                                class="portal-form-input portal-cambio-inline portal-cambio-inline-hora"
+                                title="Inicio del turno del compañero. Escribe 1030 y se convierte en 10:30"
+                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
+                            <span class="portal-cambio-sep">-</span>
+                            <input id="portal-cambio-ch2" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                                class="portal-form-input portal-cambio-inline portal-cambio-inline-hora"
+                                title="Fin del turno del compañero"
+                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
+                        </div>
+                        <div class="portal-cambio-ayuda">💡 Horario en 24 horas por tramos: escribe 1030 y se convierte en 10:30.</div>
                     </div>
-                    <div>
-                        <label class="portal-form-label">Fecha Fin</label>
-                        <input id="portal-form-ffin" type="date" class="portal-form-input">
+
+                    <!-- FECHAS Y HORAS: SOLO PARA CONCEPTOS DISTINTOS A CAMBIO DE TURNO -->
+                    <div id="portal-form-fechas-bloque" class="portal-form-full" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                        <div>
+                            <label class="portal-form-label">Fecha Inicio</label>
+                            <input id="portal-form-finicio" type="date" class="portal-form-input" onclick="event.preventDefault(); portalAbrirPicker(this)">
+                        </div>
+                        <div>
+                            <label class="portal-form-label">Fecha Fin</label>
+                            <input id="portal-form-ffin" type="date" class="portal-form-input" onclick="event.preventDefault(); portalAbrirPicker(this)">
+                        </div>
+                        <div>
+                            <label class="portal-form-label">Hora Desde</label>
+                            <input id="portal-form-hdesde" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                                class="portal-form-input" title="Escribe 0800 y se convierte en 08:00"
+                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
+                        </div>
+                        <div>
+                            <label class="portal-form-label">Hora Hasta</label>
+                            <input id="portal-form-hhasta" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                                class="portal-form-input" title="Escribe 1600 y se convierte en 16:00"
+                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
+                        </div>
                     </div>
-                    <div>
-                        <label class="portal-form-label">Hora Desde</label>
-                        <input id="portal-form-hdesde" type="time" class="portal-form-input">
-                    </div>
-                    <div>
-                        <label class="portal-form-label">Hora Hasta</label>
-                        <input id="portal-form-hhasta" type="time" class="portal-form-input">
-                    </div>
-                    <div class="portal-form-full">
+
+                    <div class="portal-form-full" id="portal-form-desc-container" style="display:none;">
                         <label class="portal-form-label">Descripción / Motivo</label>
                         <textarea id="portal-form-desc" class="portal-form-textarea"
                             placeholder="Explica el motivo de tu solicitud…"></textarea>
@@ -16293,7 +16429,7 @@
 
                 if (portalEmpleado_filtroActivo !== 'todos' && s.estado !== portalEmpleado_filtroActivo) return false;
                 if (busq) {
-                    let texto = `${s.tipo} ${s.concepto} ${s.estado} ${s.fechaInicio} ${s.fechaFin} ${s.descripcion}`.toLowerCase();
+                    let texto = `${s.tipo} ${s.concepto} ${s.estado} ${s.fechaSolicitud} ${portalEmpleado_nombrePorId(s.solicitanteId)} ${portalEmpleado_nombrePorId(s.destinatarioId)} ${s.descripcion}`.toLowerCase();
                     if (!texto.includes(busq)) return false;
                 }
                 return true;
@@ -16305,7 +16441,7 @@
             let visibles = filtradas.slice(0, maxN);
 
             if (visibles.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="portal-sin-resultados">No hay solicitudes para los filtros seleccionados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="portal-sin-resultados">No hay solicitudes para los filtros seleccionados.</td></tr>`;
             } else {
                 tbody.innerHTML = visibles.map(s => {
                     let accionRequerida = (typeof sesionActual !== 'undefined' && sesionActual &&
@@ -16320,8 +16456,9 @@
                         <td>
                             <button class="portal-btn-ver" title="Ver detalle" onclick="event.stopPropagation();portalEmpleado_verDetalle(${s.id})">👁</button>
                         </td>
-                        <td>${portalEmpleado_formatFecha(s.fechaInicio)}</td>
-                        <td>${portalEmpleado_formatFecha(s.fechaFin)}</td>
+                        <td>${portalEmpleado_formatFecha(s.fechaSolicitud)}</td>
+                        <td>${portalEmpleado_nombrePorId(s.solicitanteId)}</td>
+                        <td>${s.concepto === 'Cambio de turno' ? portalEmpleado_nombrePorId(s.destinatarioId) : '—'}</td>
                         <td>${badgeEstado}</td>
                         <td style="font-weight:600;">${s.tipo}</td>
                         <td>${s.concepto}</td>
@@ -16361,6 +16498,8 @@
             document.getElementById('portal-subpanel-tabla').classList.remove('visible');
             document.getElementById('portal-subpanel-nueva').classList.add('visible');
             document.getElementById('portal-subpanel-detalle').classList.remove('visible');
+            portalEmpleado_prepararCompaneros();
+            portalEmpleado_rellenarRemitente();
             portalEmpleado_toggleDestinatario();
 
             // Establecer fecha de hoy por defecto
@@ -16371,42 +16510,272 @@
             if (fFin && !fFin.value) fFin.value = hoy;
         }
 
+        // ---- NOMBRE DEL USUARIO CONECTADO (para Remitente y la frase) ----
+        function portalEmpleado_nombreTrabajadorActual() {
+            if (typeof sesionActual === 'undefined' || !sesionActual) return 'Usuario actual';
+            if (typeof listaTrabajadores !== 'undefined') {
+                let t = listaTrabajadores.find(x => String(x.id) === String(sesionActual.empleadoId))
+                     || listaTrabajadores.find(x => x.id === sesionActual.username || x.nombre === sesionActual.username);
+                if (t) return `${t.apellidos || ''}, ${t.nombre}`.replace(/^,\s*/, '');
+            }
+            return sesionActual.username || 'Usuario actual';
+        }
+
+        // Nombre "Apellidos, Nombre" de cualquier trabajador a partir de su id
+        function portalEmpleado_nombrePorId(id) {
+            if (!id || typeof listaTrabajadores === 'undefined') return '—';
+            let t = listaTrabajadores.find(x => String(x.id) === String(id));
+            return t ? `${t.apellidos || ''}, ${t.nombre}`.replace(/^,\s*/, '') : '—';
+        }
+
+        function portalEmpleado_rellenarRemitente() {
+            let inp = document.getElementById('portal-form-remitente');
+            if (inp) inp.value = portalEmpleado_nombreTrabajadorActual();
+            portalEmpleado_actualizarFraseCambio();
+        }
+
+        // Actualiza los nombres que aparecen dentro de la frase de cambio de turno
+        function portalEmpleado_actualizarFraseCambio() {
+            let spanRem = document.getElementById('portal-cambio-nombre-remitente');
+            if (spanRem) spanRem.textContent = portalEmpleado_nombreTrabajadorActual();
+            let spanDest = document.getElementById('portal-cambio-nombre-dest');
+            if (spanDest) {
+                let idSel = document.getElementById('portal-form-destinatario').value;
+                let c = portalCompanerosCandidatos.find(x => String(x.id) === String(idSel));
+                spanDest.textContent = c ? c.texto : '—';
+            }
+        }
+
+        // ---- COMPAÑERO IMPLICADO: lista con la MISMA función + buscador ----
+        let portalCompanerosCandidatos = [];
+
+        function portalEmpleado_prepararCompaneros() {
+            portalCompanerosCandidatos = [];
+            if (typeof listaTrabajadores === 'undefined') return;
+
+            // Función del usuario actual (si no tiene, se muestran todos)
+            let miFuncion = '';
+            if (typeof sesionActual !== 'undefined' && sesionActual) {
+                let yo = listaTrabajadores.find(x => String(x.id) === String(sesionActual.empleadoId))
+                      || listaTrabajadores.find(x => x.id === sesionActual.username || x.nombre === sesionActual.username);
+                miFuncion = ((yo && yo.funcion) || '').trim().toLowerCase();
+            }
+
+            let sorted = [...listaTrabajadores].sort((a, b) =>
+                `${a.apellidos || ''}, ${a.nombre || ''}`.localeCompare(`${b.apellidos || ''}, ${b.nombre || ''}`));
+            sorted.forEach(t => {
+                if (typeof sesionActual !== 'undefined' && sesionActual && sesionActual.role === 'trabajador' && String(t.id) === String(sesionActual.empleadoId)) return;
+                if (miFuncion && ((t.funcion || '').trim().toLowerCase() !== miFuncion)) return;
+                portalCompanerosCandidatos.push({
+                    id: t.id,
+                    texto: `${t.apellidos || ''}, ${t.nombre}`.replace(/^,\s*/, ''),
+                    funcion: t.funcion || ''
+                });
+            });
+        }
+
+        function portalEmpleado_renderListaCompaneros(filtro) {
+            let cont = document.getElementById('portal-companeros-lista');
+            if (!cont) return;
+            let f = (filtro || '').trim().toLowerCase();
+            let items = portalCompanerosCandidatos.filter(c => !f || c.texto.toLowerCase().includes(f));
+            if (items.length === 0) {
+                cont.innerHTML = '<div class="portal-combo-vacio">No hay compañeros con la misma función que coincidan.</div>';
+            } else {
+                cont.innerHTML = items.map(c =>
+                    `<div class="portal-combo-item" onmousedown="portalEmpleado_elegirCompanero('${c.id}')">${c.texto}<small>${c.funcion}</small></div>`
+                ).join('');
+            }
+            cont.style.display = 'block';
+        }
+
+        function portalEmpleado_abrirComboCompaneros() {
+            portalEmpleado_renderListaCompaneros(document.getElementById('portal-form-destinatario-buscar').value);
+        }
+
+        function portalEmpleado_filtrarCompaneros() {
+            // Si el texto no coincide con la selección guardada, la anulamos
+            let txt = document.getElementById('portal-form-destinatario-buscar').value.trim();
+            let idSel = document.getElementById('portal-form-destinatario').value;
+            let sel = portalCompanerosCandidatos.find(c => String(c.id) === String(idSel));
+            if (!sel || sel.texto !== txt) document.getElementById('portal-form-destinatario').value = '';
+            portalEmpleado_actualizarFraseCambio();
+            portalEmpleado_renderListaCompaneros(txt);
+        }
+
+        function portalEmpleado_elegirCompanero(id) {
+            let c = portalCompanerosCandidatos.find(x => String(x.id) === String(id));
+            if (!c) return;
+            document.getElementById('portal-form-destinatario').value = c.id;
+            document.getElementById('portal-form-destinatario-buscar').value = c.texto;
+            portalEmpleado_actualizarFraseCambio();
+        }
+
+        function portalEmpleado_cerrarComboCompaneros() {
+            setTimeout(() => {
+                let cont = document.getElementById('portal-companeros-lista');
+                if (cont) cont.style.display = 'none';
+            }, 150);
+        }
+
+        // Abre el calendario / selector de hora nativo al pinchar en el campo (todos los navegadores)
+        function portalAbrirPicker(el) {
+            try { if (el && typeof el.showPicker === 'function') el.showPicker(); } catch (e) { /* navegador sin soporte: el campo sigue siendo editable */ }
+        }
+
+        // ---- CAMPOS DE HORA DE ESCRITURA DIRECTA (24h, sin selector) ----
+        function portalFormatearHora(el) {
+            let d = el.value.replace(/\D/g, '').slice(0, 4);
+            if (d.length >= 3) el.value = d.slice(0, 2) + ':' + d.slice(2);
+            else el.value = d;
+        }
+
+        function portalValidarHora(el) {
+            let d = el.value.replace(/\D/g, '');
+            if (!d) { el.value = ''; el.style.borderColor = ''; return; }
+            if (d.length === 1) d = '0' + d + '00';
+            else if (d.length === 2) d = d + '00';
+            else if (d.length === 3) d = '0' + d;
+            let h = parseInt(d.slice(0, 2), 10);
+            let m = parseInt(d.slice(2, 4), 10);
+            if (h > 23 || m > 59) {
+                el.value = '';
+                el.style.borderColor = '#ef4444';
+                alert('Hora no válida. Escribe HH:MM en formato 24 horas, por ejemplo 10:30.');
+                el.focus();
+                return;
+            }
+            el.value = d.slice(0, 2) + ':' + d.slice(2, 4);
+            el.style.borderColor = '';
+        }
+
+        function portalHoraValida(s) {
+            return /^([01]?\d|2[0-3]):[0-5]\d$/.test(s || '');
+        }
+
         function portalEmpleado_toggleDestinatario() {
             let concepto = document.getElementById('portal-form-concepto').value;
+            let esCambio = (concepto === 'Cambio de turno');
+
             let destContainer = document.getElementById('portal-form-destinatario-container');
-            if (destContainer) {
-                if (concepto === 'Cambio de turno') destContainer.style.display = 'block';
-                else destContainer.style.display = 'none';
-            }
+            if (destContainer) destContainer.style.display = esCambio ? 'block' : 'none';
+
+            let bloqueCambio = document.getElementById('portal-form-cambio-bloque');
+            if (bloqueCambio) bloqueCambio.style.display = esCambio ? 'block' : 'none';
+
+            let bloqueFechas = document.getElementById('portal-form-fechas-bloque');
+            if (bloqueFechas) bloqueFechas.style.display = esCambio ? 'none' : 'grid';
+
+            let contDesc = document.getElementById('portal-form-desc-container');
+            if (contDesc) contDesc.style.display = esCambio ? 'none' : 'block';
+
+            portalEmpleado_actualizarFraseCambio();
         }
 
         // ---- ENVIAR NUEVA SOLICITUD ----
         function portalEmpleado_enviarSolicitud() {
             let tipo     = document.getElementById('portal-form-tipo').value;
             let concepto = document.getElementById('portal-form-concepto').value;
+            let esCambio = (concepto === 'Cambio de turno');
             let destinatarioId = document.getElementById('portal-form-destinatario') ? document.getElementById('portal-form-destinatario').value : '';
             let finicio  = document.getElementById('portal-form-finicio').value;
             let ffin     = document.getElementById('portal-form-ffin').value;
             let hdesde   = document.getElementById('portal-form-hdesde').value;
             let hhasta   = document.getElementById('portal-form-hhasta').value;
-            let desc     = document.getElementById('portal-form-desc').value.trim();
+            let desc     = esCambio ? '' : document.getElementById('portal-form-desc').value.trim();
 
-            if (!finicio) {
-                alert('Por favor, indica la Fecha de Inicio.');
-                document.getElementById('portal-form-finicio').focus();
-                return;
-            }
-            if (concepto === 'Cambio de turno' && !destinatarioId) {
-                alert('Por favor, selecciona al compañero destinatario del cambio.');
-                document.getElementById('portal-form-destinatario').focus();
-                return;
+            let cambio = null;
+            if (esCambio) {
+                cambio = {
+                    rFecha: document.getElementById('portal-cambio-rfecha').value,
+                    rH1:    document.getElementById('portal-cambio-rh1').value,
+                    rH2:    document.getElementById('portal-cambio-rh2').value,
+                    cFecha: document.getElementById('portal-cambio-cfecha').value,
+                    cH1:    document.getElementById('portal-cambio-ch1').value,
+                    cH2:    document.getElementById('portal-cambio-ch2').value
+                };
+                if (!destinatarioId) {
+                    alert('Por favor, selecciona al compañero destinatario del cambio.');
+                    document.getElementById('portal-form-destinatario-buscar').focus();
+                    return;
+                }
+                if (!cambio.rFecha) {
+                    alert('Por favor, indica la fecha del turno del remitente.');
+                    document.getElementById('portal-cambio-rfecha').focus();
+                    return;
+                }
+                if (!cambio.rH1) {
+                    alert('Por favor, indica el inicio del horario del remitente.');
+                    document.getElementById('portal-cambio-rh1').focus();
+                    return;
+                }
+                if (!cambio.rH2) {
+                    alert('Por favor, indica el fin del horario del remitente.');
+                    document.getElementById('portal-cambio-rh2').focus();
+                    return;
+                }
+                if (!cambio.cFecha) {
+                    alert('Por favor, indica la fecha del turno del compañero.');
+                    document.getElementById('portal-cambio-cfecha').focus();
+                    return;
+                }
+                if (!cambio.cH1) {
+                    alert('Por favor, indica el inicio del horario del compañero.');
+                    document.getElementById('portal-cambio-ch1').focus();
+                    return;
+                }
+                if (!cambio.cH2) {
+                    alert('Por favor, indica el fin del horario del compañero.');
+                    document.getElementById('portal-cambio-ch2').focus();
+                    return;
+                }
+                if (!portalHoraValida(cambio.rH1)) {
+                    alert('El horario del remitente debe tener formato HH:MM en 24 horas (ej. 10:30).');
+                    document.getElementById('portal-cambio-rh1').focus();
+                    return;
+                }
+                if (cambio.rH2 && !portalHoraValida(cambio.rH2)) {
+                    alert('El segundo horario del remitente debe tener formato HH:MM en 24 horas (ej. 14:00).');
+                    document.getElementById('portal-cambio-rh2').focus();
+                    return;
+                }
+                if (!portalHoraValida(cambio.cH1)) {
+                    alert('El horario del compañero debe tener formato HH:MM en 24 horas (ej. 10:30).');
+                    document.getElementById('portal-cambio-ch1').focus();
+                    return;
+                }
+                if (cambio.cH2 && !portalHoraValida(cambio.cH2)) {
+                    alert('El segundo horario del compañero debe tener formato HH:MM en 24 horas (ej. 14:00).');
+                    document.getElementById('portal-cambio-ch2').focus();
+                    return;
+                }
+                finicio = cambio.rFecha;
+                ffin    = cambio.cFecha;
+                hdesde  = cambio.rH1;
+                hhasta  = cambio.rH2 || '';
+            } else {
+                if (!finicio) {
+                    alert('Por favor, indica la Fecha de Inicio.');
+                    document.getElementById('portal-form-finicio').focus();
+                    return;
+                }
+                if (hdesde && !portalHoraValida(hdesde)) {
+                    alert('La Hora Desde debe tener formato HH:MM en 24 horas (ej. 08:00).');
+                    document.getElementById('portal-form-hdesde').focus();
+                    return;
+                }
+                if (hhasta && !portalHoraValida(hhasta)) {
+                    alert('La Hora Hasta debe tener formato HH:MM en 24 horas (ej. 16:00).');
+                    document.getElementById('portal-form-hhasta').focus();
+                    return;
+                }
             }
 
             let nuevaId = portalEmpleado_solicitudes.length > 0
                 ? Math.max(...portalEmpleado_solicitudes.map(s => s.id)) + 1
                 : 1;
 
-            let estadoInicial = (concepto === 'Cambio de turno') ? 'pdte_companero' : 'espera';
+            let estadoInicial = esCambio ? 'pdte_companero' : 'espera';
 
             let nueva = {
                 id: nuevaId,
@@ -16419,7 +16788,8 @@
                 fechaFin: ffin || finicio,
                 horaDesde: hdesde,
                 horaHasta: hhasta,
-                descripcion: desc || '(Sin descripción)',
+                cambioTurno: cambio,
+                descripcion: desc,
                 fechaSolicitud: new Date().toISOString().split('T')[0],
                 comentarioCompanero: null
             };
@@ -16432,6 +16802,15 @@
             document.getElementById('portal-form-hdesde').value = '';
             document.getElementById('portal-form-hhasta').value = '';
             document.getElementById('portal-form-desc').value = '';
+            ['portal-cambio-rfecha','portal-cambio-rh1','portal-cambio-rh2','portal-cambio-cfecha','portal-cambio-ch1','portal-cambio-ch2'].forEach(idCampo => {
+                let el = document.getElementById(idCampo);
+                if (el) el.value = '';
+            });
+            let hidDest = document.getElementById('portal-form-destinatario');
+            if (hidDest) hidDest.value = '';
+            let txtDest = document.getElementById('portal-form-destinatario-buscar');
+            if (txtDest) txtDest.value = '';
+            portalEmpleado_actualizarFraseCambio();
 
             // Volver a la tabla con filtro "Todas"
             portalEmpleado_filtroActivo = 'todos';
@@ -16442,7 +16821,7 @@
 
             portalEmpleado_mostrarTabla();
 
-            let msg = (concepto === 'Cambio de turno')
+            let msg = esCambio
                 ? '✔ Solicitud de cambio enviada al compañero. Pasará a Coordinación cuando la acepte.'
                 : '✔ Solicitud enviada correctamente y pendiente de revisión por Coordinación.';
 
@@ -16492,6 +16871,19 @@
                     <span class="portal-detalle-label">Concepto</span>
                     <span class="portal-detalle-val">${sol.concepto}</span>
                 </div>
+                ${sol.concepto === 'Cambio de turno' && sol.cambioTurno ? `
+                <div class="portal-detalle-row" style="flex-direction:column; align-items:stretch; gap:6px; background:rgba(34,211,238,0.06); border:1px dashed rgba(34,211,238,0.35); border-radius:8px; padding:10px 12px;">
+                    <span class="portal-detalle-label" style="margin-bottom:2px;">Turnos a intercambiar</span>
+                    <div style="font-size:13px; color:#e2e8f0; line-height:2.2;">
+                        <span style="font-weight:800; color:#fcd34d;">${nombreSol}</span>
+                        con turno el día <strong>${portalEmpleado_formatFecha(sol.cambioTurno.rFecha)}</strong>
+                        y con horario <strong>${sol.cambioTurno.rH1 || '--:--'}${sol.cambioTurno.rH2 ? ' - ' + sol.cambioTurno.rH2 : ''}</strong>;
+                        SOLICITA CAMBIAR SUS TURNOS CON
+                        <span style="font-weight:800; color:#fcd34d;">${nombreDest}</span>
+                        con turno el día <strong>${portalEmpleado_formatFecha(sol.cambioTurno.cFecha)}</strong>
+                        con horario <strong>${sol.cambioTurno.cH1 || '--:--'}${sol.cambioTurno.cH2 ? ' - ' + sol.cambioTurno.cH2 : ''}</strong>
+                    </div>
+                </div>` : `
                 <div class="portal-detalle-row">
                     <span class="portal-detalle-label">Fecha Inicio</span>
                     <span class="portal-detalle-val">${portalEmpleado_formatFecha(sol.fechaInicio)}</span>
@@ -16504,15 +16896,16 @@
                 <div class="portal-detalle-row">
                     <span class="portal-detalle-label">Horas</span>
                     <span class="portal-detalle-val">${sol.horaDesde || '--:--'} → ${sol.horaHasta || '--:--'}</span>
-                </div>` : ''}
+                </div>` : ''}`}
                 <div class="portal-detalle-row">
                     <span class="portal-detalle-label">Fecha solicitud</span>
                     <span class="portal-detalle-val">${portalEmpleado_formatFecha(sol.fechaSolicitud)}</span>
                 </div>
+                ${sol.descripcion ? `
                 <div class="portal-detalle-row" style="flex-direction:column;">
                     <span class="portal-detalle-label" style="margin-bottom:6px;">Descripción / Motivo</span>
                     <div class="portal-detalle-desc">${sol.descripcion}</div>
-                </div>
+                </div>` : ''}
                 ${sol.comentarioCompanero ? `
                 <div class="portal-detalle-row" style="flex-direction:column; background:rgba(217,119,6,0.1); border-radius:6px; padding:8px; margin-top:8px;">
                     <span class="portal-detalle-label" style="color:#fcd34d;margin-bottom:4px;">💬 Respuesta / Comentario del Compañero:</span>
@@ -16626,17 +17019,10 @@
                     : `👤 ${sesionActual.username}`;
             }
 
-            // Llenar select de destinatarios
-            let destSelect = document.getElementById('portal-form-destinatario');
-            if (destSelect && typeof listaTrabajadores !== 'undefined') {
-                destSelect.innerHTML = '<option value="">-- Selecciona compañero --</option>';
-                let sorted = [...listaTrabajadores].sort((a,b) => (a.nombre||'').localeCompare(b.nombre||''));
-                sorted.forEach(t => {
-                    if (typeof sesionActual !== 'undefined' && sesionActual && sesionActual.role === 'trabajador' && String(t.id) === String(sesionActual.empleadoId)) return;
-                    destSelect.innerHTML += `<option value="${t.id}">${t.apellidos || ''}, ${t.nombre}</option>`;
-                });
-            }
+            // Preparar compañeros candidatos (misma función) para el buscador
+            portalEmpleado_prepararCompaneros();
 
+            portalEmpleado_rellenarRemitente();
             portalEmpleado_actualizarNotificaciones();
             portalEmpleado_mostrarTabla();
         }

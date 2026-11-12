@@ -3840,7 +3840,7 @@
             min-width: 118px;
             padding: 6px 8px !important;
         }
-        input.portal-cambio-inline-hora { min-width: 84px; max-width: 84px; }
+        input.portal-cambio-inline-hora { min-width: 126px; max-width: 126px; }
         .portal-cambio-ayuda {
             margin-top: 8px;
             font-size: 11px;
@@ -4195,7 +4195,7 @@
                 <div class="portal-form-grid">
                     <div>
                         <label class="portal-form-label">Tipo de solicitud</label>
-                        <select id="portal-form-tipo" class="portal-form-select">
+                        <select id="portal-form-tipo" class="portal-form-select" onchange="portalEmpleado_filtrarConceptos()">
                             <option value="Petición">Petición</option>
                             <option value="Aviso">Aviso</option>
                         </select>
@@ -4206,7 +4206,6 @@
                             <option value="Cambio de turno">Cambio de turno</option>
                             <option value="Vacaciones">Vacaciones</option>
                             <option value="Cita médica">Cita médica</option>
-                            <option value="Baja médica">Baja médica</option>
                             <option value="Asunto personal">Asunto personal</option>
                             <option value="Formación">Formación</option>
                             <option value="Otros">Otros</option>
@@ -4236,52 +4235,117 @@
                         <div class="portal-cambio-frase">
                             <span class="portal-cambio-nombre" id="portal-cambio-nombre-remitente">—</span>
                             <span>con turno el día</span>
-                            <input id="portal-cambio-rfecha" type="date" class="portal-form-input portal-cambio-inline" title="Fecha del turno del remitente" onclick="event.preventDefault(); portalAbrirPicker(this)">
+                            <input id="portal-cambio-rfecha" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input portal-cambio-inline" title="Fecha del turno del remitente" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
                             <span>y con horario</span>
-                            <input id="portal-cambio-rh1" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                            <input id="portal-cambio-rh1" type="text" inputmode="numeric" maxlength="11" placeholder="HH:MM-HH:MM"
                                 class="portal-form-input portal-cambio-inline portal-cambio-inline-hora"
-                                title="Inicio del turno del remitente. Escribe 1030 y se convierte en 10:30"
-                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
-                            <span class="portal-cambio-sep">-</span>
-                            <input id="portal-cambio-rh2" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                                title="Primer tramo del remitente. Escribe 06001000 y se convierte en 06:00-10:00"
+                                oninput="portalFormatearTramo(this)" onblur="portalValidarTramo(this)">
+                            <span class="portal-cambio-sep">y</span>
+                            <input id="portal-cambio-rh2" type="text" inputmode="numeric" maxlength="11" placeholder="HH:MM-HH:MM"
                                 class="portal-form-input portal-cambio-inline portal-cambio-inline-hora"
-                                title="Fin del turno del remitente"
-                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
+                                title="Segundo tramo del remitente. Escribe 10001400 y se convierte en 10:00-14:00"
+                                oninput="portalFormatearTramo(this)" onblur="portalValidarTramo(this)">
                             <span class="portal-cambio-punto">; SOLICITA CAMBIAR SUS TURNOS CON</span>
                             <span class="portal-cambio-nombre" id="portal-cambio-nombre-dest">—</span>
                             <span>con turno el día</span>
-                            <input id="portal-cambio-cfecha" type="date" class="portal-form-input portal-cambio-inline" title="Fecha del turno del compañero" onclick="event.preventDefault(); portalAbrirPicker(this)">
+                            <input id="portal-cambio-cfecha" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input portal-cambio-inline" title="Fecha del turno del compañero" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
                             <span>con horario</span>
-                            <input id="portal-cambio-ch1" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                            <input id="portal-cambio-ch1" type="text" inputmode="numeric" maxlength="11" placeholder="HH:MM-HH:MM"
                                 class="portal-form-input portal-cambio-inline portal-cambio-inline-hora"
-                                title="Inicio del turno del compañero. Escribe 1030 y se convierte en 10:30"
-                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
-                            <span class="portal-cambio-sep">-</span>
-                            <input id="portal-cambio-ch2" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
+                                title="Primer tramo del compañero. Escribe 14001800 y se convierte en 14:00-18:00"
+                                oninput="portalFormatearTramo(this)" onblur="portalValidarTramo(this)">
+                            <span class="portal-cambio-sep">y</span>
+                            <input id="portal-cambio-ch2" type="text" inputmode="numeric" maxlength="11" placeholder="HH:MM-HH:MM"
                                 class="portal-form-input portal-cambio-inline portal-cambio-inline-hora"
-                                title="Fin del turno del compañero"
-                                oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
+                                title="Segundo tramo del compañero. Escribe 18002200 y se convierte en 18:00-22:00"
+                                oninput="portalFormatearTramo(this)" onblur="portalValidarTramo(this)">
                         </div>
-                        <div class="portal-cambio-ayuda">💡 Horario en 24 horas por tramos: escribe 1030 y se convierte en 10:30.</div>
+                        <div class="portal-cambio-ayuda">💡 Cada campo es un tramo en 24 horas: escribe 06001000 y se convierte en 06:00-10:00.</div>
+                        <div style="margin-top:14px;">
+                            <label class="portal-form-label" for="portal-form-observaciones">Observaciones</label>
+                            <textarea id="portal-form-observaciones" class="portal-form-textarea"
+                                placeholder="Añade observaciones sobre el cambio de turno…"
+                                oninput="portalLimitarObservaciones(this)"></textarea>
+                            <div id="portal-observaciones-contador" style="margin-top:4px; text-align:right; font-size:11px; color:#94a3b8;">0 / 30 palabras</div>
+                        </div>
                     </div>
 
                     <!-- FECHAS Y HORAS: SOLO PARA CONCEPTOS DISTINTOS A CAMBIO DE TURNO -->
                     <div id="portal-form-fechas-bloque" class="portal-form-full" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                        <div class="portal-vacaciones-titulo" style="display:none; grid-column:1 / 3; color:#7dd3fc; font-size:12px; font-weight:800; text-transform:uppercase;">Fechas solicitadas</div>
+                        <div class="portal-vacaciones-titulo" style="display:none; grid-column:3 / 5; color:#86efac; font-size:12px; font-weight:800; text-transform:uppercase;">Fechas aprobadas</div>
                         <div>
-                            <label class="portal-form-label">Fecha Inicio</label>
-                            <input id="portal-form-finicio" type="date" class="portal-form-input" onclick="event.preventDefault(); portalAbrirPicker(this)">
+                            <label id="portal-label-finicio" class="portal-form-label">Fecha Inicio</label>
+                            <input id="portal-form-finicio" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
                         </div>
-                        <div>
-                            <label class="portal-form-label">Fecha Fin</label>
-                            <input id="portal-form-ffin" type="date" class="portal-form-input" onclick="event.preventDefault(); portalAbrirPicker(this)">
+                        <div id="portal-campo-ffin">
+                            <label id="portal-label-ffin" class="portal-form-label">Fecha Fin</label>
+                            <input id="portal-form-ffin" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
                         </div>
-                        <div>
+                        <div class="portal-vacaciones-aprobada" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-aprobada-inicio-1">Fecha Inicio 1</label>
+                            <input id="portal-vacaciones-aprobada-inicio-1" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-aprobada" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-aprobada-fin-1">Fecha Fin 1</label>
+                            <input id="portal-vacaciones-aprobada-fin-1" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-periodo" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-inicio-2">Fecha Inicio 2</label>
+                            <input id="portal-vacaciones-inicio-2" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-periodo" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-fin-2">Fecha Fin 2</label>
+                            <input id="portal-vacaciones-fin-2" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-aprobada" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-aprobada-inicio-2">Fecha Inicio 2</label>
+                            <input id="portal-vacaciones-aprobada-inicio-2" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-aprobada" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-aprobada-fin-2">Fecha Fin 2</label>
+                            <input id="portal-vacaciones-aprobada-fin-2" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-periodo" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-inicio-3">Fecha Inicio 3</label>
+                            <input id="portal-vacaciones-inicio-3" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-periodo" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-fin-3">Fecha Fin 3</label>
+                            <input id="portal-vacaciones-fin-3" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-aprobada" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-aprobada-inicio-3">Fecha Inicio 3</label>
+                            <input id="portal-vacaciones-aprobada-inicio-3" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-aprobada" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-aprobada-fin-3">Fecha Fin 3</label>
+                            <input id="portal-vacaciones-aprobada-fin-3" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-periodo" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-inicio-4">Fecha Inicio 4</label>
+                            <input id="portal-vacaciones-inicio-4" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-periodo" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-fin-4">Fecha Fin 4</label>
+                            <input id="portal-vacaciones-fin-4" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-aprobada" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-aprobada-inicio-4">Fecha Inicio 4</label>
+                            <input id="portal-vacaciones-aprobada-inicio-4" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div class="portal-vacaciones-aprobada" style="display:none;">
+                            <label class="portal-form-label" for="portal-vacaciones-aprobada-fin-4">Fecha Fin 4</label>
+                            <input id="portal-vacaciones-aprobada-fin-4" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)">
+                        </div>
+                        <div id="portal-campo-hdesde">
                             <label class="portal-form-label">Hora Desde</label>
                             <input id="portal-form-hdesde" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
                                 class="portal-form-input" title="Escribe 0800 y se convierte en 08:00"
                                 oninput="portalFormatearHora(this)" onblur="portalValidarHora(this)">
                         </div>
-                        <div>
+                        <div id="portal-campo-hhasta">
                             <label class="portal-form-label">Hora Hasta</label>
                             <input id="portal-form-hhasta" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM"
                                 class="portal-form-input" title="Escribe 1600 y se convierte en 16:00"
@@ -4290,9 +4354,12 @@
                     </div>
 
                     <div class="portal-form-full" id="portal-form-desc-container" style="display:none;">
-                        <label class="portal-form-label">Descripción / Motivo</label>
+                        <label id="portal-label-desc" class="portal-form-label" for="portal-form-desc">Descripción / Motivo</label>
                         <textarea id="portal-form-desc" class="portal-form-textarea"
-                            placeholder="Explica el motivo de tu solicitud…"></textarea>
+                            placeholder="Explica el motivo de tu solicitud…"
+                            oninput="portalLimitarDescripcion(this)"></textarea>
+                        <div id="portal-descripcion-contador" style="display:none; margin-top:4px; text-align:right; font-size:11px; color:#94a3b8;">0 / 30 palabras</div>
+                        <div id="portal-nota-medica" style="display:none; margin-top:12px; padding:12px 14px; border:1px solid #facc15; border-radius:8px; background:rgba(250,204,21,0.16); color:#fde047; font-size:12px; font-weight:600; line-height:1.5;"></div>
                     </div>
                 </div>
                 <div class="portal-form-actions">
@@ -16454,7 +16521,7 @@
                 if (typeof sesionActual !== 'undefined' && sesionActual && sesionActual.role === 'trabajador') {
                     let esMio = (s.solicitanteId && String(s.solicitanteId) === String(sesionActual.empleadoId)) ||
                                 (s.destinatarioId && String(s.destinatarioId) === String(sesionActual.empleadoId));
-                    if (!esMio && s.estado === 'pdte_companero') return false;
+                    if (!esMio) return false;
                 }
 
                 if (portalEmpleado_filtroActivo !== 'todos') {
@@ -16545,14 +16612,7 @@
             document.getElementById('portal-subpanel-detalle').classList.remove('visible');
             portalEmpleado_prepararCompaneros();
             portalEmpleado_rellenarRemitente();
-            portalEmpleado_toggleDestinatario();
-
-            // Establecer fecha de hoy por defecto
-            let hoy = new Date().toISOString().split('T')[0];
-            let fIni = document.getElementById('portal-form-finicio');
-            let fFin = document.getElementById('portal-form-ffin');
-            if (fIni && !fIni.value) fIni.value = hoy;
-            if (fFin && !fFin.value) fFin.value = hoy;
+            portalEmpleado_filtrarConceptos();
         }
 
         // ---- NOMBRE DEL USUARIO CONECTADO (para Remitente y la frase) ----
@@ -16698,9 +16758,130 @@
             return /^([01]?\d|2[0-3]):[0-5]\d$/.test(s || '');
         }
 
+        function portalFormatearTramo(el) {
+            let d = el.value.replace(/\D/g, '').slice(0, 8);
+            let inicio = d.slice(0, 4);
+            let fin = d.slice(4);
+            let texto = inicio.length >= 3 ? inicio.slice(0, 2) + ':' + inicio.slice(2) : inicio;
+            if (fin) texto += '-' + (fin.length >= 3 ? fin.slice(0, 2) + ':' + fin.slice(2) : fin);
+            el.value = texto;
+        }
+
+        function portalValidarTramo(el) {
+            let d = el.value.replace(/\D/g, '');
+            if (!d) { el.value = ''; el.style.borderColor = ''; return; }
+            let inicio = d.slice(0, 2) + ':' + d.slice(2, 4);
+            let fin = d.slice(4, 6) + ':' + d.slice(6, 8);
+            if (d.length !== 8 || !portalHoraValida(inicio) || !portalHoraValida(fin)) {
+                el.value = '';
+                el.style.borderColor = '#ef4444';
+                alert('Tramo horario no válido. Escribe HH:MM-HH:MM en formato 24 horas, por ejemplo 06:00-10:00.');
+                el.focus();
+                return;
+            }
+            el.value = inicio + '-' + fin;
+            el.style.borderColor = '';
+        }
+
+        function portalTramoValido(s) {
+            return /^(?:[01]\d|2[0-3]):[0-5]\d-(?:[01]\d|2[0-3]):[0-5]\d$/.test(s || '');
+        }
+
+        function portalLimitarPalabras(el, contadorId) {
+            const limite = 30;
+            let palabras = el.value.trim().split(/\s+/).filter(Boolean);
+            if (palabras.length > limite) el.value = palabras.slice(0, limite).join(' ');
+            let contador = document.getElementById(contadorId);
+            if (contador) contador.textContent = `${Math.min(palabras.length, limite)} / ${limite} palabras`;
+        }
+
+        function portalLimitarObservaciones(el) {
+            portalLimitarPalabras(el, 'portal-observaciones-contador');
+        }
+
+        function portalEmpleado_esAvisoMedico(concepto) {
+            return ['Baja médica', 'Alta médica', 'Enfermedad sin baja'].includes(concepto);
+        }
+
+        function portalEmpleado_camposFechasVacaciones() {
+            let ids = ['portal-form-finicio', 'portal-form-ffin'];
+            for (let i = 2; i <= 4; i++) ids.push(`portal-vacaciones-inicio-${i}`, `portal-vacaciones-fin-${i}`);
+            return ids.map(id => document.getElementById(id));
+        }
+
+        function portalEmpleado_camposFechasAprobadasVacaciones() {
+            let ids = [];
+            for (let i = 1; i <= 4; i++) ids.push(`portal-vacaciones-aprobada-inicio-${i}`, `portal-vacaciones-aprobada-fin-${i}`);
+            return ids.map(id => document.getElementById(id));
+        }
+
+        function portalEmpleado_actualizarPermisosVacaciones() {
+            let puedeAprobar = typeof sesionActual !== 'undefined' && sesionActual &&
+                (sesionActual.role === 'admin' || sesionActual.role === 'gestor');
+            portalEmpleado_camposFechasAprobadasVacaciones().forEach(campo => {
+                campo.readOnly = !puedeAprobar;
+                campo.style.opacity = puedeAprobar ? '1' : '0.65';
+                campo.style.cursor = puedeAprobar ? 'text' : 'not-allowed';
+            });
+        }
+
+        function portalFechaPortalAISO(fecha) {
+            if (!/^\d{2}\/\d{2}\/\d{4}$/.test(fecha || '')) return '';
+            let [dia, mes, anio] = fecha.split('/');
+            return `${anio}-${mes}-${dia}`;
+        }
+
+        function portalFormatearFechaPortal(el) {
+            let d = el.value.replace(/\D/g, '').slice(0, 8);
+            if (d.length > 4) el.value = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4);
+            else if (d.length > 2) el.value = d.slice(0, 2) + '/' + d.slice(2);
+            else el.value = d;
+        }
+
+        function portalValidarFechaPortal(el) {
+            if (!el.value) return true;
+            let partes = el.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            let valida = false;
+            if (partes) {
+                let dia = Number(partes[1]);
+                let mes = Number(partes[2]);
+                let anio = Number(partes[3]);
+                let fecha = new Date(anio, mes - 1, dia);
+                valida = fecha.getFullYear() === anio && fecha.getMonth() === mes - 1 && fecha.getDate() === dia;
+            }
+            el.style.borderColor = valida ? '' : '#ef4444';
+            if (!valida) alert('Fecha no válida. Escribe la fecha en formato dd/mm/aaaa.');
+            return valida;
+        }
+
+        function portalLimitarDescripcion(el) {
+            let concepto = document.getElementById('portal-form-concepto').value;
+            let limitar = portalEmpleado_esAvisoMedico(concepto) || concepto === 'Vacaciones';
+            let contador = document.getElementById('portal-descripcion-contador');
+            if (contador) contador.style.display = limitar ? 'block' : 'none';
+            if (limitar) portalLimitarPalabras(el, 'portal-descripcion-contador');
+        }
+
+        function portalEmpleado_filtrarConceptos() {
+            let tipo = document.getElementById('portal-form-tipo').value;
+            let select = document.getElementById('portal-form-concepto');
+            let conceptoActual = select.value;
+            let conceptos = tipo === 'Aviso'
+                ? ['Baja médica', 'Alta médica', 'Enfermedad sin baja']
+                : ['Cambio de turno', 'Vacaciones', 'Cita médica', 'Asunto personal', 'Formación', 'Otros'];
+            select.innerHTML = conceptos.map(concepto => `<option value="${concepto}">${concepto}</option>`).join('');
+            select.value = conceptos.includes(conceptoActual) ? conceptoActual : conceptos[0];
+            portalEmpleado_toggleDestinatario();
+        }
+
         function portalEmpleado_toggleDestinatario() {
             let concepto = document.getElementById('portal-form-concepto').value;
             let esCambio = (concepto === 'Cambio de turno');
+            let esBaja = (concepto === 'Baja médica');
+            let esAlta = (concepto === 'Alta médica');
+            let esEnfermedad = (concepto === 'Enfermedad sin baja');
+            let esVacaciones = (concepto === 'Vacaciones');
+            let esAvisoMedico = portalEmpleado_esAvisoMedico(concepto);
 
             let destContainer = document.getElementById('portal-form-destinatario-container');
             if (destContainer) destContainer.style.display = esCambio ? 'block' : 'none';
@@ -16709,10 +16890,47 @@
             if (bloqueCambio) bloqueCambio.style.display = esCambio ? 'block' : 'none';
 
             let bloqueFechas = document.getElementById('portal-form-fechas-bloque');
-            if (bloqueFechas) bloqueFechas.style.display = esCambio ? 'none' : 'grid';
+            if (bloqueFechas) {
+                bloqueFechas.style.display = esCambio ? 'none' : 'grid';
+                bloqueFechas.style.gridTemplateColumns = esVacaciones ? '1fr 1fr 1fr 1fr' : '1fr 1fr';
+            }
 
             let contDesc = document.getElementById('portal-form-desc-container');
             if (contDesc) contDesc.style.display = esCambio ? 'none' : 'block';
+
+            let labelInicio = document.getElementById('portal-label-finicio');
+            if (labelInicio) labelInicio.textContent = esAlta ? 'Fecha de alta' : (esVacaciones ? 'Fecha Inicio 1' : 'Fecha Inicio');
+            let labelFin = document.getElementById('portal-label-ffin');
+            if (labelFin) labelFin.textContent = esVacaciones ? 'Fecha Fin 1' : (esBaja || esEnfermedad ? 'Fecha fin si se conoce' : 'Fecha Fin');
+            let campoFin = document.getElementById('portal-campo-ffin');
+            if (campoFin) campoFin.style.display = esAlta ? 'none' : 'block';
+            document.querySelectorAll('.portal-vacaciones-periodo, .portal-vacaciones-aprobada').forEach(campo => {
+                campo.style.display = esVacaciones ? 'block' : 'none';
+            });
+            document.querySelectorAll('.portal-vacaciones-titulo').forEach(titulo => {
+                titulo.style.display = esVacaciones ? 'block' : 'none';
+            });
+            portalEmpleado_actualizarPermisosVacaciones();
+            let campoDesde = document.getElementById('portal-campo-hdesde');
+            let campoHasta = document.getElementById('portal-campo-hhasta');
+            if (campoDesde) campoDesde.style.display = esAvisoMedico || esVacaciones ? 'none' : 'block';
+            if (campoHasta) campoHasta.style.display = esAvisoMedico || esVacaciones ? 'none' : 'block';
+            let notaMedica = document.getElementById('portal-nota-medica');
+            if (notaMedica) {
+                if (esAlta) {
+                    notaMedica.textContent = 'No hace falta entregar el parte de alta porque se tramita telemáticamente, pero sí estás obligado a avisar a la empresa tan pronto como recibes el alta medica.';
+                } else if (esEnfermedad) {
+                    notaMedica.textContent = 'Si no vas a acudir a un turno asignado, debes notificarlo tanto en el portal del empleado como llamando al Jefe de Turno.';
+                } else {
+                    notaMedica.textContent = 'No hace falta entregar el parte de baja porque se tramita telemáticamente, pero si no vas a acudir a un turno asignado, debes notificarlo tanto en el portal del empleado como llamando al Jefe de Turno.';
+                }
+                notaMedica.style.display = esAvisoMedico ? 'block' : 'none';
+            }
+            let labelDesc = document.getElementById('portal-label-desc');
+            if (labelDesc) labelDesc.textContent = esVacaciones ? 'Observaciones' : 'Descripción / Motivo';
+            let campoDesc = document.getElementById('portal-form-desc');
+            if (campoDesc) campoDesc.placeholder = esVacaciones ? 'Añade observaciones sobre las vacaciones…' : 'Explica el motivo de tu solicitud…';
+            portalLimitarDescripcion(campoDesc);
 
             portalEmpleado_actualizarFraseCambio();
         }
@@ -16722,12 +16940,53 @@
             let tipo     = document.getElementById('portal-form-tipo').value;
             let concepto = document.getElementById('portal-form-concepto').value;
             let esCambio = (concepto === 'Cambio de turno');
+            let esAlta = (concepto === 'Alta médica');
+            let esVacaciones = (concepto === 'Vacaciones');
+            let esAvisoMedico = portalEmpleado_esAvisoMedico(concepto);
             let destinatarioId = document.getElementById('portal-form-destinatario') ? document.getElementById('portal-form-destinatario').value : '';
             let finicio  = document.getElementById('portal-form-finicio').value;
             let ffin     = document.getElementById('portal-form-ffin').value;
-            let hdesde   = document.getElementById('portal-form-hdesde').value;
-            let hhasta   = document.getElementById('portal-form-hhasta').value;
-            let desc     = esCambio ? '' : document.getElementById('portal-form-desc').value.trim();
+            let hdesde   = esAvisoMedico || esVacaciones ? '' : document.getElementById('portal-form-hdesde').value;
+            let hhasta   = esAvisoMedico || esVacaciones ? '' : document.getElementById('portal-form-hhasta').value;
+            let periodosVacaciones = null;
+            let periodosVacacionesAprobados = null;
+            if (!esCambio) {
+                let camposFecha = esVacaciones
+                    ? [...portalEmpleado_camposFechasVacaciones(), ...portalEmpleado_camposFechasAprobadasVacaciones()]
+                    : [document.getElementById('portal-form-finicio'), document.getElementById('portal-form-ffin')];
+                for (let campo of camposFecha) {
+                    if (!portalValidarFechaPortal(campo)) {
+                        campo.focus();
+                        return;
+                    }
+                }
+                finicio = portalFechaPortalAISO(finicio);
+                ffin = portalFechaPortalAISO(ffin);
+            }
+            if (esVacaciones) {
+                periodosVacaciones = [{ inicio: finicio, fin: ffin || finicio }];
+                for (let i = 2; i <= 4; i++) {
+                    periodosVacaciones.push({
+                        inicio: portalFechaPortalAISO(document.getElementById(`portal-vacaciones-inicio-${i}`).value),
+                        fin: portalFechaPortalAISO(document.getElementById(`portal-vacaciones-fin-${i}`).value)
+                    });
+                }
+                periodosVacacionesAprobados = [];
+                for (let i = 1; i <= 4; i++) {
+                    periodosVacacionesAprobados.push({
+                        inicio: portalFechaPortalAISO(document.getElementById(`portal-vacaciones-aprobada-inicio-${i}`).value),
+                        fin: portalFechaPortalAISO(document.getElementById(`portal-vacaciones-aprobada-fin-${i}`).value)
+                    });
+                }
+            }
+            let campoDesc = document.getElementById('portal-form-desc');
+            portalLimitarDescripcion(campoDesc);
+            let desc     = campoDesc.value.trim();
+            if (esCambio) {
+                let observaciones = document.getElementById('portal-form-observaciones');
+                portalLimitarObservaciones(observaciones);
+                desc = observaciones.value.trim();
+            }
 
             let cambio = null;
             if (esCambio) {
@@ -16750,12 +17009,12 @@
                     return;
                 }
                 if (!cambio.rH1) {
-                    alert('Por favor, indica el inicio del horario del remitente.');
+                    alert('Por favor, indica el primer tramo horario del remitente.');
                     document.getElementById('portal-cambio-rh1').focus();
                     return;
                 }
                 if (!cambio.rH2) {
-                    alert('Por favor, indica el fin del horario del remitente.');
+                    alert('Por favor, indica el segundo tramo horario del remitente.');
                     document.getElementById('portal-cambio-rh2').focus();
                     return;
                 }
@@ -16765,32 +17024,44 @@
                     return;
                 }
                 if (!cambio.cH1) {
-                    alert('Por favor, indica el inicio del horario del compañero.');
+                    alert('Por favor, indica el primer tramo horario del compañero.');
                     document.getElementById('portal-cambio-ch1').focus();
                     return;
                 }
                 if (!cambio.cH2) {
-                    alert('Por favor, indica el fin del horario del compañero.');
+                    alert('Por favor, indica el segundo tramo horario del compañero.');
                     document.getElementById('portal-cambio-ch2').focus();
                     return;
                 }
-                if (!portalHoraValida(cambio.rH1)) {
-                    alert('El horario del remitente debe tener formato HH:MM en 24 horas (ej. 10:30).');
+                let camposFechaCambio = [
+                    document.getElementById('portal-cambio-rfecha'),
+                    document.getElementById('portal-cambio-cfecha')
+                ];
+                for (let campo of camposFechaCambio) {
+                    if (!portalValidarFechaPortal(campo)) {
+                        campo.focus();
+                        return;
+                    }
+                }
+                cambio.rFecha = portalFechaPortalAISO(cambio.rFecha);
+                cambio.cFecha = portalFechaPortalAISO(cambio.cFecha);
+                if (!portalTramoValido(cambio.rH1)) {
+                    alert('El primer tramo del remitente debe tener formato HH:MM-HH:MM en 24 horas (ej. 06:00-10:00).');
                     document.getElementById('portal-cambio-rh1').focus();
                     return;
                 }
-                if (cambio.rH2 && !portalHoraValida(cambio.rH2)) {
-                    alert('El segundo horario del remitente debe tener formato HH:MM en 24 horas (ej. 14:00).');
+                if (!portalTramoValido(cambio.rH2)) {
+                    alert('El segundo tramo del remitente debe tener formato HH:MM-HH:MM en 24 horas (ej. 10:00-14:00).');
                     document.getElementById('portal-cambio-rh2').focus();
                     return;
                 }
-                if (!portalHoraValida(cambio.cH1)) {
-                    alert('El horario del compañero debe tener formato HH:MM en 24 horas (ej. 10:30).');
+                if (!portalTramoValido(cambio.cH1)) {
+                    alert('El primer tramo del compañero debe tener formato HH:MM-HH:MM en 24 horas (ej. 14:00-18:00).');
                     document.getElementById('portal-cambio-ch1').focus();
                     return;
                 }
-                if (cambio.cH2 && !portalHoraValida(cambio.cH2)) {
-                    alert('El segundo horario del compañero debe tener formato HH:MM en 24 horas (ej. 14:00).');
+                if (!portalTramoValido(cambio.cH2)) {
+                    alert('El segundo tramo del compañero debe tener formato HH:MM-HH:MM en 24 horas (ej. 18:00-22:00).');
                     document.getElementById('portal-cambio-ch2').focus();
                     return;
                 }
@@ -16800,9 +17071,20 @@
                 hhasta  = cambio.rH2 || '';
             } else {
                 if (!finicio) {
-                    alert('Por favor, indica la Fecha de Inicio.');
+                    alert(esAlta ? 'Por favor, indica la Fecha de alta.' : 'Por favor, indica la Fecha de Inicio.');
                     document.getElementById('portal-form-finicio').focus();
                     return;
+                }
+                if (esVacaciones) {
+                    for (let i = 1; i < periodosVacaciones.length; i++) {
+                        let periodo = periodosVacaciones[i];
+                        if ((periodo.inicio && !periodo.fin) || (!periodo.inicio && periodo.fin)) {
+                            alert(`Completa la fecha de inicio y la fecha de fin del periodo ${i + 1}.`);
+                            let idCampo = `portal-vacaciones-${periodo.inicio ? 'fin' : 'inicio'}-${i + 1}`;
+                            document.getElementById(idCampo).focus();
+                            return;
+                        }
+                    }
                 }
                 if (hdesde && !portalHoraValida(hdesde)) {
                     alert('La Hora Desde debe tener formato HH:MM en 24 horas (ej. 08:00).');
@@ -16830,10 +17112,13 @@
                 destinatarioId: destinatarioId || null,
                 estado: estadoInicial,
                 fechaInicio: finicio,
-                fechaFin: ffin || finicio,
+                fechaFin: esAlta ? '' : (esAvisoMedico ? ffin : (ffin || finicio)),
                 horaDesde: hdesde,
                 horaHasta: hhasta,
                 cambioTurno: cambio,
+                periodosVacaciones,
+                periodosVacacionesAprobados,
+                observacionesCoordinacion: '',
                 descripcion: desc,
                 fechaSolicitud: new Date().toISOString().split('T')[0],
                 comentarioCompanero: null
@@ -16844,9 +17129,18 @@
             // Limpiar formulario
             document.getElementById('portal-form-finicio').value = '';
             document.getElementById('portal-form-ffin').value = '';
+            for (let i = 2; i <= 4; i++) {
+                document.getElementById(`portal-vacaciones-inicio-${i}`).value = '';
+                document.getElementById(`portal-vacaciones-fin-${i}`).value = '';
+            }
+            portalEmpleado_camposFechasAprobadasVacaciones().forEach(campo => { campo.value = ''; });
             document.getElementById('portal-form-hdesde').value = '';
             document.getElementById('portal-form-hhasta').value = '';
             document.getElementById('portal-form-desc').value = '';
+            portalLimitarDescripcion(document.getElementById('portal-form-desc'));
+            let observaciones = document.getElementById('portal-form-observaciones');
+            observaciones.value = '';
+            portalLimitarObservaciones(observaciones);
             ['portal-cambio-rfecha','portal-cambio-rh1','portal-cambio-rh2','portal-cambio-cfecha','portal-cambio-ch1','portal-cambio-ch2'].forEach(idCampo => {
                 let el = document.getElementById(idCampo);
                 if (el) el.value = '';
@@ -16877,6 +17171,57 @@
             }
         }
 
+        function portalEmpleado_htmlPeriodosVacaciones(sol) {
+            let puedeEditar = typeof sesionActual !== 'undefined' && sesionActual &&
+                (sesionActual.role === 'admin' || sesionActual.role === 'gestor') && sol.estado === 'espera';
+            let filas = '';
+            for (let i = 0; i < 4; i++) {
+                let solicitado = sol.periodosVacaciones[i] || { inicio: '', fin: '' };
+                let aprobado = (sol.periodosVacacionesAprobados && sol.periodosVacacionesAprobados[i]) || { inicio: '', fin: '' };
+                if (puedeEditar && !aprobado.inicio && !aprobado.fin) aprobado = solicitado;
+                let inicioAprobado = portalEmpleado_formatFecha(aprobado.inicio);
+                let finAprobado = portalEmpleado_formatFecha(aprobado.fin);
+                if (inicioAprobado === '—') inicioAprobado = '';
+                if (finAprobado === '—') finAprobado = '';
+                let soloLectura = puedeEditar ? '' : 'readonly';
+                filas += `
+                    <tr>
+                        <td style="padding:8px; border:1px solid #334155; text-align:center;">${i + 1}</td>
+                        <td style="padding:8px; border:1px solid #334155; text-align:center;">${portalEmpleado_formatFecha(solicitado.inicio)}</td>
+                        <td style="padding:8px; border:1px solid #334155; text-align:center;">${portalEmpleado_formatFecha(solicitado.fin)}</td>
+                        <td style="padding:5px; border:1px solid #334155;"><input id="portal-detalle-vac-inicio-${i}" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" value="${inicioAprobado}" ${soloLectura} oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)"></td>
+                        <td style="padding:5px; border:1px solid #334155;"><input id="portal-detalle-vac-fin-${i}" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa" class="portal-form-input" value="${finAprobado}" ${soloLectura} oninput="portalFormatearFechaPortal(this)" onblur="portalValidarFechaPortal(this)"></td>
+                    </tr>`;
+            }
+            return `
+                <div style="overflow-x:auto; margin-top:8px;">
+                    <table style="width:100%; min-width:650px; border-collapse:collapse; font-size:12px;">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="padding:8px; border:1px solid #334155;">Periodo</th>
+                                <th colspan="2" style="padding:8px; border:1px solid #334155; color:#7dd3fc;">Fechas solicitadas</th>
+                                <th colspan="2" style="padding:8px; border:1px solid #334155; color:#86efac;">Fechas aprobadas</th>
+                            </tr>
+                            <tr>
+                                <th style="padding:6px; border:1px solid #334155;">Inicio</th><th style="padding:6px; border:1px solid #334155;">Fin</th>
+                                <th style="padding:6px; border:1px solid #334155;">Inicio</th><th style="padding:6px; border:1px solid #334155;">Fin</th>
+                            </tr>
+                        </thead>
+                        <tbody>${filas}</tbody>
+                    </table>
+                </div>`;
+        }
+
+        function portalEmpleado_htmlObservacionesCoordinacion(sol) {
+            let puedeEditar = typeof sesionActual !== 'undefined' && sesionActual &&
+                (sesionActual.role === 'admin' || sesionActual.role === 'gestor') && sol.estado === 'espera';
+            return `
+                <div class="portal-detalle-row" style="flex-direction:column; align-items:stretch;">
+                    <label class="portal-detalle-label" for="portal-detalle-observaciones-coordinacion" style="margin-bottom:6px;">Observaciones de Coordinación</label>
+                    <textarea id="portal-detalle-observaciones-coordinacion" class="portal-form-textarea" placeholder="Añade observaciones a la resolución…" ${puedeEditar ? '' : 'readonly'}>${sol.observacionesCoordinacion || ''}</textarea>
+                </div>`;
+        }
+
         // ---- VER DETALLE Y ACCIONES ----
         function portalEmpleado_verDetalle(id) {
             let sol = portalEmpleado_solicitudes.find(s => s.id === id);
@@ -16899,6 +17244,7 @@
                     <span class="portal-detalle-label">Estado</span>
                     <span class="portal-detalle-val">${portalEmpleado_badgeHtml(sol.estado)}</span>
                 </div>
+                ${sol.concepto === 'Vacaciones' ? portalEmpleado_htmlObservacionesCoordinacion(sol) : ''}
                 <div class="portal-detalle-row">
                     <span class="portal-detalle-label">Solicitante</span>
                     <span class="portal-detalle-val" style="font-weight:700;color:#7dd3fc;">${nombreSol}</span>
@@ -16922,21 +17268,23 @@
                     <div style="font-size:13px; color:#e2e8f0; line-height:2.2;">
                         <span style="font-weight:800; color:#fcd34d;">${nombreSol}</span>
                         con turno el día <strong>${portalEmpleado_formatFecha(sol.cambioTurno.rFecha)}</strong>
-                        y con horario <strong>${sol.cambioTurno.rH1 || '--:--'}${sol.cambioTurno.rH2 ? ' - ' + sol.cambioTurno.rH2 : ''}</strong>;
+                        y con horario <strong>${sol.cambioTurno.rH1 || '--:--'}${sol.cambioTurno.rH2 ? ' y ' + sol.cambioTurno.rH2 : ''}</strong>;
                         SOLICITA CAMBIAR SUS TURNOS CON
                         <span style="font-weight:800; color:#fcd34d;">${nombreDest}</span>
                         con turno el día <strong>${portalEmpleado_formatFecha(sol.cambioTurno.cFecha)}</strong>
-                        con horario <strong>${sol.cambioTurno.cH1 || '--:--'}${sol.cambioTurno.cH2 ? ' - ' + sol.cambioTurno.cH2 : ''}</strong>
+                        con horario <strong>${sol.cambioTurno.cH1 || '--:--'}${sol.cambioTurno.cH2 ? ' y ' + sol.cambioTurno.cH2 : ''}</strong>
                     </div>
                 </div>` : `
+                ${sol.concepto === 'Vacaciones' && Array.isArray(sol.periodosVacaciones) ? portalEmpleado_htmlPeriodosVacaciones(sol) : `
                 <div class="portal-detalle-row">
-                    <span class="portal-detalle-label">Fecha Inicio</span>
+                    <span class="portal-detalle-label">${sol.concepto === 'Alta médica' ? 'Fecha de alta' : 'Fecha Inicio'}</span>
                     <span class="portal-detalle-val">${portalEmpleado_formatFecha(sol.fechaInicio)}</span>
                 </div>
+                ${sol.concepto !== 'Alta médica' ? `
                 <div class="portal-detalle-row">
-                    <span class="portal-detalle-label">Fecha Fin</span>
+                    <span class="portal-detalle-label">${sol.concepto === 'Baja médica' || sol.concepto === 'Enfermedad sin baja' ? 'Fecha fin si se conoce' : 'Fecha Fin'}</span>
                     <span class="portal-detalle-val">${portalEmpleado_formatFecha(sol.fechaFin)}</span>
-                </div>
+                </div>` : ''}`}
                 ${sol.horaDesde || sol.horaHasta ? `
                 <div class="portal-detalle-row">
                     <span class="portal-detalle-label">Horas</span>
@@ -16948,7 +17296,7 @@
                 </div>
                 ${sol.descripcion ? `
                 <div class="portal-detalle-row" style="flex-direction:column;">
-                    <span class="portal-detalle-label" style="margin-bottom:6px;">Descripción / Motivo</span>
+                    <span class="portal-detalle-label" style="margin-bottom:6px;">${sol.concepto === 'Cambio de turno' || sol.concepto === 'Vacaciones' ? 'Observaciones' : 'Descripción / Motivo'}</span>
                     <div class="portal-detalle-desc">${sol.descripcion}</div>
                 </div>` : ''}
                 ${sol.comentarioCompanero ? `
@@ -16979,8 +17327,14 @@
                 <div style="margin-top:20px; padding:12px; background:rgba(30,58,138,0.25); border:1px solid #2563eb; border-radius:8px;">
                     <div style="font-weight:700; color:#93c5fd; margin-bottom:8px; font-size:13px;">⚙️ Resolución de Coordinación / RRHH:</div>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        ${sol.concepto === 'Cambio de turno' && sol.cambioTurno ? `
+                        <button style="padding:8px 16px; background:#15803d; color:#fff; border:none; border-radius:6px; font-weight:700; cursor:pointer;" onclick="portalEmpleado_aceptarCambio(${sol.id})">✅ Aceptar cambio</button>
+                        ` : sol.concepto === 'Vacaciones' ? `
+                        <button style="padding:8px 16px; background:#15803d; color:#fff; border:none; border-radius:6px; font-weight:700; cursor:pointer;" onclick="portalEmpleado_resolverVacaciones(${sol.id}, true)">✅ Aprobar vacaciones</button>
+                        ` : `
                         <button style="padding:8px 16px; background:#15803d; color:#fff; border:none; border-radius:6px; font-weight:700; cursor:pointer;" onclick="portalEmpleado_resolverAdmin(${sol.id}, true)">✅ Aprobar definitivamente</button>
-                        <button style="padding:8px 16px; background:#b91c1c; color:#fff; border:none; border-radius:6px; font-weight:700; cursor:pointer;" onclick="portalEmpleado_resolverAdmin(${sol.id}, false)">❌ Denegar</button>
+                        `}
+                        <button style="padding:8px 16px; background:#b91c1c; color:#fff; border:none; border-radius:6px; font-weight:700; cursor:pointer;" onclick="${sol.concepto === 'Vacaciones' ? 'portalEmpleado_resolverVacaciones' : 'portalEmpleado_resolverAdmin'}(${sol.id}, false)">❌ Denegar</button>
                     </div>
                 </div>
                 `;
@@ -17034,6 +17388,122 @@
                 return;
             }
             portalEmpleado_responderCompanero(id, true, true);
+        }
+
+        function portalEmpleado_aceptarCambio(id) {
+            if (typeof sesionActual === 'undefined' || !sesionActual ||
+                (sesionActual.role !== 'admin' && sesionActual.role !== 'gestor')) return;
+
+            let sol = portalEmpleado_solicitudes.find(s => s.id === id);
+            if (!sol || sol.estado !== 'espera' || sol.concepto !== 'Cambio de turno' || !sol.cambioTurno) return;
+
+            let remitente = listaTrabajadores.find(t => String(t.id) === String(sol.solicitanteId));
+            let companero = listaTrabajadores.find(t => String(t.id) === String(sol.destinatarioId));
+            if (!remitente || !companero) {
+                alert('No se ha podido aplicar el cambio porque no se encontró a uno de los trabajadores.');
+                return;
+            }
+
+            const filas = [
+                { campo: 'est', row: 0 },
+                { campo: 'tramo1', row: 1 },
+                { campo: 'tramo2', row: 2 }
+            ];
+            swapRange1 = {
+                empId: remitente.id,
+                celdas: filas.map(fila => ({ ...fila, empId: remitente.id, fecha: sol.cambioTurno.rFecha })),
+                count: filas.length
+            };
+            swapRange2 = {
+                empId: companero.id,
+                celdas: filas.map(fila => ({ ...fila, empId: companero.id, fecha: sol.cambioTurno.cFecha })),
+                count: filas.length
+            };
+
+            ejecutarIntercambio();
+            sol.estado = 'aprobada';
+            portalEmpleado_actualizarNotificaciones();
+            portalEmpleado_verDetalle(id);
+        }
+
+        function portalEmpleado_aplicarVacacionesAprobadas(sol) {
+            let trabajador = listaTrabajadores.find(t => String(t.id) === String(sol.solicitanteId));
+            if (!trabajador) {
+                alert('No se ha encontrado al trabajador para aplicar las vacaciones.');
+                return 0;
+            }
+
+            let diasMarcados = 0;
+            if (typeof saveHistoryState === 'function') saveHistoryState();
+            sol.periodosVacacionesAprobados.forEach(periodo => {
+                if (!periodo.inicio || !periodo.fin) return;
+                let fecha = new Date(periodo.inicio + 'T00:00:00');
+                let fechaFin = new Date(periodo.fin + 'T00:00:00');
+                while (fecha <= fechaFin) {
+                    let dateKey = formataFechaKey(fecha);
+                    baseDatosTurnos[`${trabajador.id}_est_${dateKey}`] = 'V';
+                    diasMarcados++;
+                    fecha.setDate(fecha.getDate() + 1);
+                }
+            });
+
+            if (typeof inicializarCuadrante === 'function') inicializarCuadrante();
+            if (typeof inicializarPlanificar === 'function') inicializarPlanificar();
+            if (typeof inicializarVacaciones === 'function') inicializarVacaciones();
+            if (typeof autoSaveToSupabase === 'function') autoSaveToSupabase();
+            return diasMarcados;
+        }
+
+        function portalEmpleado_resolverVacaciones(id, aprobar) {
+            if (typeof sesionActual === 'undefined' || !sesionActual ||
+                (sesionActual.role !== 'admin' && sesionActual.role !== 'gestor')) return;
+
+            let sol = portalEmpleado_solicitudes.find(s => s.id === id);
+            if (!sol || sol.estado !== 'espera' || sol.concepto !== 'Vacaciones') return;
+            let observaciones = document.getElementById('portal-detalle-observaciones-coordinacion');
+            sol.observacionesCoordinacion = observaciones ? observaciones.value.trim() : '';
+
+            if (!aprobar) {
+                sol.estado = 'denegada';
+                portalEmpleado_actualizarNotificaciones();
+                portalEmpleado_verDetalle(id);
+                alert('❌ Solicitud de vacaciones denegada.');
+                return;
+            }
+
+            let periodosAprobados = [];
+            for (let i = 0; i < 4; i++) {
+                let campoInicio = document.getElementById(`portal-detalle-vac-inicio-${i}`);
+                let campoFin = document.getElementById(`portal-detalle-vac-fin-${i}`);
+                if (!portalValidarFechaPortal(campoInicio) || !portalValidarFechaPortal(campoFin)) return;
+                let inicioTexto = campoInicio.value;
+                let finTexto = campoFin.value;
+                if ((inicioTexto && !finTexto) || (!inicioTexto && finTexto)) {
+                    alert(`Completa la fecha de inicio y la fecha de fin aprobadas del periodo ${i + 1}.`);
+                    (inicioTexto ? campoFin : campoInicio).focus();
+                    return;
+                }
+                let inicio = portalFechaPortalAISO(inicioTexto);
+                let fin = portalFechaPortalAISO(finTexto);
+                if (inicio && fin && inicio > fin) {
+                    alert(`La fecha de fin aprobada del periodo ${i + 1} no puede ser anterior a la fecha de inicio.`);
+                    campoFin.focus();
+                    return;
+                }
+                periodosAprobados.push({ inicio, fin });
+            }
+            if (!periodosAprobados.some(periodo => periodo.inicio && periodo.fin)) {
+                alert('Indica al menos un periodo de vacaciones aprobado.');
+                return;
+            }
+
+            sol.periodosVacacionesAprobados = periodosAprobados;
+            let diasMarcados = portalEmpleado_aplicarVacacionesAprobadas(sol);
+            if (diasMarcados === 0) return;
+            sol.estado = 'aprobada';
+            portalEmpleado_actualizarNotificaciones();
+            portalEmpleado_verDetalle(id);
+            alert(`✔ Vacaciones aprobadas. Se han marcado ${diasMarcados} días con V.`);
         }
 
         function portalEmpleado_resolverAdmin(id, aprobar) {

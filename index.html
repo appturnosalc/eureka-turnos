@@ -4234,9 +4234,6 @@
                             <option value="Cambio de turno">Cambio de turno</option>
                             <option value="Vacaciones">Vacaciones</option>
                             <option value="Cita médica">Cita médica</option>
-                            <option value="Asunto personal">Asunto personal</option>
-                            <option value="Formación">Formación</option>
-                            <option value="Otros">Otros</option>
                         </select>
                     </div>
                     <div>
@@ -4387,7 +4384,7 @@
                             placeholder="Explica el motivo de tu solicitud…"
                             oninput="portalLimitarDescripcion(this)"></textarea>
                         <div id="portal-descripcion-contador" style="display:none; margin-top:4px; text-align:right; font-size:11px; color:#94a3b8;">0 / 30 palabras</div>
-                        <div id="portal-nota-medica" style="display:none; margin-top:12px; padding:12px 14px; border:1px solid #facc15; border-radius:8px; background:rgba(250,204,21,0.16); color:#fde047; font-size:12px; font-weight:600; line-height:1.5;"></div>
+                        <div id="portal-nota-medica" style="display:none; margin-top:12px; padding:12px 14px; border:1px solid #facc15; border-radius:8px; background:rgba(250,204,21,0.16); color:#fde047; font-size:12px; font-weight:600; line-height:1.5; white-space:pre-line;"></div>
                     </div>
                 </div>
                 <div class="portal-form-actions">
@@ -16897,7 +16894,7 @@
             let conceptoActual = select.value;
             let conceptos = tipo === 'Aviso'
                 ? ['Baja médica', 'Alta médica', 'Enfermedad sin baja']
-                : ['Cambio de turno', 'Vacaciones', 'Cita médica', 'Asunto personal', 'Formación', 'Otros'];
+                : ['Cambio de turno', 'Vacaciones', 'Cita médica'];
             select.innerHTML = conceptos.map(concepto => `<option value="${concepto}">${concepto}</option>`).join('');
             select.value = conceptos.includes(conceptoActual) ? conceptoActual : conceptos[0];
             portalEmpleado_toggleDestinatario();
@@ -16943,14 +16940,25 @@
             portalEmpleado_actualizarPermisosVacaciones();
             let campoDesde = document.getElementById('portal-campo-hdesde');
             let campoHasta = document.getElementById('portal-campo-hhasta');
-            if (campoDesde) campoDesde.style.display = esAvisoMedico || esVacaciones ? 'none' : 'block';
-            if (campoHasta) campoHasta.style.display = esAvisoMedico || esVacaciones ? 'none' : 'block';
+            if (campoDesde) {
+                campoDesde.style.display = esAvisoMedico || esVacaciones ? 'none' : 'block';
+                campoDesde.style.gridColumn = esCita ? '1' : '';
+                campoDesde.style.gridRow = esCita ? '2' : '';
+            }
+            if (campoHasta) {
+                campoHasta.style.display = esAvisoMedico || esVacaciones ? 'none' : 'block';
+                campoHasta.style.gridColumn = esCita ? '2' : '';
+                campoHasta.style.gridRow = esCita ? '2' : '';
+            }
             let notaMedica = document.getElementById('portal-nota-medica');
             if (notaMedica) {
                 if (esAlta) {
                     notaMedica.textContent = 'No hace falta entregar el parte de alta porque se tramita telemáticamente, pero sí estás obligado a avisar a la empresa tan pronto como recibes el alta medica.';
                 } else if (esEnfermedad) {
-                    notaMedica.textContent = 'Si no vas a acudir a un turno asignado, debes notificarlo tanto en el portal del empleado como llamando al Jefe de Turno.';
+                    notaMedica.textContent = 'Importante: Cómo justificar tu ausencia
+• Notificación y envío: Comunícalo tanto en este portal como llamando al Jefe de Turno, y envía el justificante médico por email a RRHH el mismo día.
+• Datos obligatorios: El documento debe indicar tu nombre, fecha y tipo de situación (consulta puntual o reposo de 24/48/72 h).
+• Privacidad: Por protección de datos, asegúrate de que el justificante no incluya tu diagnóstico ni otra información médica personal.';
                 } else {
                     notaMedica.textContent = 'No hace falta entregar el parte de baja porque se tramita telemáticamente, pero si no vas a acudir a un turno asignado, debes notificarlo tanto en el portal del empleado como llamando al Jefe de Turno.';
                 }

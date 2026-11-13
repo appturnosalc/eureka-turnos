@@ -3526,6 +3526,34 @@
             text-shadow: 0 0 12px rgba(34, 211, 238, 0.45);
         }
 
+        .fecha-con-calendario {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            vertical-align: middle;
+        }
+        .fecha-con-calendario > input {
+            padding-right: 32px !important;
+        }
+        .btn-selector-calendario {
+            position: absolute;
+            top: 50%;
+            right: 4px;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            padding: 0;
+            border: none;
+            border-radius: 5px;
+            background: transparent;
+            color: #22d3ee;
+            cursor: pointer;
+            font-size: 15px;
+            line-height: 26px;
+        }
+        .btn-selector-calendario:hover { background: rgba(34, 211, 238, 0.12); }
+        .btn-selector-calendario:disabled { opacity: 0.35; cursor: not-allowed; }
+
         /* =============================================
            PORTAL DEL EMPLEADO - ESTILOS
            ============================================= */
@@ -16823,6 +16851,7 @@
                 campo.style.opacity = puedeAprobar ? '1' : '0.65';
                 campo.style.cursor = puedeAprobar ? 'text' : 'not-allowed';
             });
+            if (typeof habilitarSelectoresCalendario === 'function') habilitarSelectoresCalendario();
         }
 
         function portalFechaPortalAISO(fecha) {
@@ -16881,6 +16910,7 @@
             let esAlta = (concepto === 'Alta médica');
             let esEnfermedad = (concepto === 'Enfermedad sin baja');
             let esVacaciones = (concepto === 'Vacaciones');
+            let esCita = (concepto === 'Cita médica');
             let esAvisoMedico = portalEmpleado_esAvisoMedico(concepto);
 
             let destContainer = document.getElementById('portal-form-destinatario-container');
@@ -16899,11 +16929,11 @@
             if (contDesc) contDesc.style.display = esCambio ? 'none' : 'block';
 
             let labelInicio = document.getElementById('portal-label-finicio');
-            if (labelInicio) labelInicio.textContent = esAlta ? 'Fecha de alta' : (esVacaciones ? 'Fecha Inicio 1' : 'Fecha Inicio');
+            if (labelInicio) labelInicio.textContent = esAlta ? 'Fecha de alta' : (esVacaciones ? 'Fecha Inicio 1' : (esCita ? 'Fecha' : 'Fecha Inicio'));
             let labelFin = document.getElementById('portal-label-ffin');
             if (labelFin) labelFin.textContent = esVacaciones ? 'Fecha Fin 1' : (esBaja || esEnfermedad ? 'Fecha fin si se conoce' : 'Fecha Fin');
             let campoFin = document.getElementById('portal-campo-ffin');
-            if (campoFin) campoFin.style.display = esAlta ? 'none' : 'block';
+            if (campoFin) campoFin.style.display = esAlta || esCita ? 'none' : 'block';
             document.querySelectorAll('.portal-vacaciones-periodo, .portal-vacaciones-aprobada').forEach(campo => {
                 campo.style.display = esVacaciones ? 'block' : 'none';
             });
@@ -16927,9 +16957,9 @@
                 notaMedica.style.display = esAvisoMedico ? 'block' : 'none';
             }
             let labelDesc = document.getElementById('portal-label-desc');
-            if (labelDesc) labelDesc.textContent = esVacaciones ? 'Observaciones' : 'Descripción / Motivo';
+            if (labelDesc) labelDesc.textContent = esVacaciones || esCita ? 'Observaciones' : 'Descripción / Motivo';
             let campoDesc = document.getElementById('portal-form-desc');
-            if (campoDesc) campoDesc.placeholder = esVacaciones ? 'Añade observaciones sobre las vacaciones…' : 'Explica el motivo de tu solicitud…';
+            if (campoDesc) campoDesc.placeholder = esVacaciones ? 'Añade observaciones sobre las vacaciones…' : (esCita ? 'Añade observaciones sobre la cita…' : 'Explica el motivo de tu solicitud…');
             portalLimitarDescripcion(campoDesc);
 
             portalEmpleado_actualizarFraseCambio();
@@ -16942,6 +16972,7 @@
             let esCambio = (concepto === 'Cambio de turno');
             let esAlta = (concepto === 'Alta médica');
             let esVacaciones = (concepto === 'Vacaciones');
+            let esCita = (concepto === 'Cita médica');
             let esAvisoMedico = portalEmpleado_esAvisoMedico(concepto);
             let destinatarioId = document.getElementById('portal-form-destinatario') ? document.getElementById('portal-form-destinatario').value : '';
             let finicio  = document.getElementById('portal-form-finicio').value;
@@ -17071,7 +17102,7 @@
                 hhasta  = cambio.rH2 || '';
             } else {
                 if (!finicio) {
-                    alert(esAlta ? 'Por favor, indica la Fecha de alta.' : 'Por favor, indica la Fecha de Inicio.');
+                    alert(esAlta ? 'Por favor, indica la Fecha de alta.' : (esCita ? 'Por favor, indica la Fecha.' : 'Por favor, indica la Fecha de Inicio.'));
                     document.getElementById('portal-form-finicio').focus();
                     return;
                 }
@@ -17112,7 +17143,7 @@
                 destinatarioId: destinatarioId || null,
                 estado: estadoInicial,
                 fechaInicio: finicio,
-                fechaFin: esAlta ? '' : (esAvisoMedico ? ffin : (ffin || finicio)),
+                fechaFin: esAlta || esCita ? '' : (esAvisoMedico ? ffin : (ffin || finicio)),
                 horaDesde: hdesde,
                 horaHasta: hhasta,
                 cambioTurno: cambio,
@@ -17277,10 +17308,10 @@
                 </div>` : `
                 ${sol.concepto === 'Vacaciones' && Array.isArray(sol.periodosVacaciones) ? portalEmpleado_htmlPeriodosVacaciones(sol) : `
                 <div class="portal-detalle-row">
-                    <span class="portal-detalle-label">${sol.concepto === 'Alta médica' ? 'Fecha de alta' : 'Fecha Inicio'}</span>
+                    <span class="portal-detalle-label">${sol.concepto === 'Alta médica' ? 'Fecha de alta' : (sol.concepto === 'Cita médica' ? 'Fecha' : 'Fecha Inicio')}</span>
                     <span class="portal-detalle-val">${portalEmpleado_formatFecha(sol.fechaInicio)}</span>
                 </div>
-                ${sol.concepto !== 'Alta médica' ? `
+                ${sol.concepto !== 'Alta médica' && sol.concepto !== 'Cita médica' ? `
                 <div class="portal-detalle-row">
                     <span class="portal-detalle-label">${sol.concepto === 'Baja médica' || sol.concepto === 'Enfermedad sin baja' ? 'Fecha fin si se conoce' : 'Fecha Fin'}</span>
                     <span class="portal-detalle-val">${portalEmpleado_formatFecha(sol.fechaFin)}</span>
@@ -17296,7 +17327,7 @@
                 </div>
                 ${sol.descripcion ? `
                 <div class="portal-detalle-row" style="flex-direction:column;">
-                    <span class="portal-detalle-label" style="margin-bottom:6px;">${sol.concepto === 'Cambio de turno' || sol.concepto === 'Vacaciones' ? 'Observaciones' : 'Descripción / Motivo'}</span>
+                    <span class="portal-detalle-label" style="margin-bottom:6px;">${['Cambio de turno', 'Vacaciones', 'Cita médica'].includes(sol.concepto) ? 'Observaciones' : 'Descripción / Motivo'}</span>
                     <div class="portal-detalle-desc">${sol.descripcion}</div>
                 </div>` : ''}
                 ${sol.comentarioCompanero ? `
@@ -17781,6 +17812,97 @@
         });
     </script>
 
+    <script>
+        let selectorCalendarioInput = null;
+        let selectorCalendarioDestino = null;
+        let observadorSelectoresCalendario = null;
+
+        function fechaTextoAISOSelector(fecha) {
+            if (!/^\d{2}\/\d{2}\/\d{4}$/.test(fecha || '')) return '';
+            let [dia, mes, anio] = fecha.split('/');
+            return `${anio}-${mes}-${dia}`;
+        }
+
+        function fechaISOATextoSelector(fecha) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha || '')) return '';
+            let [anio, mes, dia] = fecha.split('-');
+            return `${dia}/${mes}/${anio}`;
+        }
+
+        function abrirSelectorCalendario(input) {
+            if (!input || input.readOnly || input.disabled) return;
+            if (!selectorCalendarioInput) {
+                selectorCalendarioInput = document.createElement('input');
+                selectorCalendarioInput.type = 'date';
+                selectorCalendarioInput.setAttribute('aria-hidden', 'true');
+                selectorCalendarioInput.style.cssText = 'position:fixed;left:8px;bottom:8px;width:2px;height:2px;opacity:0;pointer-events:none;';
+                document.body.appendChild(selectorCalendarioInput);
+                selectorCalendarioInput.addEventListener('change', () => {
+                    if (!selectorCalendarioDestino || !selectorCalendarioInput.value) return;
+                    selectorCalendarioDestino.value = fechaISOATextoSelector(selectorCalendarioInput.value);
+                    selectorCalendarioDestino.dispatchEvent(new Event('input', { bubbles: true }));
+                    selectorCalendarioDestino.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            }
+            selectorCalendarioDestino = input;
+            selectorCalendarioInput.value = fechaTextoAISOSelector(input.value);
+            try {
+                if (typeof selectorCalendarioInput.showPicker === 'function') selectorCalendarioInput.showPicker();
+                else selectorCalendarioInput.click();
+            } catch (e) {
+                selectorCalendarioInput.click();
+            }
+        }
+
+        function instalarSelectorCalendario(input) {
+            let boton = input.parentElement ? input.parentElement.querySelector('.btn-selector-calendario') : null;
+            if (input.dataset.selectorCalendario === 'true') {
+                if (boton) boton.disabled = input.readOnly || input.disabled;
+                return;
+            }
+            let wrapper = document.createElement('span');
+            wrapper.className = 'fecha-con-calendario';
+            if (input.classList.contains('portal-form-input') && !input.classList.contains('portal-cambio-inline')) wrapper.style.width = '100%';
+            if (input.classList.contains('act-fecha-i') || input.classList.contains('act-fecha-f')) wrapper.style.width = '82px';
+            input.parentNode.insertBefore(wrapper, input);
+            wrapper.appendChild(input);
+            input.dataset.selectorCalendario = 'true';
+            boton = document.createElement('button');
+            boton.type = 'button';
+            boton.className = 'btn-selector-calendario';
+            boton.title = 'Seleccionar fecha en el calendario';
+            boton.setAttribute('aria-label', 'Seleccionar fecha en el calendario');
+            boton.textContent = '📅';
+            boton.disabled = input.readOnly || input.disabled;
+            boton.addEventListener('click', () => abrirSelectorCalendario(input));
+            wrapper.appendChild(boton);
+        }
+
+        function habilitarSelectoresCalendario(root = document) {
+            const selector = 'input[type="text"][placeholder="dd/mm/aaaa"], input[type="text"][placeholder="DD/MM/YYYY"]';
+            if (root.matches && root.matches(selector)) instalarSelectorCalendario(root);
+            if (root.querySelectorAll) root.querySelectorAll(selector).forEach(instalarSelectorCalendario);
+        }
+
+        function iniciarSelectoresCalendario() {
+            habilitarSelectoresCalendario();
+            if (observadorSelectoresCalendario) return;
+            observadorSelectoresCalendario = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === 1) habilitarSelectoresCalendario(node);
+                    });
+                });
+            });
+            observadorSelectoresCalendario.observe(document.body, { childList: true, subtree: true });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', iniciarSelectoresCalendario);
+        } else {
+            iniciarSelectoresCalendario();
+        }
+    </script>
 
 </body>
 
